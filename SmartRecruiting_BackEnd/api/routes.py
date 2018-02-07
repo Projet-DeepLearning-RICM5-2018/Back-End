@@ -8,10 +8,10 @@ from flask.json import jsonify
 from flask import render_template
 from SmartRecruiting_BackEnd import app
 
-from SmartRecruiting_BackEnd.data import Formation, DatabaseManager
+from SmartRecruiting_BackEnd.data import Program, DatabaseManager
 
 dbManager = DatabaseManager()
 
-@app.route('/formations')
-def getFormations():
-    return jsonify(dbManager.getAllFormations()), 200
+@app.route('/programs')
+def getPrograms():
+    return jsonify(dbManager.getAllPrograms()), 200

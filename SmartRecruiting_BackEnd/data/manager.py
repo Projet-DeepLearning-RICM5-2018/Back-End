@@ -5,7 +5,7 @@ Created on Sun Feb 26 16:23:02 2017
 @author: Julian
 """
 
-from SmartRecruiting_BackEnd.data.models import Formation
+from SmartRecruiting_BackEnd.data.models import Program
 from SmartRecruiting_BackEnd.data.database import initDb, dbSession as db
 from sqlalchemy.orm import join
 
@@ -18,6 +18,6 @@ class DatabaseManager():
         """
         initDb()
         
-    def getAllFormations(self):
-        formations = Formation.query.all()
-        return [f.serialize() for f in formations]
+    def getAllPrograms(self):
+        programs = Program.query.all()
+        return [p.serialize() for p in programs]
