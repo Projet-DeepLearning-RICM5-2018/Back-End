@@ -20,5 +20,4 @@ class DatabaseManager():
         
     def getAllFormations(self):
         formations = Formation.query.all()
-        f = formations[0]
         return [f.serialize() for f in formations]
