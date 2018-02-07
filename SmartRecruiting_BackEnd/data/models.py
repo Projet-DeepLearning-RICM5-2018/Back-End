@@ -44,14 +44,6 @@ class Program(Base):
     description = Column(Text, unique=False, nullable=True)
     descriptor = Column(Text, unique=False, nullable=False)
     site = Column(String(100), unique=False, nullable=True)
-    def serialize(self):
-        return {
-            'id': self.id,
-            'label': self.label.decode("utf-8"),
-            'description': self.description.decode("utf-8"),
-            'descriptor': self.descriptor.decode("utf-8"),
-            'site': self.site.decode("utf-8")
-        }
 
 class Contact(Base):
     __tablename__ = 'contact'
