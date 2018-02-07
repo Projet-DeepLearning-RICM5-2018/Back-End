@@ -21,6 +21,7 @@ class User(Base):
     email = Column(String(100), unique=False, nullable=False)
     password = Column(String(100), unique=False, nullable=False)
     admin = Column(Boolean, unique=False, nullable=False)
+    offers = relationship("Offer")
 
 class Offer(Base):
     __tablename__ = 'offer'
@@ -29,6 +30,7 @@ class Offer(Base):
     description = Column(Text, unique=False, nullable=False)
     descriptor = Column(Text, unique=False, nullable=False)
     idUser = Column(Integer, ForeignKey('user.id'), unique=False, nullable=False)
+    predictions = relationship("Prediction")
 
 class Prediction(Base):
     __tablename__ = 'prediction'
@@ -44,6 +46,7 @@ class Program(Base):
     description = Column(Text, unique=False, nullable=True)
     descriptor = Column(Text, unique=False, nullable=False)
     site = Column(String(100), unique=False, nullable=True)
+    contacts = relationship("Contact")
 
 class Contact(Base):
     __tablename__ = 'contact'

@@ -21,3 +21,7 @@ class DatabaseManager():
     def getAllPrograms(self):
         programs = Program.query.all()
         return [p.serialize() for p in programs]
+
+    def getProgramContacts(self, idProgram):
+        program = Program.query.filter_by(id=idProgram).first()
+        return [c.serialize() for c in program.contacts]
