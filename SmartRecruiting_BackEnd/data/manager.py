@@ -24,7 +24,10 @@ class DatabaseManager():
 
     def getUserById(self, id):
         user = User.query.get(id)
-        return user.serialize()
+        if user is None:
+            return None
+        else:
+            return user.serialize()
         
     def getAllOffers(self):
         offers = Offer.query.all()
@@ -32,7 +35,10 @@ class DatabaseManager():
 
     def getOfferById(self, id):
         offer = Offer.query.get(id)
-        return offer.serialize()
+        if offer is None:
+            return None
+        else:
+            return offer.serialize()
         
     def getAllPredictions(self):
         predictions = Prediction.query.all()
@@ -40,7 +46,10 @@ class DatabaseManager():
 
     def getPredictionById(self, id):
         prediction = Prediction.query.get(id)
-        return prediction.serialize()
+        if prediction is None:
+            return None
+        else:
+            return prediction.serialize()
         
     def getAllTeams(self):
         teams = Team.query.all()
@@ -56,7 +65,10 @@ class DatabaseManager():
 
     def getProgramById(self, id):
         program = Program.query.get(id)
-        return program.serialize()
+        if program is None:
+            return None
+        else:
+            return program.serialize()
 
     def getAllContacts(self):
         contacts = Contact.query.all()
@@ -64,7 +76,10 @@ class DatabaseManager():
 
     def getContactById(self, id):
         contact = Contact.query.get(id)
-        return contact.serialize()
+        if contact is None:
+            return None
+        else:
+            return contact.serialize()
 
 
     def getProgramContacts(self, idProgram):
