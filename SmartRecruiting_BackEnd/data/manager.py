@@ -5,7 +5,7 @@ Created on Sun Feb 26 16:23:02 2017
 @author: Julian
 """
 
-from SmartRecruiting_BackEnd.data.models import Program
+from SmartRecruiting_BackEnd.data.models import *
 from SmartRecruiting_BackEnd.data.database import initDb, dbSession as db
 from sqlalchemy.orm import join
 
@@ -18,10 +18,55 @@ class DatabaseManager():
         """
         initDb()
         
+    def getAllUsers(self):
+        users = User.query.all()
+        return [u.serialize() for u in users]
+
+    def getUserById(self, id):
+        user = User.query.get(id)
+        return user.serialize()
+        
+    def getAllOffers(self):
+        offers = Offer.query.all()
+        return [o.serialize() for o in offers]
+
+    def getOfferById(self, id):
+        offer = Offer.query.get(id)
+        return offer.serialize()
+        
+    def getAllPredictions(self):
+        predictions = Prediction.query.all()
+        return [p.serialize() for p in predictions]
+
+    def getPredictionById(self, id):
+        prediction = Prediction.query.get(id)
+        return prediction.serialize()
+        
+    def getAllTeams(self):
+        teams = Team.query.all()
+        return [t.serialize() for t in teams]
+
+    def getTeamByPredictionAndProgram(self, idPrediction, idProgram):
+        team = Team.query.filter_by(idPrediction=idPrediction, idProgram=idProgram).first()
+        return team.serialize()
+    
     def getAllPrograms(self):
         programs = Program.query.all()
         return [p.serialize() for p in programs]
 
+    def getProgramById(self, id):
+        program = Program.query.get(id)
+        return program.serialize()
+
+    def getAllContacts(self):
+        contacts = Contact.query.all()
+        return [c.serialize() for c in contacts]
+
+    def getContactById(self, id):
+        contact = Contact.query.get(id)
+        return contact.serialize()
+
+
     def getProgramContacts(self, idProgram):
-        program = Program.query.filter_by(id=idProgram).first()
+        program = Program.query.get(idProgram)
         return [c.serialize() for c in program.contacts]
