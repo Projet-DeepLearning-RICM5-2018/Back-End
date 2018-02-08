@@ -39,6 +39,12 @@ class Prediction(Base):
     learning = Column(Boolean, unique=False, nullable=False)
     idOffer = Column(Integer, ForeignKey('offer.id'), unique=False, nullable=False)
 
+class Team(Base):
+    __tablename__ = 'team'
+    idPrediction = Column(Integer, ForeignKey('prediction.id'), primary_key=True, nullable=False)
+    idProgram = Column(Integer, ForeignKey('program.id'), primary_key=True, nullable=False)
+    nbMembers = Column(Integer, unique=False, nullable=False)
+
 class Program(Base):
     __tablename__ = 'program'
     id = Column(Integer, primary_key=True, nullable=False)
