@@ -38,6 +38,7 @@ class Prediction(Base):
     score = Column(Float, unique=False, nullable=False)
     learning = Column(Boolean, unique=False, nullable=False)
     idOffer = Column(Integer, ForeignKey('offer.id'), unique=False, nullable=False)
+    teams = relationship("Team")
 
 class Team(Base):
     __tablename__ = 'team'
@@ -52,6 +53,7 @@ class Program(Base):
     description = Column(Text, unique=False, nullable=True)
     descriptor = Column(Text, unique=False, nullable=False)
     site = Column(String(100), unique=False, nullable=True)
+    teams = relationship("Team")
     contacts = relationship("Contact")
 
 class Contact(Base):
