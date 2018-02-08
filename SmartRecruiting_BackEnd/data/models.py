@@ -30,7 +30,7 @@ class Offer(Base):
     description = Column(Text, unique=False, nullable=False)
     descriptor = Column(Text, unique=False, nullable=False)
     idUser = Column(Integer, ForeignKey('user.id'), unique=False, nullable=False)
-    predictions = relationship("Prediction")
+    prediction = relationship("Prediction", uselist=False)
 
 class Prediction(Base):
     __tablename__ = 'prediction'
