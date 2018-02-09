@@ -22,7 +22,7 @@ def getUser(id):
     if user is None:
         abort(404)
     else:
-        return jsonify(user)
+        return jsonify(user), 200
 
 @app.route('/offers')
 def getOffers():
@@ -34,7 +34,7 @@ def getOffer(id):
     if offer is None:
         abort(404)
     else:
-        return jsonify(offer)
+        return jsonify(offer), 200
 
 @app.route('/predictions')
 def getPredictions():
@@ -46,7 +46,7 @@ def getPrediction(id):
     if prediction is None:
         abort(404)
     else:
-        return jsonify(prediction)
+        return jsonify(prediction), 200
 
 @app.route('/teams')
 def getTeams():
@@ -62,7 +62,7 @@ def getProgram(id):
     if program is None:
         abort(404)
     else:
-        return jsonify(program)
+        return jsonify(program), 200
 
 @app.route('/contacts')
 def getContacts():
@@ -74,4 +74,4 @@ def getContact(id):
     if contact is None:
         abort(404)
     else:
-        return jsonify(contact)
+        return jsonify(contact), 200
