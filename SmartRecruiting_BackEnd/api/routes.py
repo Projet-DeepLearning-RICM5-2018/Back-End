@@ -5,7 +5,7 @@ Routes and views for the flask application.
 from datetime import datetime
 import json
 from flask.json import jsonify
-from flask import render_template, abort
+from flask import render_template, abort, request
 from SmartRecruiting_BackEnd import app
 
 from SmartRecruiting_BackEnd.data import DatabaseManager
@@ -23,6 +23,15 @@ def getUser(id):
         abort(404)
     else:
         return jsonify(user), 200
+
+@app.route('/users', methods=['POST'])
+def addUser():
+    data = request.form
+    job = data.get('job', None)
+    if dbManager.addUser(data['lastName'], data['firstName'], job, data['email'], data['password'], data['admin']):
+        return '', 201
+    else:
+        abort(400)
 
 @app.route('/offers')
 def getOffers():
