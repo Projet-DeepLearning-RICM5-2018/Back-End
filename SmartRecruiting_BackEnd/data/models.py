@@ -23,6 +23,14 @@ class User(Base):
     admin = Column(Boolean, unique=False, nullable=False)
     offers = relationship("Offer")
 
+    def __init__(self, lastName, firstName, job, email, password, admin):
+        self.lastName = lastName
+        self.firstName = firstName
+        self.job = job
+        self.email = email
+        self.password = password
+        self.admin = admin
+
 class Offer(Base):
     __tablename__ = 'offer'
     id = Column(Integer, primary_key=True, nullable=False)

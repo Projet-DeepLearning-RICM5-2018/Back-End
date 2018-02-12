@@ -28,6 +28,49 @@ class DatabaseManager():
             return None
         else:
             return user.serialize()
+
+    def addUser(self, lastName, firstName, job, email, password, admin):
+        user = User(lastName, firstName, job, email, password, admin==1)
+        db.add(user)
+        try:
+            db.commit()
+            return True
+        except Exception as e:
+            db.rollback()
+            return False
+
+    def updateUser(self, id, lastName, firstName, job, email, password, admin):
+        user = User.query.get(id)
+        if user is None:
+            return None
+        else:
+            try:
+                if lastName is not None:
+                    user.lastName = lastName
+                if firstName is not None:
+                    user.firstName = firstName
+                if job is not None:
+                    user.job = job
+                if email is not None:
+                    user.email = email
+                if password is not None:
+                    user.password = password
+                if admin is not None:
+                    user.admin = admin==1
+                db.commit()
+                return True
+            except Exception as e:
+                db.rollback()
+                return False
+
+    def deleteUser(self, id):
+        user = User.query.get(id)
+        if user is None:
+            return None
+        else:
+            db.delete(user)
+            db.commit()
+            return True
         
     def getAllOffers(self):
         offers = Offer.query.all()

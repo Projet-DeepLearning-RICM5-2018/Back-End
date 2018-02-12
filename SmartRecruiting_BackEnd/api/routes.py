@@ -5,7 +5,7 @@ Routes and views for the flask application.
 from datetime import datetime
 import json
 from flask.json import jsonify
-from flask import render_template, abort
+from flask import render_template, abort, request
 from SmartRecruiting_BackEnd import app
 
 from SmartRecruiting_BackEnd.data import DatabaseManager
@@ -22,7 +22,41 @@ def getUser(id):
     if user is None:
         abort(404)
     else:
-        return jsonify(user)
+        return jsonify(user), 200
+
+@app.route('/users', methods=['POST'])
+def addUser():
+    data = request.form
+    job = data.get('job', None)
+    if dbManager.addUser(data['lastName'], data['firstName'], job, data['email'], data['password'], data['admin']):
+        return '', 201
+    else:
+        abort(400)
+
+@app.route('/users/<int:id>', methods=['PUT'])
+def updateUser(id):
+    data = request.form
+    lastName = data.get('lastName', None)
+    firstName = data.get('firstName', None)
+    job = data.get('job', None)
+    email = data.get('email', None)
+    password = data.get('password', None)
+    admin = data.get('admin', None)
+    response = dbManager.updateUser(id, lastName, firstName, job, email, password, admin)
+    if response is None:
+        abort(404)
+    else:
+        if response:
+            return '', 200
+        else:
+            abort(400)
+
+@app.route('/users/<int:id>', methods=['DELETE'])
+def deleteUser(id):
+    if dbManager.deleteUser(id) is None:
+        abort(404)
+    else:
+        return '', 200
 
 @app.route('/offers')
 def getOffers():
@@ -34,7 +68,7 @@ def getOffer(id):
     if offer is None:
         abort(404)
     else:
-        return jsonify(offer)
+        return jsonify(offer), 200
 
 @app.route('/predictions')
 def getPredictions():
@@ -46,7 +80,7 @@ def getPrediction(id):
     if prediction is None:
         abort(404)
     else:
-        return jsonify(prediction)
+        return jsonify(prediction), 200
 
 @app.route('/teams')
 def getTeams():
@@ -62,7 +96,7 @@ def getProgram(id):
     if program is None:
         abort(404)
     else:
-        return jsonify(program)
+        return jsonify(program), 200
 
 @app.route('/contacts')
 def getContacts():
@@ -74,4 +108,4 @@ def getContact(id):
     if contact is None:
         abort(404)
     else:
-        return jsonify(contact)
+        return jsonify(contact), 200
