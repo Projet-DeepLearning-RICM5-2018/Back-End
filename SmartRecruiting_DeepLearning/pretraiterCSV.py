@@ -13,12 +13,7 @@ if not sys.stderr.encoding: # pas d'encoding sur le flux d'erreur
   sys.stderr = codecs.getwriter(ENCODING)(sys.stderr) # écrire du latin-9
 
 filename = 'Données_RICM_GEO_PRI7.csv'
-f = open(filename,'r')
-data = pd.read_csv(f)
-record_num = int(data.describe().ix[0,0])
-print(record_num)#876
-f.close()
-#print(len(string.punctuation))#32
+
 def pretraiter(text):
     # split into words by white space
     words = text.split()
@@ -26,8 +21,6 @@ def pretraiter(text):
     #table = maketrans(None, string.punctuation)
     stripped = [w.lower().translate(None, string.punctuation) for w in words]
     return stripped
-
-    #cleaned = ' '.join(cleaned)
 
 fileHandle = open ( 'offres.txt', 'w' ) 
 with open(filename) as f:
@@ -39,12 +32,3 @@ with open(filename) as f:
         fileHandle.write(' '.join(cleaned[:250]))
         fileHandle.write ('\n')
 fileHandle.close()
-'''
-path = 'protestdata_1.csv'#r
-
-for i in range(record_num):
-    record = data.ix[i,:]
-    comment = record['comment']
-    cleaned = pretraiter(comment)
-    print(comment)
-'''
