@@ -51,6 +51,13 @@ def updateUser(id):
         else:
             abort(400)
 
+@app.route('/users/<int:id>', methods=['DELETE'])
+def deleteUser(id):
+    if dbManager.deleteUser(id) is None:
+        abort(404)
+    else:
+        return '', 200
+
 @app.route('/offers')
 def getOffers():
     return jsonify(dbManager.getAllOffers()), 200

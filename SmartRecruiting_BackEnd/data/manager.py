@@ -62,6 +62,15 @@ class DatabaseManager():
             except Exception as e:
                 db.rollback()
                 return False
+
+    def deleteUser(self, id):
+        user = User.query.get(id)
+        if user is None:
+            return None
+        else:
+            db.delete(user)
+            db.commit()
+            return True
         
     def getAllOffers(self):
         offers = Offer.query.all()
