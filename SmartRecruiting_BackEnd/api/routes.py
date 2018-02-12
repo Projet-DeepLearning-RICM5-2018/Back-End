@@ -33,6 +33,24 @@ def addUser():
     else:
         abort(400)
 
+@app.route('/users/<int:id>', methods=['PUT'])
+def updateUser(id):
+    data = request.form
+    lastName = data.get('lastName', None)
+    firstName = data.get('firstName', None)
+    job = data.get('job', None)
+    email = data.get('email', None)
+    password = data.get('password', None)
+    admin = data.get('admin', None)
+    response = dbManager.updateUser(id, lastName, firstName, job, email, password, admin)
+    if response is None:
+        abort(404)
+    else:
+        if response:
+            return '', 200
+        else:
+            abort(400)
+
 @app.route('/offers')
 def getOffers():
     return jsonify(dbManager.getAllOffers()), 200
