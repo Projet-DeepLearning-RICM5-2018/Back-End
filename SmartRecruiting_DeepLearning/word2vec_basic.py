@@ -42,7 +42,7 @@ import tensorflow as tf
 # Step 1: get the data.
 
 dataFile = open("belling_the_cat.txt", "r")
-vocabulary=tf.compat.as_str(dataFile.read()).split()
+vocabulary=[word for line in open(dataFile, 'r') for word in line.split()]
 dataFile.close() 
 print('Data size', len(vocabulary))
 
