@@ -32,6 +32,7 @@ dbSession = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=
 Base = declarative_base()
 Base.query = dbSession.query_property()
 
+
 def serialize(self):
     serialized = {}
     for k in self.__table__.columns.keys():
@@ -41,9 +42,12 @@ def serialize(self):
         else:
             serialized[k] = value
     return serialized
+
+
 Base.serialize = serialize
 
-def initDb():
+
+def init_db():
     # import all modules here that might define models so that
     # they will be registered properly on the metadata.  Otherwise
     # you will have to import them first before calling init_db()
