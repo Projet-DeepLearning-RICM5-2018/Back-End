@@ -23,13 +23,14 @@ class User(Base):
     admin = Column(Boolean, unique=False, nullable=False)
     offers = relationship("Offer")
 
-    def __init__(self, lastName, firstName, job, email, password, admin):
-        self.lastName = lastName
-        self.firstName = firstName
+    def __init__(self, last_name, first_name, job, email, password, admin):
+        self.lastName = last_name
+        self.firstName = first_name
         self.job = job
         self.email = email
         self.password = password
         self.admin = admin
+
 
 class Offer(Base):
     __tablename__ = 'offer'
@@ -40,6 +41,7 @@ class Offer(Base):
     idUser = Column(Integer, ForeignKey('user.id'), unique=False, nullable=False)
     prediction = relationship("Prediction", uselist=False)
 
+
 class Prediction(Base):
     __tablename__ = 'prediction'
     id = Column(Integer, primary_key=True, nullable=False)
@@ -48,11 +50,13 @@ class Prediction(Base):
     idOffer = Column(Integer, ForeignKey('offer.id'), unique=False, nullable=False)
     teams = relationship("Team")
 
+
 class Team(Base):
     __tablename__ = 'team'
     idPrediction = Column(Integer, ForeignKey('prediction.id'), primary_key=True, nullable=False)
     idProgram = Column(Integer, ForeignKey('program.id'), primary_key=True, nullable=False)
     nbMembers = Column(Integer, unique=False, nullable=False)
+
 
 class Program(Base):
     __tablename__ = 'program'
@@ -63,6 +67,7 @@ class Program(Base):
     site = Column(String(100), unique=False, nullable=True)
     teams = relationship("Team")
     contacts = relationship("Contact")
+
 
 class Contact(Base):
     __tablename__ = 'contact'
