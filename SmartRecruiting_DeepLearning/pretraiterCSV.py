@@ -19,7 +19,9 @@ if not sys.stderr.encoding: # pas d'encoding sur le flux d'erreur
   sys.stderr = codecs.getwriter(ENCODING)(sys.stderr) # écrire du latin-9
 
 filename = 'Données_RICM_GEO_PRI7.csv'
+stop_list =[word for line in open("stopwords_fr.txt", 'r') for word in line.split()]
 
+# remove characters and stoplist words
 def pretraiter(text):
     # split into words by white space
     words = text.split()
@@ -28,7 +30,9 @@ def pretraiter(text):
     stripped = [w.lower().translate(None, string.punctuation) for w in words]
     s=[st.translate(None,'•') for st in stripped]
     p=[sfin.translate(None,'·       ') for sfin in s]
-    return p
+    stemmed_text_data = [' '.join(filter(None,filter(lambda word: word not in stop_list, p)))]
+    #print stemmed_text_data
+    return stemmed_text_data
 
 fileHandle = open ( 'offres.txt', 'w' ) 
 with open(filename) as f:

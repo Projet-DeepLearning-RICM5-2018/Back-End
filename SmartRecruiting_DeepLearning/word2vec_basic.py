@@ -243,7 +243,7 @@ def plot_with_labels(low_dim_embs, labels, filename):
   for i, label in enumerate(labels):
     x, y = low_dim_embs[i, :]
     plt.scatter(x, y)
-    plt.annotate(label,
+    plt.annotate(label.decode('latin1').encode('utf-8'),
                  xy=(x, y),
                  xytext=(5, 2),
                  textcoords='offset points',
