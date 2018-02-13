@@ -1,5 +1,11 @@
 # encoding: utf-8
 # -*- coding: utf-8 -*-
+"""
+Created on 12th Feb 2018
+
+@author: Qianqian
+"""
+
 import string
 import csv
 import pandas as pd
@@ -20,13 +26,15 @@ def pretraiter(text):
     # remove punctuation from each word
     #table = maketrans(None, string.punctuation)
     stripped = [w.lower().translate(None, string.punctuation) for w in words]
-    return stripped
+    s=[st.translate(None,'•') for st in stripped]
+    p=[sfin.translate(None,'·       ') for sfin in s]
+    return p
 
 fileHandle = open ( 'offres.txt', 'w' ) 
 with open(filename) as f:
     reader = csv.DictReader(f)
     for row in reader:
-        # Reasonforprotest as key
+        # Offre initiale  as key
         max_temp = row['Offre initiale ']
         cleaned = pretraiter(max_temp)
         fileHandle.write(' '.join(cleaned[:250]))
