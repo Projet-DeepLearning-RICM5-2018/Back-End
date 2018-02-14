@@ -1,5 +1,11 @@
 # encoding: utf-8
 # -*- coding: utf-8 -*-
+"""
+Created on 12th Feb 2018
+
+@author: Qianqian
+"""
+
 import string
 import csv
 import pandas as pd
@@ -13,22 +19,34 @@ if not sys.stderr.encoding: # pas d'encoding sur le flux d'erreur
   sys.stderr = codecs.getwriter(ENCODING)(sys.stderr) # écrire du latin-9
 
 filename = 'Données_RICM_GEO_PRI7.csv'
+stop_list =[word for line in open("stopwords_fr.txt", 'r') for word in line.split()]
 
+# remove characters and stoplist words
 def pretraiter(text):
     # split into words by white space
     words = text.split()
     # remove punctuation from each word
     #table = maketrans(None, string.punctuation)
     stripped = [w.lower().translate(None, string.punctuation) for w in words]
-    return stripped
-
+    s=[st.translate(None,'•') for st in stripped]
+    p=[sfin.translate(None,'·       ') for sfin in s]
+    stemmed_text_data = [' '.join(filter(None,filter(lambda word: word not in stop_list, p)))]
+    #print stemmed_text_data
+    return stemmed_text_data
+taille=400
 fileHandle = open ( 'offres.txt', 'w' ) 
 with open(filename) as f:
     reader = csv.DictReader(f)
     for row in reader:
-        # Reasonforprotest as key
+        # Offre initiale  as key
         max_temp = row['Offre initiale ']
         cleaned = pretraiter(max_temp)
-        fileHandle.write(' '.join(cleaned[:250]))
+        print len(cleaned[0].split())
+        if(len(cleaned[0].split())>=taille):
+           fileHandle.write(' '.join(cleaned[:taille]))
+        else :
+           fileHandle.write(' '.join(cleaned))
+           for i in range(taille-len(cleaned[0].split())):
+               fileHandle.write(' x')
         fileHandle.write ('\n')
 fileHandle.close()

@@ -1,5 +1,9 @@
 #!/usr/bin/env python2.7
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 
 # Copyright 2015 The TensorFlow Authors. All Rights Reserved.
 #
@@ -23,10 +27,6 @@ Modified on 7th Feb 2018
 #https://github.com/tensorflow/tensorflow/issues/10866
 """Basic word2vec example."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import collections
 import math
 import os
@@ -39,15 +39,21 @@ from six.moves import urllib
 from six.moves import xrange  # pylint: disable=redefined-builtin
 import tensorflow as tf
 
+# encoding=utf8  
+import sys  
+
+reload(sys)  
+sys.setdefaultencoding('utf8')
+
 # Step 1: get the data.
 
-dataFile = open("belling_the_cat.txt", "r")
-vocabulary=[word for line in open(dataFile, 'r') for word in line.split()]
+dataFile = open("offres.txt", "r")
+vocabulary=[word for line in dataFile for word in line.split() if word is not 'x']
 dataFile.close() 
 print('Data size', len(vocabulary))
 
 # Step 2: Build the dictionary and replace rare words with UNK token.
-vocabulary_size = 100#50000 =>if (150)line 247, in <module>
+vocabulary_size = 500#50000 =>if (150)line 247, in <module>
     #close_word = reverse_dictionary[nearest[k]] KeyError: 121
 
 
@@ -237,7 +243,7 @@ def plot_with_labels(low_dim_embs, labels, filename):
   for i, label in enumerate(labels):
     x, y = low_dim_embs[i, :]
     plt.scatter(x, y)
-    plt.annotate(label,
+    plt.annotate(label.decode('latin1').encode('utf-8'),
                  xy=(x, y),
                  xytext=(5, 2),
                  textcoords='offset points',
