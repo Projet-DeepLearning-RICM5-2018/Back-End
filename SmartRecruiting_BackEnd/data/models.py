@@ -41,6 +41,12 @@ class Offer(Base):
     idUser = Column(Integer, ForeignKey('user.id'), unique=False, nullable=False)
     prediction = relationship("Prediction", uselist=False)
 
+    def __init__(self, title, description, descriptor, id_user):
+        self.title = title
+        self.description = description
+        self.descriptor = descriptor
+        self.idUser = id_user
+
 
 class Prediction(Base):
     __tablename__ = 'prediction'
@@ -50,6 +56,10 @@ class Prediction(Base):
     idOffer = Column(Integer, ForeignKey('offer.id'), unique=False, nullable=False)
     teams = relationship("Team")
 
+    def __init__(self, score, learning, id_offer):
+        self.score = score
+        self.learning = learning
+        self.idOffer = id_offer
 
 class Team(Base):
     __tablename__ = 'team'
@@ -57,6 +67,10 @@ class Team(Base):
     idProgram = Column(Integer, ForeignKey('program.id'), primary_key=True, nullable=False)
     nbMembers = Column(Integer, unique=False, nullable=False)
 
+    def __init__(self, id_prediction, id_program, nb_members):
+        self.idPrediction = id_prediction
+        self.idProgram = id_program
+        self.nbMembers = nb_members
 
 class Program(Base):
     __tablename__ = 'program'
@@ -68,6 +82,11 @@ class Program(Base):
     teams = relationship("Team")
     contacts = relationship("Contact")
 
+    def __init__(self, label, description, descriptor, site):
+        self.label = label
+        self.description = description
+        self.descriptor = descriptor
+        self.site =site
 
 class Contact(Base):
     __tablename__ = 'contact'
@@ -78,3 +97,11 @@ class Contact(Base):
     phone = Column(String(20), unique=False, nullable=True)
     position = Column(String(100), unique=False, nullable=True)
     idProgram = Column(Integer, ForeignKey('program.id'), unique=False, nullable=False)
+
+    def __init__(self, last_name, first_name, email, phone, position, id_program):
+        self.lastName = last_name
+        self.firstName = first_name
+        self.email = email
+        self.phone = phone
+        self.position = position
+        self.idProgram = id_program
