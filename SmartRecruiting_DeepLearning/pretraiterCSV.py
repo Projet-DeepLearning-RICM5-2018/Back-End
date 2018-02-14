@@ -33,7 +33,7 @@ def pretraiter(text):
     stemmed_text_data = [' '.join(filter(None,filter(lambda word: word not in stop_list, p)))]
     #print stemmed_text_data
     return stemmed_text_data
-
+taille=400
 fileHandle = open ( 'offres.txt', 'w' ) 
 with open(filename) as f:
     reader = csv.DictReader(f)
@@ -41,6 +41,12 @@ with open(filename) as f:
         # Offre initiale  as key
         max_temp = row['Offre initiale ']
         cleaned = pretraiter(max_temp)
-        fileHandle.write(' '.join(cleaned[:250]))
+        print len(cleaned[0].split())
+        if(len(cleaned[0].split())>=taille):
+           fileHandle.write(' '.join(cleaned[:taille]))
+        else :
+           fileHandle.write(' '.join(cleaned))
+           for i in range(taille-len(cleaned[0].split())):
+               fileHandle.write(' x')
         fileHandle.write ('\n')
 fileHandle.close()

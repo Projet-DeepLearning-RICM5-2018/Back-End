@@ -48,7 +48,7 @@ sys.setdefaultencoding('utf8')
 # Step 1: get the data.
 
 dataFile = open("offres.txt", "r")
-vocabulary=[word for line in dataFile for word in line.split()]
+vocabulary=[word for line in dataFile for word in line.split() if word is not 'x']
 dataFile.close() 
 print('Data size', len(vocabulary))
 

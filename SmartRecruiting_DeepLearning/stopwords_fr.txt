@@ -81,11 +81,9 @@ chez
 chiche
 chut
 ci
-cinq
 cinquantaine
 cinquante
 cinquantième
-cinquième
 clac
 clic
 combien
@@ -113,8 +111,6 @@ desquelles
 desquels
 dessous
 dessus
-deux
-deuxième
 deuxièmement
 devant
 devers
@@ -127,7 +123,6 @@ dire
 divers
 diverse
 diverses
-dix
 dix-huit
 dixième
 dix-neuf
@@ -246,7 +241,6 @@ mien
 mienne
 miennes
 miens
-mille
 mince
 moi
 moi-même
@@ -257,7 +251,6 @@ n
 na
 ne
 néanmoins
-neuf
 neuvième
 ni
 nombreuses
@@ -333,9 +326,7 @@ quanta
 quant-à-soi
 quarante
 quatorze
-quatre
 quatre-vingt
-quatrième
 quatrièmement
 que
 quel
@@ -375,8 +366,6 @@ sienne
 siennes
 siens
 sinon
-six
-sixième
 soi
 soi-même
 soit
@@ -420,8 +409,6 @@ toutes
 treize
 trente
 très
-trois
-troisième
 troisièmement
 trop
 tsoin
