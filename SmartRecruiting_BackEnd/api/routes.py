@@ -30,8 +30,8 @@ def get_user(id_user):
 @app.route('/users', methods=['POST'])
 def add_user():
     data = request.form
-    job = data.get('job', None)
-    if dbManager.add_user(data['last_name'], data['first_name'], job, data['email'], data['password'], data['admin']):
+    role = data.get('role', None)
+    if dbManager.add_user(data['name'], data['surname'], role, data['email'], data['password'], data['is_admin']):
         return '', 201
     else:
         abort(400)
@@ -40,13 +40,13 @@ def add_user():
 @app.route('/users/<int:id_user>', methods=['PUT'])
 def update_user(id_user):
     data = request.form
-    last_name = data.get('lastName', None)
-    first_name = data.get('firstName', None)
-    job = data.get('job', None)
+    name = data.get('name', None)
+    surname = data.get('surname', None)
+    role = data.get('role', None)
     email = data.get('email', None)
     password = data.get('password', None)
-    admin = data.get('admin', None)
-    response = dbManager.update_user(id_user, last_name, first_name, job, email, password, admin)
+    is_admin = data.get('is_admin', None)
+    response = dbManager.update_user(id_user, name, surname, role, email, password, is_admin)
     if response is None:
         abort(404)
     else:
@@ -81,7 +81,7 @@ def get_offer(id_offer):
 @app.route('/offers', methods=['POST'])
 def add_offer():
     data = request.form
-    if dbManager.add_offer(data['title'], data['description'], data['descriptor'], data['id_user']):
+    if dbManager.add_offer(data['title'], data['content'], data['descriptor'], data['id_user']):
         return '', 201
     else:
         abort(400)
@@ -91,11 +91,11 @@ def add_offer():
 def update_offer(id_offer):
     data = request.form
     title = data.get('title', None)
-    description = data.get('description', None)
+    content = data.get('content', None)
     descriptor = data.get('descriptor', None)
     id_user = data.get('id_user', None)
 
-    response = dbManager.update_offer(id_offer, title, description, descriptor, id_user)
+    response = dbManager.update_offer(id_offer, title, content, descriptor, id_user)
     if response is None:
         abort(404)
     else:
@@ -130,7 +130,7 @@ def get_prediction(id_offer):
 @app.route('/predictions', methods=['POST'])
 def add_prediction():
     data = request.form
-    if dbManager.add_prediction(data['score'], data['learning'], data['id_offer']):
+    if dbManager.add_prediction(data['mark'], data['inbase'], data['id_offer']):
         return '', 201
     else:
         abort(400)
@@ -138,11 +138,12 @@ def add_prediction():
 
 @app.route('/predictions/<int:id_prediction>', methods=['PUT'])
 def update_prediction(id_prediction):
+    "TODO la mise a jour de inbase ne fonctionne pas pour une raison obscure"
     data = request.form
-    score = data.get('score', None)
-    learning = data.get('learning', None)
+    mark = data.get('mark', None)
+    inbase = data.get('inbase', None)
     id_offer = data.get('id_offer', None)
-    response = dbManager.update_prediction(id_prediction, score, learning, id_offer)
+    response = dbManager.update_prediction(id_prediction, mark, inbase, id_offer)
     if response is None:
         abort(404)
     else:
@@ -165,36 +166,37 @@ def get_teams():
     return jsonify(dbManager.get_all_teams()), 200
 
 
-@app.route('/programs')
-def get_programs():
-    return jsonify(dbManager.get_all_programs()), 200
+@app.route('/fields')
+def get_field():
+    return jsonify(dbManager.get_all_fields()), 200
 
 
-@app.route('/programs/<int:id_program>')
-def get_program(id_program):
-    program = dbManager.get_program_by_id(id_program)
-    if program is None:
+@app.route('/fields/<int:id_field>')
+def get_fields(id_field):
+    field = dbManager.get_field_by_id(id_field)
+    if field is None:
         abort(404)
     else:
-        return jsonify(program), 200
+        return jsonify(field), 200
 
 
-@app.route('/programs', methods=['POST'])
-def add_program():
+@app.route('/fields', methods=['POST'])
+def add_field():
     data = request.form
-    if dbManager.add_program(data['label'], data['description'], data['descriptor'], data['site']):
+    if dbManager.add_field(data['name'], data['description'], data['descriptor'], data['website']):
         return '', 201
     else:
         abort(400)
 
 
-@app.route('/programs/<int:id_program>', methods=['PUT'])
-def update_program(id_program):
+@app.route('/fields/<int:id_field>', methods=['PUT'])
+def update_field(id_field):
     data = request.form
-    label = data.get('label', None)
+    name = data.get('name', None)
     description = data.get('description', None)
     descriptor = data.get('descriptor', None)
-    response = dbManager.update_program(id_program, label, description, descriptor)
+    website = data.get('website',None)
+    response = dbManager.update_field(id_field, name, description, descriptor, website)
     if response is None:
         abort(404)
     else:
@@ -204,9 +206,9 @@ def update_program(id_program):
             abort(400)
 
 
-@app.route('/programs/<int:id_program>', methods=['DELETE'])
-def delete_program(id_program):
-    if dbManager.delete_prediction(id_program) is None:
+@app.route('/fields/<int:id_field>', methods=['DELETE'])
+def delete_field(id_field):
+    if dbManager.delete_field(id_field) is None:
         abort(404)
     else:
         return '', 200
@@ -231,8 +233,8 @@ def add_contact():
     data = request.form
     email = data.get('email', None)
     phone = data.get('phone', None)
-    position = data.get('position', None)
-    if dbManager.add_contact(data['last_name'], data['first_name'], email, phone, position, data['id_program']):
+    role = data.get('role', None)
+    if dbManager.add_contact(data['name'], data['surname'], email, phone, role, data['id_field']):
         return '', 201
     else:
         abort(400)
@@ -241,13 +243,13 @@ def add_contact():
 @app.route('/contacts/<int:id_contact>', methods=['PUT'])
 def update_contact(id_contact):
     data = request.form
-    last_name = data.get('last_name', None)
-    first_name = data.get('first_name',None)
+    name = data.get('name', None)
+    surname = data.get('surname',None)
     email = data.get('email', None)
     phone = data.get('phone', None)
-    position = data.get('position', None)
-    id_program = data.get('id_program', None)
-    response = dbManager.update_contact(id_contact, last_name, first_name, email, phone, position, id_program)
+    role = data.get('role', None)
+    id_field = data.get('id_field', None)
+    response = dbManager.update_contact(id_contact, name, surname, email, phone, role, id_field)
     if response is None:
         abort(404)
     else:

@@ -29,8 +29,8 @@ class DatabaseManager():
         else:
             return user.serialize()
 
-    def add_user(self, last_name, first_name, job, email, password, admin):
-        user = User(last_name, first_name, job, email, password, admin ==1)
+    def add_user(self, name, surname, role, email, password, is_admin):
+        user = User(name, surname, role, email, password, is_admin == 1)
         dB.add(user)
         try:
             dB.commit()
@@ -39,24 +39,24 @@ class DatabaseManager():
             dB.rollback()
             return False
 
-    def update_user(self, id_user, last_name, first_name, job, email, password, admin):
+    def update_user(self, id_user, name, surname, role, email, password, is_admin):
         user = User.query.get(id_user)
         if user is None:
             return None
         else:
             try:
-                if last_name is not None:
-                    user.lastName = last_name
-                if first_name is not None:
-                    user.firstName = first_name
-                if job is not None:
-                    user.job = job
+                if name is not None:
+                    user.name = name
+                if surname is not None:
+                    user.surname = surname
+                if role is not None:
+                    user.role = role
                 if email is not None:
                     user.email = email
                 if password is not None:
                     user.password = password
-                if admin is not None:
-                    user.admin = admin == 1
+                if is_admin is not None:
+                    user.is_admin = is_admin == 1
                 dB.commit()
                 return True
             except Exception as e:
@@ -83,8 +83,8 @@ class DatabaseManager():
         else:
             return offer.serialize()
 
-    def add_offer(self, title, description, descriptor, id_user):
-        offer = Offer(title, description, descriptor, id_user)
+    def add_offer(self, title, content, descriptor, id_user):
+        offer = Offer(title, content, descriptor, id_user)
         dB.add(offer)
         try:
             dB.commit()
@@ -93,7 +93,7 @@ class DatabaseManager():
             dB.rollback()
             return False
 
-    def update_offer(self, id_offer, title, description, descriptor, id_user):
+    def update_offer(self, id_offer, title, content, descriptor, id_user):
         offer = Offer.query.get(id_offer)
         if offer is None:
             return None
@@ -101,12 +101,12 @@ class DatabaseManager():
             try:
                 if title is not None:
                     offer.title = title
-                if description is not None:
-                    offer.description = description
+                if content is not None:
+                    offer.content = content
                 if descriptor is not None:
                     offer.descriptor = descriptor
                 if id_user is not None:
-                    offer.idUser = id_user
+                    offer.id_user = id_user
                 dB.commit()
                 return True
             except Exception as e:
@@ -126,15 +126,15 @@ class DatabaseManager():
         predictions = Prediction.query.all()
         return [p.serialize() for p in predictions]
 
-    def get_prediction_by_id(self, id):
-        prediction = Prediction.query.get(id)
+    def get_prediction_by_id(self, id_prediction):
+        prediction = Prediction.query.get(id_prediction)
         if prediction is None:
             return None
         else:
             return prediction.serialize()
 
-    def add_prediction(self, score, learning, id_offer):
-        prediction = Prediction(score, learning == 1, id_offer)
+    def add_prediction(self, mark, inbase, id_offer):
+        prediction = Prediction(mark, inbase == 1, id_offer)
         dB.add(prediction)
         try:
             dB.commit()
@@ -143,16 +143,16 @@ class DatabaseManager():
             dB.rollback()
             return False
 
-    def update_prediction(self,id_prediction, score, learning, id_offer):
+    def update_prediction(self, id_prediction, mark, inbase, id_offer):
         prediction = Prediction.query.get(id_prediction)
         if prediction is None:
             return None
         else:
             try:
-                if score is not None:
-                    prediction.score = score
-                if learning is not None:
-                    prediction.learning = learning
+                if mark is not None:
+                    prediction.mark = mark
+                if inbase is not None:
+                    prediction.inbase = inbase == 1
                 if id_offer is not None:
                     prediction.idOffer = id_offer
                 dB.commit()
@@ -174,24 +174,24 @@ class DatabaseManager():
         teams = Team.query.all()
         return [t.serialize() for t in teams]
 
-    def get_team_by_prediction_and_program(self, id_prediction, id_program):
-        team = Team.query.filter_by(idPrediction=id_prediction, idProgram=id_program).first()
+    def get_team_by_prediction_and_field(self, id_prediction, id_field):
+        team = Team.query.filter_by(id_prediction=id_prediction, id_field=id_field).first()
         return team.serialize()
     
-    def get_all_programs(self):
-        programs = Program.query.all()
-        return [p.serialize() for p in programs]
+    def get_all_fields(self):
+        fields = Field.query.all()
+        return [p.serialize() for p in fields]
 
-    def get_program_by_id(self, id_prog):
-        program = Program.query.get(id_prog)
-        if program is None:
+    def get_field_by_id(self, id_prog):
+        field = Field.query.get(id_prog)
+        if field is None:
             return None
         else:
-            return program.serialize()
+            return field.serialize()
 
-    def add_program(self, label, description, descriptor, site):
-        program = Program(label, description, descriptor, site)
-        dB.add(program)
+    def add_field(self, name, description, descriptor, website):
+        field = Field(name, description, descriptor, website)
+        dB.add(field)
         try:
             dB.commit()
             return True
@@ -199,32 +199,32 @@ class DatabaseManager():
             dB.rollback()
             return False
 
-    def update_program(self,id_program, label, description, descriptor, site):
-        program = Program.query.get(id_program)
-        if program is None:
+    def update_field(self,id_field, name, description, descriptor, website):
+        field = Field.query.get(id_field)
+        if field is None:
             return None
         else:
             try:
-                if label is not None:
-                    program.label = label
+                if name is not None:
+                    field.name = name
                 if description is not None:
-                    program.description = description
+                    field.description = description
                 if descriptor is not None:
-                    program.descriptor = descriptor
-                if site is not None:
-                    program.site = site
+                    field.descriptor = descriptor
+                if website is not None:
+                    field.website = website
                 dB.commit()
                 return True
             except Exception as e:
                 dB.rollback()
                 return False
 
-    def delete_program(self, id_program):
-        program = Program.query.get(id_program)
-        if program is None:
+    def delete_field(self, id_field):
+        field = Field.query.get(id_field)
+        if field is None:
             return None
         else:
-            dB.delete(program)
+            dB.delete(field)
             dB.commit()
             return True
 
@@ -239,8 +239,8 @@ class DatabaseManager():
         else:
             return contact.serialize()
 
-    def add_contact(self, last_name, first_name, email, phone, position, id_program):
-        contact = Contact(last_name, first_name, email, phone, position, id_program)
+    def add_contact(self, name, surname, email, phone, role, id_field):
+        contact = Contact(name, surname, email, phone, role, id_field)
         dB.add(contact)
         try:
             dB.commit()
@@ -249,24 +249,24 @@ class DatabaseManager():
             dB.rollback()
             return False
 
-    def update_contact(self, id_contact, last_name, first_name, email, phone, position, id_program):
+    def update_contact(self, id_contact, name, surname, email, phone, role, id_field):
         contact = Contact.query.get(id_contact)
         if contact is None:
             return None
         else:
             try:
-                if last_name is not None:
-                  contact.lastName = last_name
-                if first_name is not None:
-                    contact.firstName = first_name
+                if name is not None:
+                  contact.name = name
+                if surname is not None:
+                    contact.surname = surname
                 if email is not None:
                     contact.email = email
                 if phone is not None:
                     contact.phone = phone
-                if position is not None:
-                    contact.position = position
-                if id_program is not None:
-                    contact.idProgram = id_program
+                if role is not None:
+                    contact.role = role
+                if id_field is not None:
+                    contact.id_field = id_field
                 dB.commit()
                 return True
             except Exception as e:
@@ -282,6 +282,6 @@ class DatabaseManager():
             dB.commit()
             return True
 
-    def get_program_contacts(self, id_program):
-        program = Program.query.get(id_program)
-        return [c.serialize() for c in program.contacts]
+    def get_field_contacts(self, id_field):
+        field = Field.query.get(id_field)
+        return [c.serialize() for c in field.contacts]
