@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 """
 Created on 12th Feb 2018
-
 @author: Qianqian
+@description: preprocess the file CSV of PStage(Données_RICM_GEO_PRI7.csv), remove French stopwords and Special characters, into the file TXT size of 400(offres.txt)
 """
 
 import string
@@ -21,6 +21,8 @@ if not sys.stderr.encoding: # pas d'encoding sur le flux d'erreur
 filename = 'Données_RICM_GEO_PRI7.csv'
 stop_list =[word for line in open("stopwords_fr.txt", 'r') for word in line.split()]
 
+#Entrée : une offre en format chaine de caractère
+#Sortir : une liste de mot,taille 400
 # remove characters and stoplist words
 def pretraiter(text):
     # split into words by white space
