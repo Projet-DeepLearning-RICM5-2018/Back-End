@@ -15,93 +15,93 @@ from SmartRecruiting_BackEnd.data.database import Base
 class User(Base):
     __tablename__ = 'user'
     id = Column(Integer, primary_key=True, nullable=False)
-    lastName = Column(String(100), unique=False, nullable=False)
-    firstName = Column(String(100), unique=False, nullable=False)
-    job = Column(String(100), unique=False, nullable=True)
+    name = Column(String(100), unique=False, nullable=False)
+    surname = Column(String(100), unique=False, nullable=False)
+    role = Column(String(100), unique=False, nullable=True)
     email = Column(String(100), unique=False, nullable=False)
     password = Column(String(100), unique=False, nullable=False)
-    admin = Column(Boolean, unique=False, nullable=False)
+    is_admin = Column(Boolean, unique=False, nullable=False)
     offers = relationship("Offer")
 
-    def __init__(self, last_name, first_name, job, email, password, admin):
-        self.lastName = last_name
-        self.firstName = first_name
-        self.job = job
+    def __init__(self, name, surname, role, email, password, is_admin):
+        self.name = name
+        self.surname = surname
+        self.role = role
         self.email = email
         self.password = password
-        self.admin = admin
+        self.is_admin = is_admin
 
 
 class Offer(Base):
     __tablename__ = 'offer'
     id = Column(Integer, primary_key=True, nullable=False)
     title = Column(String(100), unique=False, nullable=False)
-    description = Column(Text, unique=False, nullable=False)
+    content = Column(Text, unique=False, nullable=False)
     descriptor = Column(Text, unique=False, nullable=False)
-    idUser = Column(Integer, ForeignKey('user.id'), unique=False, nullable=False)
+    id_user = Column(Integer, ForeignKey('user.id'), unique=False, nullable=False)
     prediction = relationship("Prediction", uselist=False)
 
-    def __init__(self, title, description, descriptor, id_user):
+    def __init__(self, title, content, descriptor, id_user):
         self.title = title
-        self.description = description
+        self.content = content
         self.descriptor = descriptor
-        self.idUser = id_user
+        self.id_user = id_user
 
 
 class Prediction(Base):
     __tablename__ = 'prediction'
     id = Column(Integer, primary_key=True, nullable=False)
-    score = Column(Float, unique=False, nullable=False)
-    learning = Column(Boolean, unique=False, nullable=False)
-    idOffer = Column(Integer, ForeignKey('offer.id'), unique=False, nullable=False)
+    mark = Column(Float, unique=False, nullable=False)
+    inbase = Column(Boolean, unique=False, nullable=False)
+    id_offer = Column(Integer, ForeignKey('offer.id'), unique=False, nullable=False)
     teams = relationship("Team")
 
-    def __init__(self, score, learning, id_offer):
-        self.score = score
-        self.learning = learning
-        self.idOffer = id_offer
+    def __init__(self, mark, inbase, id_offer):
+        self.mark = mark
+        self.inbase = inbase
+        self.id_offer = id_offer
 
 class Team(Base):
     __tablename__ = 'team'
-    idPrediction = Column(Integer, ForeignKey('prediction.id'), primary_key=True, nullable=False)
-    idProgram = Column(Integer, ForeignKey('program.id'), primary_key=True, nullable=False)
-    nbMembers = Column(Integer, unique=False, nullable=False)
+    id_prediction = Column(Integer, ForeignKey('prediction.id'), primary_key=True, nullable=False)
+    id_field = Column(Integer, ForeignKey('field.id'), primary_key=True, nullable=False)
+    nb_members = Column(Integer, unique=False, nullable=False)
 
-    def __init__(self, id_prediction, id_program, nb_members):
-        self.idPrediction = id_prediction
-        self.idProgram = id_program
-        self.nbMembers = nb_members
+    def __init__(self, id_prediction, id_field, nb_members):
+        self.id_prediction = id_prediction
+        self.id_field = id_field
+        self.nb_members = nb_members
 
-class Program(Base):
-    __tablename__ = 'program'
+class Field (Base):
+    __tablename__ = 'field'
     id = Column(Integer, primary_key=True, nullable=False)
-    label = Column(String(100), unique=True, nullable=False)
+    name = Column(String(100), unique=True, nullable=False)
     description = Column(Text, unique=False, nullable=True)
     descriptor = Column(Text, unique=False, nullable=False)
-    site = Column(String(100), unique=False, nullable=True)
+    website = Column(String(100), unique=False, nullable=True)
     teams = relationship("Team")
     contacts = relationship("Contact")
 
-    def __init__(self, label, description, descriptor, site):
-        self.label = label
+    def __init__(self, name, description, descriptor, website):
+        self.name = name
         self.description = description
         self.descriptor = descriptor
-        self.site =site
+        self.website = website
 
 class Contact(Base):
     __tablename__ = 'contact'
     id = Column(Integer, primary_key=True, nullable=False)
-    lastName = Column(String(100), unique=False, nullable=False)
-    firstName = Column(String(100), unique=False, nullable=False)
+    name = Column(String(100), unique=False, nullable=False)
+    surname = Column(String(100), unique=False, nullable=False)
     email = Column(String(100), unique=False, nullable=True)
     phone = Column(String(20), unique=False, nullable=True)
-    position = Column(String(100), unique=False, nullable=True)
-    idProgram = Column(Integer, ForeignKey('program.id'), unique=False, nullable=False)
+    role = Column(String(100), unique=False, nullable=True)
+    id_field = Column(Integer, ForeignKey('field.id'), unique=False, nullable=False)
 
-    def __init__(self, last_name, first_name, email, phone, position, id_program):
-        self.lastName = last_name
-        self.firstName = first_name
+    def __init__(self, name, surname, email, phone, role, id_field):
+        self.name = name
+        self.surname = surname
         self.email = email
         self.phone = phone
-        self.position = position
-        self.idProgram = id_program
+        self.role = role
+        self.id_field = id_field
