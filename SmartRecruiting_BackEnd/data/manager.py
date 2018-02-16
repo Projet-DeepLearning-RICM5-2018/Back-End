@@ -82,6 +82,45 @@ class DatabaseManager():
             return None
         else:
             return offer.serialize()
+
+    def add_offer(self, title, description, descriptor, id_user):
+        offer = Offer(title, description, descriptor, id_user)
+        dB.add(offer)
+        try:
+            dB.commit()
+            return True
+        except Exception as e:
+            dB.rollback()
+            return False
+
+    def update_offer(self, id_offer, title, description, descriptor, id_user):
+        offer = Offer.query.get(id_offer)
+        if offer is None:
+            return None
+        else:
+            try:
+                if title is not None:
+                    offer.title = title
+                if description is not None:
+                    offer.description = description
+                if descriptor is not None:
+                    offer.descriptor = descriptor
+                if id_user is not None:
+                    offer.idUser = id_user
+                dB.commit()
+                return True
+            except Exception as e:
+                dB.rollback()
+                return False
+
+    def delete_offer(self, id_offer):
+        offer = Offer.query.get(id_offer)
+        if offer is None:
+            return None
+        else:
+            dB.delete(offer)
+            dB.commit()
+            return True
         
     def get_all_predictions(self):
         predictions = Prediction.query.all()
@@ -93,6 +132,43 @@ class DatabaseManager():
             return None
         else:
             return prediction.serialize()
+
+    def add_prediction(self, score, learning, id_offer):
+        prediction = Prediction(score, learning == 1, id_offer)
+        dB.add(prediction)
+        try:
+            dB.commit()
+            return True
+        except Exception as e:
+            dB.rollback()
+            return False
+
+    def update_prediction(self,id_prediction, score, learning, id_offer):
+        prediction = Prediction.query.get(id_prediction)
+        if prediction is None:
+            return None
+        else:
+            try:
+                if score is not None:
+                    prediction.score = score
+                if learning is not None:
+                    prediction.learning = learning
+                if id_offer is not None:
+                    prediction.idOffer = id_offer
+                dB.commit()
+                return True
+            except Exception as e:
+                dB.rollback()
+                return False
+
+    def delete_prediction(self, id_prediction):
+        prediction = Prediction.query.get(id_prediction)
+        if prediction is None:
+            return None
+        else:
+            dB.delete(prediction)
+            dB.commit()
+            return True
         
     def get_all_teams(self):
         teams = Team.query.all()
@@ -113,6 +189,45 @@ class DatabaseManager():
         else:
             return program.serialize()
 
+    def add_program(self, label, description, descriptor, site):
+        program = Program(label, description, descriptor, site)
+        dB.add(program)
+        try:
+            dB.commit()
+            return True
+        except Exception as e:
+            dB.rollback()
+            return False
+
+    def update_program(self,id_program, label, description, descriptor, site):
+        program = Program.query.get(id_program)
+        if program is None:
+            return None
+        else:
+            try:
+                if label is not None:
+                    program.label = label
+                if description is not None:
+                    program.description = description
+                if descriptor is not None:
+                    program.descriptor = descriptor
+                if site is not None:
+                    program.site = site
+                dB.commit()
+                return True
+            except Exception as e:
+                dB.rollback()
+                return False
+
+    def delete_program(self, id_program):
+        program = Program.query.get(id_program)
+        if program is None:
+            return None
+        else:
+            dB.delete(program)
+            dB.commit()
+            return True
+
     def get_all_contacts(self):
         contacts = Contact.query.all()
         return [c.serialize() for c in contacts]
@@ -123,6 +238,49 @@ class DatabaseManager():
             return None
         else:
             return contact.serialize()
+
+    def add_contact(self, last_name, first_name, email, phone, position, id_program):
+        contact = Contact(last_name, first_name, email, phone, position, id_program)
+        dB.add(contact)
+        try:
+            dB.commit()
+            return True
+        except Exception as e:
+            dB.rollback()
+            return False
+
+    def update_contact(self, id_contact, last_name, first_name, email, phone, position, id_program):
+        contact = Contact.query.get(id_contact)
+        if contact is None:
+            return None
+        else:
+            try:
+                if last_name is not None:
+                  contact.lastName = last_name
+                if first_name is not None:
+                    contact.firstName = first_name
+                if email is not None:
+                    contact.email = email
+                if phone is not None:
+                    contact.phone = phone
+                if position is not None:
+                    contact.position = position
+                if id_program is not None:
+                    contact.idProgram = id_program
+                dB.commit()
+                return True
+            except Exception as e:
+                dB.rollback()
+                return False
+
+    def delete_contact(self, id_contact):
+        contact = Contact.query.get(id_contact)
+        if contact is None:
+            return None
+        else:
+            dB.delete(contact)
+            dB.commit()
+            return True
 
     def get_program_contacts(self, id_program):
         program = Program.query.get(id_program)
