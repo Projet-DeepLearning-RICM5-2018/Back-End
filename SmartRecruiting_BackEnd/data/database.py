@@ -26,6 +26,7 @@ DB_OPTIONS = "?charset=utf8&use_unicode=0"
 
 
 engine = create_engine((DB_CONN_FORMAT+DB_OPTIONS).format(**DB_CONFIG_DICT), pool_recycle=60)
+#engine = create_engine("sqlite+pysqlite:///test.db", pool_recycle=60)
 
 dbSession = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
 
