@@ -53,7 +53,7 @@ dataFile.close()
 print('Data size', len(vocabulary))
 
 # Step 2: Build the dictionary and replace rare words with UNK token.
-vocabulary_size = 500#50000 =>if (150)line 247, in <module>
+vocabulary_size = 2000#50000
     #close_word = reverse_dictionary[nearest[k]] KeyError: 121
 
 
@@ -258,7 +258,7 @@ try:
   import matplotlib.pyplot as plt
 
   tsne = TSNE(perplexity=30, n_components=2, init='pca', n_iter=5000, method='exact')
-  plot_only = 50#500 line 254 KeyError: 100
+  plot_only = 100# how many points to plot : wait 2 mins for PLOT 500,you can change to 50
   low_dim_embs = tsne.fit_transform(final_embeddings[:plot_only, :])
   labels = [reverse_dictionary[i] for i in xrange(plot_only)]
   plot_with_labels(low_dim_embs, labels,'tsne.png')
