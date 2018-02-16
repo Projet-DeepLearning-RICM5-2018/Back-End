@@ -20,11 +20,11 @@ from __future__ import print_function
 # limitations under the License.
 # ==============================================================================
 """
-Modified on 7th Feb 2018
-
+basic code from TensorFLow, Modified on 7th Feb 2018
 @author: Qianqian
+@description: using the prepared offre data(offres.txt) to create Word2Vec model and visualize the embeddings(tsne.png)
 """
-#https://github.com/tensorflow/tensorflow/issues/10866
+#to solve word2vec error https://github.com/tensorflow/tensorflow/issues/10866
 """Basic word2vec example."""
 
 import collections
@@ -56,7 +56,7 @@ print('Data size', len(vocabulary))
 vocabulary_size = 2000#50000
     #close_word = reverse_dictionary[nearest[k]] KeyError: 121
 
-
+#Entrée :list of words, size of vocabulary as we want
 def build_dataset(words, n_words):
   """Process raw inputs into a dataset."""
   count = [['UNK', -1]]
@@ -74,7 +74,7 @@ def build_dataset(words, n_words):
   count[0][1] = unk_count
   reversed_dictionary = dict(zip(dictionary.values(), dictionary.keys()))
   return data, count, dictionary, reversed_dictionary
-
+#Sortir :
 # Filling 4 global variables:
 # data - list of codes (integers from 0 to vocabulary_size-1).
 #   This is the original text but words are replaced by their codes
@@ -90,6 +90,12 @@ print('Sample data', data[:10], [reverse_dictionary[i] for i in data[:10]])
 data_index = 0
 
 # Step 3: Function to generate a training batch for the skip-gram model.
+
+#Entrée : 
+#  batch_size=everytime sgd's data size for train
+#  num_skips=how many times the word input is used to create label
+#  skip_window=size of scanning window
+#Sortir :2 lists of index(word input + embeddings)
 def generate_batch(batch_size, num_skips, skip_window):
   global data_index
   assert batch_size % num_skips == 0
@@ -251,6 +257,7 @@ def plot_with_labels(low_dim_embs, labels, filename):
                  va='bottom')
 
   plt.savefig(filename)
+
 
 try:
   # pylint: disable=g-import-not-at-top
