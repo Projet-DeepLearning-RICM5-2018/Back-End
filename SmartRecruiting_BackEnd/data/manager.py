@@ -29,6 +29,14 @@ class DatabaseManager():
         else:
             return user.serialize()
 
+    def get_user_by_email(self, email):
+        return User.query.filter_by(email=email).first()
+        """if user is None:
+            return None
+        else:
+            return user.serialize()"""
+
+
     def add_user(self, name, surname, role, email, password, is_admin):
         user = User(name, surname, role, email, password, is_admin == 1)
         dB.add(user)
@@ -41,6 +49,7 @@ class DatabaseManager():
 
     def update_user(self, id_user, name, surname, role, email, password, is_admin):
         user = User.query.get(id_user)
+
         if user is None:
             return None
         else:
@@ -71,7 +80,7 @@ class DatabaseManager():
             dB.delete(user)
             dB.commit()
             return True
-        
+
     def get_all_offers(self):
         offers = Offer.query.all()
         return [o.serialize() for o in offers]
@@ -121,7 +130,7 @@ class DatabaseManager():
             dB.delete(offer)
             dB.commit()
             return True
-        
+
     def get_all_predictions(self):
         predictions = Prediction.query.all()
         return [p.serialize() for p in predictions]
@@ -169,7 +178,7 @@ class DatabaseManager():
             dB.delete(prediction)
             dB.commit()
             return True
-        
+
     def get_all_teams(self):
         teams = Team.query.all()
         return [t.serialize() for t in teams]
@@ -177,7 +186,7 @@ class DatabaseManager():
     def get_team_by_prediction_and_field(self, id_prediction, id_field):
         team = Team.query.filter_by(id_prediction=id_prediction, id_field=id_field).first()
         return team.serialize()
-    
+
     def get_all_fields(self):
         fields = Field.query.all()
         return [p.serialize() for p in fields]

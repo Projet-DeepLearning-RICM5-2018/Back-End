@@ -18,7 +18,7 @@ class User(Base):
     name = Column(String(100), unique=False, nullable=False)
     surname = Column(String(100), unique=False, nullable=False)
     role = Column(String(100), unique=False, nullable=True)
-    email = Column(String(100), unique=False, nullable=False)
+    email = Column(String(100), unique=True, nullable=False)
     password = Column(String(100), unique=False, nullable=False)
     is_admin = Column(Boolean, unique=False, nullable=False)
     offers = relationship("Offer")
@@ -54,6 +54,7 @@ class Prediction(Base):
     mark = Column(Float, unique=False, nullable=False)
     inbase = Column(Boolean, unique=False, nullable=False)
     id_offer = Column(Integer, ForeignKey('offer.id'), unique=False, nullable=False)
+    lunch_date = Column(Date, unique=False, nullable=False)
     teams = relationship("Team")
 
     def __init__(self, mark, inbase, id_offer):
