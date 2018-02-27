@@ -7,8 +7,8 @@ Routes and views for the flask application.
 from flask.json import jsonify
 from flask import render_template, abort, request
 from SmartRecruiting_BackEnd import app
-
 from SmartRecruiting_BackEnd.data import DatabaseManager
+from datetime import datetime
 
 dbManager = DatabaseManager()
 
@@ -166,6 +166,30 @@ def get_teams():
     return jsonify(dbManager.get_all_teams()), 200
 
 
+@app.route('/teams', methods=['POST'])
+def add_team():
+    data = request.form
+    if dbManager.add_team(data['id_prediction'], data['id_field'], data['nb_members']):
+        return '', 201
+    else:
+        abort(400)
+
+
+@app.route('/teams/<int:id_prediction>', methods=['PUT'])
+def update_teams(id_prediction):
+    data = request.form
+    id_field = data.get('id_field', None)
+    nb_members = data.get('nb_members', None)
+    response = dbManager.update_team(id_prediction, id_field, nb_members)
+    if response is None:
+        abort(404)
+    else:
+        if response:
+            return '', 200
+        else:
+            abort(400)
+
+
 @app.route('/fields')
 def get_field():
     return jsonify(dbManager.get_all_fields()), 200
@@ -195,7 +219,7 @@ def update_field(id_field):
     name = data.get('name', None)
     description = data.get('description', None)
     descriptor = data.get('descriptor', None)
-    website = data.get('website',None)
+    website = data.get('website', None)
     response = dbManager.update_field(id_field, name, description, descriptor, website)
     if response is None:
         abort(404)
@@ -265,3 +289,56 @@ def delete_contact(id_contact):
         abort(404)
     else:
         return '', 200
+
+
+@app.route('/searchOffersByField/<int:id_field>', methods=['GET'])
+def offers_by_field(id_field):
+    offers = dbManager.offers_by_field(id_field)
+    if offers is None:
+        abort(404)
+    else:
+        return jsonify(offers), 200
+
+
+@app.route('/searchFieldsByOffer/<int:id_offer>', methods=['GET'])
+def fields_by_offer(id_offer):
+    fields = dbManager.fields_by_offer(id_offer)
+    if fields is None:
+        abort(404)
+    else:
+        return jsonify(fields), 200
+
+
+@app.route('/searchOffersByUser/<int:id_user>', methods=['GET'])
+def offers_by_user(id_user):
+    offers = dbManager.offers_by_user(id_user)
+    if offers is None:
+        abort(404)
+    else:
+        return jsonify(offers), 200
+
+
+@app.route('/averageMark/', methods=['GET'])
+def average_mark():
+    begin_date = request.args.get('begin_date')
+    begin_date = datetime.strptime(begin_date, "%Y-%m-%d").date()
+    end_date = request.args.get('end_date')
+    end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
+    mark = dbManager.average_mark(begin_date, end_date)
+    if mark is None:
+        abort(404)
+    else:
+        return jsonify(mark), 200
+
+
+@app.route('/nbPrediction/', methods=['GET'])
+def nb_prediction():
+    begin_date = request.args.get('begin_date')
+    begin_date = datetime.strptime(begin_date, "%Y-%m-%d").date()
+    end_date = request.args.get('end_date')
+    end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
+    number = dbManager.nb_prediction(begin_date, end_date)
+    if number is None:
+        abort(404)
+    else:
+        return jsonify(number), 200
