@@ -1,9 +1,6 @@
 """
 Routes and views for the flask application.
-sudo apt-get install python3 python3-pip
-sudo pip3 install flask sqlalchemy flask-sqlalchemy pymysql
-python3 runserver.py
-pip3 install cffi, bcrypt, PyJWT
+
 """
 
 # from datetime import datetime
@@ -11,7 +8,7 @@ pip3 install cffi, bcrypt, PyJWT
 from flask import Flask, jsonify, request, json, session, g
 from flask.json import jsonify
 from flask import render_template, abort, request
-from SmartRecruiting_BackEnd import app
+from SmartRecruiting_BackEnd import app, dbManager
 
 from flask_cors import CORS, cross_origin
 from functools import wraps
@@ -19,10 +16,8 @@ from bcrypt import gensalt, hashpw
 from jwt import encode, decode, DecodeError, ExpiredSignature
 from datetime import datetime, timedelta
 
-from SmartRecruiting_BackEnd.data import DatabaseManager
 from datetime import datetime
 
-dbManager = DatabaseManager()
 
 def createToken(user):
         """
@@ -532,7 +527,7 @@ def signup():
 @app.route('/auth/login', methods=['POST'])
 @cross_origin()
 def login():
-	"""
+    """
     METHOD : POST
     HEADER PARAM  : None
     BODY PARAMS : { "emailUser" : str, "password" : str}
@@ -562,7 +557,7 @@ def login():
 @cross_origin()
 @loginRequired
 def logout():
-	"""
+    """
     METHOD : POST
     HEADER PARAM  : {Authorization : Bearer token}
     BODY PARAMS : None
