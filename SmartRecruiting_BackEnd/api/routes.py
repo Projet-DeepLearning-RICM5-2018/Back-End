@@ -6,8 +6,6 @@ python3 runserver.py
 pip install cffi, bcrypt, PyJWT
 """
 
-
-
 # from datetime import datetime
 # import json
 from flask import Flask, jsonify, request, json, session, g
@@ -28,7 +26,7 @@ dbManager = DatabaseManager()
 
 def createToken(user):
         """
-            Create a token for a user with an expiration of ...
+            Create a token for a user with an expiration of 14 days
         """
         payload = {
             'sub': user.email.decode('utf-8'),
@@ -47,7 +45,7 @@ def parseToken(req):
 
 def loginRequired(f):
     """
-        Decorator for use of token to have an access to a route
+        Decorator for allowing a logged in user to access to the route
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -82,7 +80,7 @@ def loginRequired(f):
 
 def loginAdminRequired(f):
     """
-        Decorator for use of token to have an access to a route
+        Decorator for allowing a logged in administrator to access to the route
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -505,6 +503,16 @@ def nb_prediction():
 @app.route('/auth/signup', methods=['POST'])
 @cross_origin()
 def signup():
+    """
+    METHOD : POST
+    HEADER PARAM  : None
+    BODY PARAMS : { "name" : str, "surname" : str, "role" : str, "email" : str, "password" : str }
+    RETURNS : 
+        {
+            "token": str,
+            "user": { "email": str, "id": int, "is_admin": boolean, "name": str, "password": str, "role": str, "surname": str }
+        }
+    """
     data = json.loads(request.data)
 
     user = dbManager.get_user_by_email(data["email"])
@@ -524,6 +532,16 @@ def signup():
 @app.route('/auth/login', methods=['POST'])
 @cross_origin()
 def login():
+	"""
+    METHOD : POST
+    HEADER PARAM  : None
+    BODY PARAMS : { "emailUser" : str, "password" : str}
+    RETURNS : 
+        {
+            "token": str,
+            "user": { "email": str, "id": int, "is_admin": boolean, "name": str, "password": str, "role": str, "surname": str }
+        }
+    """
     data = json.loads(request.data)
     
     user = dbManager.get_user_by_email(data["emailUser"])
@@ -544,5 +562,11 @@ def login():
 @cross_origin()
 @loginRequired
 def logout():
+	"""
+    METHOD : POST
+    HEADER PARAM  : {Authorization : Bearer token}
+    BODY PARAMS : None
+    RETURNS : { 'result': 'success' }
+    """
     session.pop('logged_in', None)
     return jsonify({'result': 'success'}), 200
