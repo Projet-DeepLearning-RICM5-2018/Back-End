@@ -2,6 +2,23 @@
 The flask application package.
 """
 
+#parse arguments
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument('-t', '--testing', action='store_true') #to use the testing database
+args = parser.parse_args()
+
+#remove arguments to not interfere with unittest
+import sys
+try:
+    sys.argv.remove('-t')
+except:
+    pass
+try:
+    sys.argv.remove('--testing')
+except:
+    pass
+
 from flask import Flask
 from flask_cors import CORS
 from SmartRecruiting_BackEnd.data import DatabaseManager
@@ -14,6 +31,8 @@ app.config['SECRET_KEY'] = 'Secret_Key' #Change this
 app.config['CORS_HEADERS'] = ['Content-Type', 'Authorization']
 app.config['CORS_AUTOMATIC_OPTIONS'] = True
 CORS(app)
+
+app.config['TESTING'] = args.testing
 
 import SmartRecruiting_BackEnd.api.routes
 import SmartRecruiting_BackEnd.data
