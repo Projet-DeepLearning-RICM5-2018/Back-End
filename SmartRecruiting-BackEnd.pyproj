@@ -34,12 +34,16 @@
     <Compile Include="SmartRecruiting_BackEnd\data\manager.py" />
     <Compile Include="SmartRecruiting_BackEnd\data\models.py" />
     <Compile Include="SmartRecruiting_BackEnd\data\__init__.py" />
+    <Compile Include="SmartRecruiting_BackEnd\tests\test_user.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="SmartRecruiting_BackEnd\__init__.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="SmartRecruiting_BackEnd\" />
     <Folder Include="SmartRecruiting_BackEnd\api\" />
     <Folder Include="SmartRecruiting_BackEnd\data\" />
+    <Folder Include="SmartRecruiting_BackEnd\tests\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="requirements.txt" />
