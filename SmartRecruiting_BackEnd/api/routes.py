@@ -3,7 +3,7 @@ Routes and views for the flask application.
 sudo apt-get install python3 python3-pip
 sudo pip3 install flask sqlalchemy flask-sqlalchemy pymysql
 python3 runserver.py
-pip install cffi, bcrypt, PyJWT
+pip3 install cffi, bcrypt, PyJWT
 """
 
 # from datetime import datetime
