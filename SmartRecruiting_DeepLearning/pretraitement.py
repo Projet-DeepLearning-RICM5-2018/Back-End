@@ -18,60 +18,85 @@ stop_list =[word for line in open("stopwords_fr.txt", 'r') for word in line.spli
 
 """
 Function to remove stop words and punctuation from a text
-@param text, the input text
-@return the text without the stop words and punctuation
+@param text : string, the input text
+@return [string] the tokenized text without the stop words and punctuation as a list
 """
-def removeStopWords(text) :
-    # split into words by white space
-    words = text.split()
-    # remove punctuation from each word
-    punct = str.maketrans(dict.fromkeys(string.punctuation + "•" + "’")) # To use translate in Python 3 we need to use the function maketrans
-    no_punct = [w.lower().translate(punct) for w in words]
+def tokenize(text) :
+    words = text.split() # split into words by white space
+    words = [w.lower() for w in words] # put to lowercase
+    words = [''.join(letter for letter in word if letter.isalpha()) for word in words] # remove punctuation
+    words = list(filter(None,filter(lambda word: word not in stop_list, words))) # remove stop words
+    return words
 
-    #p=[sfin.translate(None,'·       ') for sfin in s]
-    no_stop_words = [' '.join(filter(None,filter(lambda word: word not in stop_list, no_punct)))]
-    return no_stop_words
 
 """
-Function to initialize the model
+Function to get the descriptor from a text
+@param text : string, the input text
+@return [[float]] the text's descriptor
+"""
+def preprocess(text) :
+    cleaned = tokenize(text)
+    model = Word2Vec.load("preprocessing_model")
+    words = list(filter(lambda x: x in model.wv.vocab, cleaned))
+    if(len(words) >= max_size) :
+        words = words[:max_size]
+    else :
+        words = words + ['x']*(max_size-len(words))
+    descriptor = [model.wv[w] for w in words]
+    return descriptor
+
+"""
+Function to preprocess all the offer from a csv.
+@param fileName : string, the name of the file containing the data to Process
+@return [(string,[[float]],string)] list of all offers and their descriptors : (text,descriptor,label)
+"""
+def preprocessAll(file_name) :
+    learning_base = []
+    with open(file_name) as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            text = row['Offre initiale '] # Get the text from the initial offer
+            label = row['Formation']
+            learning_base = learning_base + [(text,preprocess(text),label)] # All the text saved for preprocessing after building the model
+    return learning_base
+
+"""
+Function to initialize the model and BDD
+Has to be called before using the model for the first time or if the csv containing the base changed
+@return the preprocessed descriptors
 """
 def init() :
     # Input files #
     filename = 'Données_RICM_GEO_PRI7.csv'
-    fileHandle = open('vocabulary.txt','w')
-    sentences = []
-    learning_base = []
+    sentences = [['x','x','x','x','x']]
+    base_text = []
     with open(filename) as f:
         reader = csv.DictReader(f)
         for row in reader:
-            # Offre initiale  as key
-            max_temp = row['Offre initiale ']
-            cleaned = removeStopWords(max_temp)
-            learning_base = learning_base + [preprocess(max_temp)]
-            sentences = sentences + [cleaned[0].split()]
-            #print(len(cleaned[0].split()))
-            if(len(cleaned[0].split()) >= max_size):
-               fileHandle.write(' '.join(cleaned[:taille]))
-            else :
-               fileHandle.write(' '.join(cleaned))
-    fileHandle.close()
+            text = row['Offre initiale '] # Get the text from the initial offer
+            cleaned = tokenize(text)
+            sentences = sentences + [cleaned] #Sentences used to build the model's vocabulary
+            base_text = base_text + [text] # All the text saved for preprocessing after building the model
     model = Word2Vec(sentences, size=100, window=5, min_count=5, workers=4)
     model.save("preprocessing_model")
-    return learning_base
+
+    # TODO : Put everything in the DB for the first time"
+    return preprocessAll(filename)
 
 """
-Function to rget the descriptor from a text
-@param text, the input text
-@return the text's descriptor
+To reinit the model, and calculate all the descriptors when the DB changed
+So not taking data from the CSV but DB
 """
-def preprocess(text) :
-    cleaned = removeStopWords(text)[0].split()
-    model = Word2Vec.load("preprocessing_model")
-    words = filter(lambda x: x in model.wv.vocab, cleaned)
-    descriptor = [model.wv[w] for w in words]
-    return descriptor
+def reinit() :
+    # TODO : Get all offers from dB"
+    # Rebuild the model #
+    # Recompute all descriptors and put them in the DB #
+    blop = 2
+
 
 # Tests #
 base = init()
-text = open ( 'test.txt', 'r' ).read()
-print(preprocess(text))
+model = Word2Vec.load("preprocessing_model")
+#print(base[:2])
+#text = open ( 'test.txt', 'r' ).read()
+#print((text,preprocess(text)[:10]))
