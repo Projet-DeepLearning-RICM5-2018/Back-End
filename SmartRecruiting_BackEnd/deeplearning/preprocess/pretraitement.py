@@ -5,7 +5,7 @@ Created on 27/02/2018
 @author: alicia
 @description: preprocessing of texts, using the removal of stop words and the Word2Vec to create descriptors
 """
-
+import sys
 import string
 import csv
 from gensim.models import Word2Vec
@@ -14,7 +14,14 @@ from SmartRecruiting_BackEnd import dbManager
 
 # Constants definition #
 max_size = 400 # The maximal size that a text should have.
-stop_list =[word for line in open("stopwords_fr.txt", 'r') for word in line.split()]
+stop_list =[word for line in open("./data/stopwords_fr.txt", 'r') for word in line.split()]
+
+ENCODING="iso-8859-15" # ce programme génère du latin-9 par défaut
+
+if not sys.stdout.encoding: # pas d'encoding sur le flux de sortie standard
+  sys.stdout = codecs.getwriter(ENCODING)(sys.stdout) # écrire du latin-9
+if not sys.stderr.encoding: # pas d'encoding sur le flux d'erreur
+  sys.stderr = codecs.getwriter(ENCODING)(sys.stderr) # écrire du latin-9
 
 # Functions definition #
 
@@ -69,7 +76,7 @@ Has to be called before using the model for the first time or if the csv contain
 """
 def init() :
     # Input files #
-    filename = '../Données_RICM_GEO_PRI7.csv'
+    filename = './data/Données_RICM_GEO_PRI7.csv'
     sentences = [['x','x','x','x','x']]
     base_text = []
     with open(filename) as f:
@@ -97,8 +104,9 @@ def reinit() :
 
 
 # Tests #
-base = init()
-model = Word2Vec.load("preprocessing_model")
-print(base[:2])
+def test() :
+    base = init()
+    model = Word2Vec.load("preprocessing_model")
+    print(base[:2])
 #text = open ( 'test.txt', 'r' ).read()
 #print((text,preprocess(text)[:10]))
