@@ -29,7 +29,6 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Unit Test' ">
     <StartupFile>SmartRecruiting_BackEnd\tests\test_user.py</StartupFile>
-    <CommandLineArguments>-t</CommandLineArguments>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="runserver.py" />
