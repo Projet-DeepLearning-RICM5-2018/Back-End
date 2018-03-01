@@ -22,13 +22,18 @@ num_epochs=200
 
 
 base = pretraitement.init()
-x=base[1]
-y=base[2]
-
-# Randomly shuffle data5
+#base.shape(59,) array([(,,),(),(),()*59])
+x,y=[],[]
+for i in base:#[(text,preprocess(text),label)]
+    x.append(i[2])
+    y.append(i[3])#base[:,2]
+print("try to find")
+print(base[58][0][2])
+# Randomly shuffle data
 np.random.seed(10)
 shuffle_indices = np.random.permutation(np.arange(len(y)))
-x_shuffled = x[shuffle_indices]
+#print(shuffle_indices)
+x_shuffled = np.array(list(x))[shuffle_indices]
 y_shuffled = y[shuffle_indices]
 
 #train/test
