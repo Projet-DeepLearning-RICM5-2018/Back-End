@@ -18,83 +18,60 @@ stop_list =[word for line in open("stopwords_fr.txt", 'r') for word in line.spli
 
 """
 Function to remove stop words and punctuation from a text
-@param text : string, the input text
-@return [string] the tokenized text without the stop words and punctuation as a list
+@param text, the input text
+@return the text without the stop words and punctuation
 """
-def tokenize(text) :
-    words = text.split() # split into words by white space
-    words = [w.lower() for w in words] # put to lowercase
-    # remove punctuation
+def removeStopWords(text) :
+    # split into words by white space
+    words = text.split()
+    # remove punctuation from each word
     punct = str.maketrans(dict.fromkeys(string.punctuation + "•" + "’")) # To use translate in Python 3 we need to use the function maketrans
-    words = [w.translate(punct) for w in words] # translate removes characters
-    words = list(filter(None,filter(lambda word: word not in stop_list, words))) # remove stop words
-    return words
+    no_punct = [w.lower().translate(punct) for w in words]
 
+    #p=[sfin.translate(None,'·       ') for sfin in s]
+    no_stop_words = [' '.join(filter(None,filter(lambda word: word not in stop_list, no_punct)))]
+    return no_stop_words
 
 """
-Function to get the descriptor from a text
-@param text : string, the input text
-@return [[float]] the text's descriptor
+Function to initialize the model
+"""
+def init() :
+    # Input files #
+    filename = 'Données_RICM_GEO_PRI7.csv'
+    fileHandle = open('vocabulary.txt','w')
+    sentences = []
+    learning_base = []
+    with open(filename) as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            # Offre initiale  as key
+            max_temp = row['Offre initiale ']
+            cleaned = removeStopWords(max_temp)
+            learning_base = learning_base + [preprocess(max_temp)]
+            sentences = sentences + [cleaned[0].split()]
+            #print(len(cleaned[0].split()))
+            if(len(cleaned[0].split()) >= max_size):
+               fileHandle.write(' '.join(cleaned[:taille]))
+            else :
+               fileHandle.write(' '.join(cleaned))
+    fileHandle.close()
+    model = Word2Vec(sentences, size=100, window=5, min_count=5, workers=4)
+    model.save("preprocessing_model")
+    return learning_base
+
+"""
+Function to rget the descriptor from a text
+@param text, the input text
+@return the text's descriptor
 """
 def preprocess(text) :
-    cleaned = tokenize(text)
+    cleaned = removeStopWords(text)[0].split()
     model = Word2Vec.load("preprocessing_model")
     words = filter(lambda x: x in model.wv.vocab, cleaned)
     descriptor = [model.wv[w] for w in words]
     return descriptor
 
-"""
-Function to preprocess all the offer from a csv.
-@param fileName : string, the name of the file containing the data to Process
-@return [(string,[[float]],string)] list of all offers and their descriptors : (text,descriptor,label)
-"""
-def preprocessAll(file_name) :
-    learning_base = []
-    with open(file_name) as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            text = row['Offre initiale '] # Get the text from the initial offer
-            label = row['Formation']
-            learning_base = learning_base + [(text,preprocess(text),label)] # All the text saved for preprocessing after building the model
-    return learning_base
-
-"""
-Function to initialize the model and BDD
-Has to be called before using the model for the first time or if the csv containing the base changed
-@return the preprocessed descriptors
-"""
-def init() :
-    # Input files #
-    filename = 'Données_RICM_GEO_PRI7.csv'
-    sentences = []
-    base_text = []
-    with open(filename) as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            text = row['Offre initiale '] # Get the text from the initial offer
-            cleaned = tokenize(text)
-            sentences = sentences + [cleaned] #Sentences used to build the model's vocabulary
-            base_text = base_text + [text] # All the text saved for preprocessing after building the model
-
-    model = Word2Vec(sentences, size=100, window=5, min_count=5, workers=4)
-    model.save("preprocessing_model")
-
-    # TODO : Put everything in the DB for the first time"
-    return preprocessAll(filename)
-
-"""
-To reinit the model, and calculate all the descriptors when the DB changed
-So not taking data from the CSV but DB
-"""
-def reinit() :
-    # TODO : Get all offers from dB"
-    # Rebuild the model #
-    # Recompute all descriptors and put them in the DB #
-    blop = 2
-
-
 # Tests #
-#base = init()
-#print(base[:2])
-#text = open ( 'test.txt', 'r' ).read()
-#print((text,preprocess(text)[:10]))
+base = init()
+text = open ( 'test.txt', 'r' ).read()
+print(preprocess(text))
