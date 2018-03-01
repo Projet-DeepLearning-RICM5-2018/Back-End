@@ -8,6 +8,7 @@ Created on 27/02/2018
 import sys
 import string
 import csv
+import numpy as np
 from gensim.models import Word2Vec
 
 # Constants definition #
@@ -81,11 +82,11 @@ def init(dbManager) :
     model.save("preprocessing_model")
 
     # TODO : Put everything in the DB for the first time"
-    print(str(dbManager))
+    
     print("ADD IN THE BDD ALL OFFERS")
     base = preprocessAll(filename)
-    for offer in base :
-        add_an_offer(offer, dbManager)
+    add_base_to_database(dbManager,base)
+    
 
 """
 To reinit the model, and calculate all the descriptors when the DB changed
@@ -99,22 +100,53 @@ def reinit(dbManager) :
     print(base)
 
 """
+Add all preprocessed offer in the database
+@param offer : list of (text,descriptor,label)
+"""
+def add_base_to_database(dbManager, base):
+    adminId = dbManager.get_one_admin().id
+    for offer in base :
+        nameField = offer[2]
+        idOffer = add_an_offer(dbManager, offer, adminId)
+        if idOffer!=-1 :
+            idPredic = dbManager.add_prediction_v2(10.0, True, idOffer)
+            if idPredic!=-1:
+                idField = get_id_field(dbManager,nameField)
+                if idField!=-1 :
+                    dbManager.add_team(idPredic , idField, 1)
+"""
 Add a preprocessed offer in the database
 @param offer : (text,descriptor,label) the processed offer
 """
-def add_an_offer(offer,dbManager) :
-    #print("ADD AN OFFER")
+def add_an_offer(dbManager, offer, idAdmin) :
+    #Make title
     title = offer[0].split(' ')
     title = title[:5]
     title = ' '.join(title)
-    desc = (o[0].tostring() for o in offer[1])
-    print(str(desc))
-    """
-    if dbManager.add_offer(title, offer[0], offer[1], 2) :#2 is root for me HF
-        print("ALRIGHT")
-    else:
-        print("OOOOH :-(")
-    """
+
+    #Make descriptor
+    desc = (np.array2string(o, precision=5, separator=' ', suppress_small=False) for o in offer[1])
+    desc = ','.join(desc)
+    
+    id = dbManager.add_offer_v2(title, offer[0], desc, idAdmin)
+    return id
+
+"""
+Add id of the named field or crete the field and get the id if the field doesn't exist
+@param offer : name of the field (string)
+"""
+def get_id_field(dbManager, name)  :
+   field = dbManager.get_field_by_name(name)
+   if field :
+      return field.id
+   else :
+      id = dbManager.add_field_v2(name, "", "", "")
+      if id!=-1:
+         return id
+      else :
+         return -1
+      
+
 """
 Add a preprocessed offer in the database
 @param offer : 

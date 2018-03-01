@@ -23,6 +23,7 @@ class DatabaseManager():
         """
             initialize the database, creates tables if not exists
         """
+        print("Init BD")
         init_db()
         if(app.config['INIT']):
             init(self)
@@ -42,6 +43,10 @@ class DatabaseManager():
 
     def get_user_by_email(self, email):
         return User.query.filter_by(email=email).first()
+
+
+    def get_one_admin(self):
+        return User.query.filter_by(is_admin=1).first()
         """if user is None:
             return None
         else:
@@ -114,6 +119,17 @@ class DatabaseManager():
             dB.rollback()
             return False
 
+    def add_offer_v2(self, title, content, descriptor, id_user):
+        offer = Offer(title, content, descriptor, id_user)
+        dB.add(offer)
+        try:
+            dB.commit()
+            return offer.id
+        except Exception as e:
+            print(e)
+            dB.rollback()
+            return -1
+
     def update_offer(self, id_offer, title, content, descriptor, id_user):
         offer = Offer.query.get(id_offer)
         if offer is None:
@@ -164,6 +180,17 @@ class DatabaseManager():
         except Exception as e:
             dB.rollback()
             return False
+    
+    def add_prediction_v2(self, mark, inbase, id_offer):
+        date = datetime.datetime.now()
+        prediction = Prediction(mark, inbase == 1, date, id_offer)
+        dB.add(prediction)
+        try:
+            dB.commit()
+            return prediction.id
+        except Exception as e:
+            dB.rollback()
+            return -1
 
     def update_prediction(self, id_prediction, mark, inbase, id_offer):
         prediction = Prediction.query.get(id_prediction)
@@ -242,6 +269,10 @@ class DatabaseManager():
         else:
             return field.serialize()
 
+    def get_field_by_name(self, name):
+        return Field.query.filter_by(name=name).first()
+   
+
     def add_field(self, name, description, descriptor, website):
         field = Field(name, description, descriptor, website)
         dB.add(field)
@@ -251,6 +282,16 @@ class DatabaseManager():
         except Exception as e:
             dB.rollback()
             return False
+
+    def add_field_v2(self, name, description, descriptor, website):
+        field = Field(name, description, descriptor, website)
+        dB.add(field)
+        try:
+            dB.commit()
+            return field.id
+        except Exception as e:
+            dB.rollback()
+            return -1
 
     def update_field(self,id_field, name, description, descriptor, website):
         field = Field.query.get(id_field)
