@@ -10,18 +10,9 @@ import string
 import csv
 from gensim.models import Word2Vec
 
-from SmartRecruiting_BackEnd import dbManager
-
 # Constants definition #
 max_size = 400 # The maximal size that a text should have.
-stop_list =[word for line in open("./data/stopwords_fr.txt", 'r') for word in line.split()]
-
-ENCODING="iso-8859-15" # ce programme génère du latin-9 par défaut
-
-if not sys.stdout.encoding: # pas d'encoding sur le flux de sortie standard
-  sys.stdout = codecs.getwriter(ENCODING)(sys.stdout) # écrire du latin-9
-if not sys.stderr.encoding: # pas d'encoding sur le flux d'erreur
-  sys.stderr = codecs.getwriter(ENCODING)(sys.stderr) # écrire du latin-9
+stop_list =[word for line in open("./data/stopwords_fr.txt",encoding='utf-8', mode="r") for word in line.split()]
 
 # Functions definition #
 
@@ -61,7 +52,7 @@ Function to preprocess all the offer from a csv.
 """
 def preprocessAll(file_name) :
     learning_base = []
-    with open(file_name) as f:
+    with open(file_name,encoding='utf-8', mode="r") as f:
         reader = csv.DictReader(f)
         for row in reader:
             text = row['Offre initiale '] # Get the text from the initial offer
@@ -74,12 +65,12 @@ Function to initialize the model and BDD
 Has to be called before using the model for the first time or if the csv containing the base changed
 @return the preprocessed descriptors
 """
-def init() :
+def init(dbManager) :
     # Input files #
     filename = './data/Données_RICM_GEO_PRI7.csv'
     sentences = [['x','x','x','x','x']]
     base_text = []
-    with open(filename) as f:
+    with open(filename,encoding='utf-8', mode="r") as f:
         reader = csv.DictReader(f)
         for row in reader:
             text = row['Offre initiale '] # Get the text from the initial offer
@@ -90,23 +81,55 @@ def init() :
     model.save("preprocessing_model")
 
     # TODO : Put everything in the DB for the first time"
-    return preprocessAll(filename)
+    print(str(dbManager))
+    print("ADD IN THE BDD ALL OFFERS")
+    base = preprocessAll(filename)
+    for offer in base :
+        add_an_offer(offer, dbManager)
 
 """
 To reinit the model, and calculate all the descriptors when the DB changed
 So not taking data from the CSV but DB
 """
-def reinit() :
+def reinit(dbManager) :
     # TODO : Get all offers from dB"
     # Rebuild the model #
     # Recompute all descriptors and put them in the DB #
-    blop = 2
+    base = dbManager.get_all_offers()
+    print(base)
 
+"""
+Add a preprocessed offer in the database
+@param offer : (text,descriptor,label) the processed offer
+"""
+def add_an_offer(offer,dbManager) :
+    #print("ADD AN OFFER")
+    title = offer[0].split(' ')
+    title = title[:5]
+    title = ' '.join(title)
+    desc = (o[0].tostring() for o in offer[1])
+    print(str(desc))
+    """
+    if dbManager.add_offer(title, offer[0], offer[1], 2) :#2 is root for me HF
+        print("ALRIGHT")
+    else:
+        print("OOOOH :-(")
+    """
+"""
+Add a preprocessed offer in the database
+@param offer : 
+"""
+"""
+def update_an_offer(offer) :
+    title = offer[0].split(' ')
+    title = title[:8]
+    title = ' '.join(title)
+    dbManager.add_offer(title, offer[0], offer[2], None)
+"""
 
 # Tests #
-def test() :
-    base = init()
-    model = Word2Vec.load("preprocessing_model")
-    print(base[:2])
+#base = init()
+#with open('./data/test.txt',encoding='utf-8', mode="w") as f:
+#   f.write(str(base))
 #text = open ( 'test.txt', 'r' ).read()
 #print((text,preprocess(text)[:10]))

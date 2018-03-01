@@ -1,3 +1,5 @@
+# encoding: utf-8
+# -*- coding: utf-8 -*-
 """
 Initializes the connection with the remote database, creates tables if necessary
 and generates the session.

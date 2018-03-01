@@ -1,3 +1,5 @@
+# encoding: utf-8
+# -*- coding: utf-8 -*-
 """
 Manager to interact with the database
 
@@ -7,6 +9,8 @@ Created on Sun Feb 26 16:23:02 2017
 
 from SmartRecruiting_BackEnd.data.models import *
 from SmartRecruiting_BackEnd.data.database import init_db, dbSession as dB
+from SmartRecruiting_BackEnd import app
+from SmartRecruiting_BackEnd.deeplearning.preprocess.pretraitement import init, reinit
 import datetime
 
 from sqlalchemy.sql import func
@@ -20,6 +24,10 @@ class DatabaseManager():
             initialize the database, creates tables if not exists
         """
         init_db()
+        if(app.config['INIT']):
+            init(self)
+        elif (app.config['REINIT']):
+            reinit(self)
 
     def get_all_users(self):
         users = User.query.all()
@@ -102,6 +110,7 @@ class DatabaseManager():
             dB.commit()
             return True
         except Exception as e:
+            print(e)
             dB.rollback()
             return False
 

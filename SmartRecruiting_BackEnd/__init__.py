@@ -1,3 +1,5 @@
+# encoding: utf-8
+# -*- coding: utf-8 -*-
 """
 The flask application package.
 """
@@ -12,6 +14,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('-t', '--testing', action='store_true') #to use the testing database
 parser.add_argument('-i', '--init', action='store_true') #to use the testing database
+parser.add_argument('-r', '--reinit', action='store_true') #to use the testing database
 args = parser.parse_args()
 
 #remove arguments to not interfere with unittest
@@ -32,7 +35,14 @@ try:
     sys.argv.remove('--init')
 except:
     pass
-
+try:
+    sys.argv.remove('-r')
+except:
+    pass
+try:
+    sys.argv.remove('--reinit')
+except:
+    pass
 
 
 app = Flask(__name__)
@@ -44,6 +54,7 @@ CORS(app)
 
 app.config['TESTING'] = args.testing
 app.config['INIT'] = args.init
+app.config['REINIT'] = args.reinit
 
 from SmartRecruiting_BackEnd.data import DatabaseManager
 dbManager = DatabaseManager()
