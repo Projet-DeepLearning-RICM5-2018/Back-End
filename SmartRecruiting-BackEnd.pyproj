@@ -27,6 +27,9 @@
     <DebugSymbols>true</DebugSymbols>
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Unit Test' ">
+    <StartupFile>SmartRecruiting_BackEnd\tests\test_user.py</StartupFile>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="runserver.py" />
     <Compile Include="SmartRecruiting_BackEnd\api\routes.py" />

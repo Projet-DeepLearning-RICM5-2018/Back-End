@@ -1,4 +1,13 @@
 import unittest
+
+#add root directory to the path to import app
+import sys
+import os.path
+sys.path.append(os.path.join(os.path.dirname(__file__), '../..'))
+
+sys.argv.append('-t')
+
+from SmartRecruiting_BackEnd import app
 from SmartRecruiting_BackEnd.data import DatabaseManager, Base, User
 from SmartRecruiting_BackEnd.data import init_db, dbSession as dB
 
