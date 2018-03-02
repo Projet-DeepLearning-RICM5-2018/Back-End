@@ -47,10 +47,6 @@ class DatabaseManager():
 
     def get_one_admin(self):
         return User.query.filter_by(is_admin=1).first()
-        """if user is None:
-            return None
-        else:
-            return user.serialize()"""
 
 
     def add_user(self, name, surname, role, email, password, is_admin):
@@ -405,10 +401,6 @@ class DatabaseManager():
             "TODO"
 
     def offers_by_field(self,id_field):
-        "offre associes a une formation"
-        "Idoffers = Prediction.query\
-            .join(Team, Team.id_prediction == Prediction.id)\
-            .filter(Team.id_field == id_field)"
         offers = Offer.query\
             .join(Prediction, Prediction.id_offer == Offer.id)\
             .join(Team, Team.id_prediction == Prediction.id)\
