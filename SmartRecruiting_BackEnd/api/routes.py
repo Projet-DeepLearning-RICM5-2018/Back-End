@@ -1,18 +1,125 @@
+# encoding: utf-8
+# -*- coding: utf-8 -*-
 """
 Routes and views for the flask application.
+
 """
 
 # from datetime import datetime
 # import json
+from flask import Flask, jsonify, request, json, session, g
 from flask.json import jsonify
 from flask import render_template, abort, request
-from SmartRecruiting_BackEnd import app
+from SmartRecruiting_BackEnd import app, dbManager
 
-from SmartRecruiting_BackEnd.data import DatabaseManager
+from flask_cors import CORS, cross_origin
+from functools import wraps
+from bcrypt import gensalt, hashpw
+from jwt import encode, decode, DecodeError, ExpiredSignature
+from datetime import datetime, timedelta
 
-dbManager = DatabaseManager()
+from datetime import datetime
+
+
+def createToken(user):
+        """
+            Create a token for a user with an expiration of 14 days
+        """
+        payload = {
+            'sub': user.email.decode('utf-8'),
+            'iat': datetime.utcnow(),
+            'exp': datetime.utcnow() + timedelta(days=14)
+        }
+        token = encode(payload, app.config['TOKEN_SECRET'])
+        return token.decode('unicode_escape')
+
+
+def parseToken(req):
+    """
+        Check if the token is correct
+    """
+    token = req.headers.get('Authorization').split()[1]
+    return decode(token, app.config['TOKEN_SECRET'])
+
+
+def loginRequired(f):
+    """
+        Decorator for allowing a logged in user to access to the route
+    """
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # Allow OPTIONS request
+        if request.headers.get("Access-Control-Request-Headers") == "authorization":
+            response = jsonify(message="ok")
+            response.status_code = 200
+            return response
+
+        # Reject request with no header Authorization
+        if not request.headers.get('Authorization'):
+            response = jsonify(message='Missing authorization header')
+            response.status_code = 401
+            return response
+
+        try:
+            payload = parseToken(request)
+        except DecodeError:
+            response = jsonify(message='Token is invalid')
+            response.status_code = 401
+            return response
+        except ExpiredSignature:
+            response = jsonify(message='Token has expired')
+            response.status_code = 401
+            return response
+
+        g.user_email = payload['sub']
+
+        return f(*args, **kwargs)
+
+    return decorated_function
+
+
+def loginAdminRequired(f):
+    """
+        Decorator for allowing a logged in administrator to access to the route
+    """
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        #Allow OPTIONS request
+        if request.headers.get("Access-Control-Request-Headers") == "authorization":
+            response = jsonify(message="ok")
+            response.status_code = 200
+            return response
+
+        #Reject request with no header Authorization
+        if not request.headers.get('Authorization'):
+            response = jsonify(message='Missing authorization header')
+            response.status_code = 401
+            return response
+
+        try:
+            payload = parseToken(request)
+        except DecodeError:
+            response = jsonify(message='Token is invalid')
+            response.status_code = 401
+            return response
+        except ExpiredSignature:
+            response = jsonify(message='Token has expired')
+            response.status_code = 401
+            return response
+        g.user_email = payload['sub']
+        user = dbManager.get_user_by_email(g.user_email)
+        if user and user.is_admin:
+            return f(*args, **kwargs)
+        else :
+            response = jsonify(message='Not admin')
+            response.status_code = 401
+            return response
+    return decorated_function
+
 
 @app.route('/users')
+@cross_origin()
+@loginAdminRequired
 def get_users():
     """
     Function to get all the users
@@ -22,6 +129,8 @@ def get_users():
 
 
 @app.route('/users/<int:id_user>')
+@cross_origin()
+@loginAdminRequired
 def get_user(id_user):
     """
     Function to get the user in the database
@@ -36,6 +145,8 @@ def get_user(id_user):
 
 
 @app.route('/users', methods=['POST'])
+@cross_origin()
+@loginAdminRequired
 def add_user():
     """
     METHOD : POST
@@ -51,6 +162,8 @@ def add_user():
 
 
 @app.route('/users/<int:id_user>', methods=['PUT'])
+@cross_origin()
+@loginAdminRequired
 def update_user(id_user):
     """
     METHOD : PUT
@@ -75,6 +188,8 @@ def update_user(id_user):
 
 
 @app.route('/users/<int:id_user>', methods=['DELETE'])
+@cross_origin()
+@loginAdminRequired
 def delete_user(id_user):
     """
     METHOD : DELETE
@@ -87,6 +202,8 @@ def delete_user(id_user):
 
 
 @app.route('/offers')
+@cross_origin()
+@loginAdminRequired
 def get_offers():
     """
     Function to get all the offers in the database
@@ -96,6 +213,8 @@ def get_offers():
 
 
 @app.route('/offers/<int:id_offer>')
+@cross_origin()
+@loginRequired
 def get_offer(id_offer):
     """
     Get the offer of id id_offer
@@ -110,6 +229,8 @@ def get_offer(id_offer):
 
 
 @app.route('/offers', methods=['POST'])
+@cross_origin()
+@loginAdminRequired
 def add_offer():
     """
     METHOD : POST
@@ -124,6 +245,8 @@ def add_offer():
 
 
 @app.route('/offers/<int:id_offer>', methods=['PUT'])
+@cross_origin()
+@loginRequired
 def update_offer(id_offer):
     """
     METHOD : PUT
@@ -147,6 +270,8 @@ def update_offer(id_offer):
 
 
 @app.route('/offers/<int:id_offer>', methods=['DELETE'])
+@cross_origin()
+@loginRequired
 def delete_offer(id_offer):
     """
     METHOD : DELETE
@@ -159,6 +284,8 @@ def delete_offer(id_offer):
 
 
 @app.route('/predictions')
+@cross_origin()
+@loginAdminRequired
 def get_predictions():
     """
     Function to get all the prediction in the database
@@ -168,6 +295,8 @@ def get_predictions():
 
 
 @app.route('/predictions/<int:id_offer>')
+@cross_origin()
+@loginRequired
 def get_prediction(id_offer):
     """
     Function to get a prediction in the database
@@ -182,6 +311,8 @@ def get_prediction(id_offer):
 
 
 @app.route('/predictions', methods=['POST'])
+@cross_origin()
+@loginAdminRequired
 def add_prediction():
     """
     Function to add a prediction in the database
@@ -197,6 +328,8 @@ def add_prediction():
 
 
 @app.route('/predictions/<int:id_prediction>', methods=['PUT'])
+@cross_origin()
+@loginAdminRequired
 def update_prediction(id_prediction):
     """
     Function to update a prediction in the database
@@ -220,6 +353,8 @@ def update_prediction(id_prediction):
 
 
 @app.route('/predictions/<int:id_prediction>', methods=['DELETE'])
+@cross_origin()
+@loginAdminRequired
 def delete_prediction(id_prediction):
     """
     Function to delete a prediction in the database
@@ -234,6 +369,8 @@ def delete_prediction(id_prediction):
 
 
 @app.route('/teams')
+@cross_origin()
+@loginAdminRequired
 def get_teams():
     """
     Function to get all the teams in the database
@@ -242,7 +379,33 @@ def get_teams():
     return jsonify(dbManager.get_all_teams()), 200
 
 
+@app.route('/teams', methods=['POST'])
+def add_team():
+    data = request.form
+    if dbManager.add_team(data['id_prediction'], data['id_field'], data['nb_members']):
+        return '', 201
+    else:
+        abort(400)
+
+
+@app.route('/teams/<int:id_prediction>', methods=['PUT'])
+def update_teams(id_prediction):
+    data = request.form
+    id_field = data.get('id_field', None)
+    nb_members = data.get('nb_members', None)
+    response = dbManager.update_team(id_prediction, id_field, nb_members)
+    if response is None:
+        abort(404)
+    else:
+        if response:
+            return '', 200
+        else:
+            abort(400)
+
+
 @app.route('/fields')
+@cross_origin()
+@loginAdminRequired
 def get_fields():
     """
     Function to get all the field in the database
@@ -252,6 +415,8 @@ def get_fields():
 
 
 @app.route('/fields/<int:id_field>')
+@cross_origin()
+@loginRequired
 def get_field(id_field):
     """
     Function to get a field in the database
@@ -266,6 +431,8 @@ def get_field(id_field):
 
 
 @app.route('/fields', methods=['POST'])
+@cross_origin()
+@loginAdminRequired
 def add_field():
     """
     Function to add a field in the database
@@ -281,6 +448,8 @@ def add_field():
 
 
 @app.route('/fields/<int:id_field>', methods=['PUT'])
+@cross_origin()
+@loginAdminRequired
 def update_field(id_field):
     """
     Function to update a field in the database
@@ -292,7 +461,7 @@ def update_field(id_field):
     name = data.get('name', None)
     description = data.get('description', None)
     descriptor = data.get('descriptor', None)
-    website = data.get('website',None)
+    website = data.get('website', None)
     response = dbManager.update_field(id_field, name, description, descriptor, website)
     if response is None:
         abort(404)
@@ -304,6 +473,8 @@ def update_field(id_field):
 
 
 @app.route('/fields/<int:id_field>', methods=['DELETE'])
+@cross_origin()
+@loginAdminRequired
 def delete_field(id_field):
     """
     Function to delete a field in the database
@@ -317,6 +488,8 @@ def delete_field(id_field):
 
 
 @app.route('/contacts')
+@cross_origin()
+@loginAdminRequired
 def get_contacts():
     """
     Function to get all the contact in the database
@@ -326,6 +499,8 @@ def get_contacts():
 
 
 @app.route('/contacts/<int:id_contact>')
+@cross_origin()
+@loginRequired
 def get_contact(id_contact):
     """
     Function to get a contact in the database
@@ -340,6 +515,8 @@ def get_contact(id_contact):
 
 
 @app.route('/contacts', methods=['POST'])
+@cross_origin()
+@loginAdminRequired
 def add_contact():
     """
     Function to add a contact in the database
@@ -359,6 +536,8 @@ def add_contact():
 
 
 @app.route('/contacts/<int:id_contact>', methods=['PUT'])
+@cross_origin()
+@loginAdminRequired
 def update_contact(id_contact):
     """
     Function to update a contact in the database
@@ -384,6 +563,8 @@ def update_contact(id_contact):
 
 
 @app.route('/contacts/<int:id_contact>', methods=['DELETE'])
+@cross_origin()
+@loginAdminRequired
 def delete_contact(id_contact):
     """
     Function to delete a contact in the database
@@ -396,3 +577,131 @@ def delete_contact(id_contact):
         abort(404)
     else:
         return '', 200
+
+
+@app.route('/searchOffersByField/<int:id_field>', methods=['GET'])
+def offers_by_field(id_field):
+    offers = dbManager.offers_by_field(id_field)
+    if offers is None:
+        abort(404)
+    else:
+        return jsonify(offers), 200
+
+
+@app.route('/searchFieldsByOffer/<int:id_offer>', methods=['GET'])
+def fields_by_offer(id_offer):
+    fields = dbManager.fields_by_offer(id_offer)
+    if fields is None:
+        abort(404)
+    else:
+        return jsonify(fields), 200
+
+
+@app.route('/searchOffersByUser/<int:id_user>', methods=['GET'])
+def offers_by_user(id_user):
+    offers = dbManager.offers_by_user(id_user)
+    if offers is None:
+        abort(404)
+    else:
+        return jsonify(offers), 200
+
+
+@app.route('/averageMark/', methods=['GET'])
+def average_mark():
+    begin_date = request.args.get('begin_date')
+    begin_date = datetime.strptime(begin_date, "%Y-%m-%d").date()
+    end_date = request.args.get('end_date')
+    end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
+    mark = dbManager.average_mark(begin_date, end_date)
+    if mark is None:
+        abort(404)
+    else:
+        return jsonify(mark), 200
+
+
+@app.route('/nbPrediction/', methods=['GET'])
+def nb_prediction():
+    begin_date = request.args.get('begin_date')
+    begin_date = datetime.strptime(begin_date, "%Y-%m-%d").date()
+    end_date = request.args.get('end_date')
+    end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
+    number = dbManager.nb_prediction(begin_date, end_date)
+    if number is None:
+        abort(404)
+    else:
+        return jsonify(number), 200
+
+# #############################AUTHETIFICATION
+
+
+@app.route('/auth/signup', methods=['POST'])
+@cross_origin()
+def signup():
+    """
+    METHOD : POST
+    HEADER PARAM  : None
+    BODY PARAMS : { "name" : str, "surname" : str, "role" : str, "email" : str, "password" : str }
+    RETURNS : 
+        {
+            "token": str,
+            "user": { "email": str, "id": int, "is_admin": boolean, "name": str, "password": str, "role": str, "surname": str }
+        }
+    """
+    data = json.loads(request.data)
+
+    user = dbManager.get_user_by_email(data["email"])
+
+    if user!=None:
+        return jsonify(error="User already exist"), 404
+
+    password = hashpw(data["password"].encode('utf-8'), gensalt())
+
+    if dbManager.add_user(data["name"], data["surname"], data["role"], data['email'], password,False):
+        session['logged_in'] = True
+        user = dbManager.get_user_by_email(data["email"])
+        return jsonify(user = user.serialize(), token=createToken(user)), 200
+    else :
+        abort(400)
+
+
+@app.route('/auth/login', methods=['POST'])
+@cross_origin()
+def login():
+    """
+    METHOD : POST
+    HEADER PARAM  : None
+    BODY PARAMS : { "emailUser" : str, "password" : str}
+    RETURNS : 
+        {
+            "token": str,
+            "user": { "email": str, "id": int, "is_admin": boolean, "name": str, "password": str, "role": str, "surname": str }
+        }
+    """
+    data = json.loads(request.data)
+    
+    user = dbManager.get_user_by_email(data["emailUser"])
+
+    if not user:
+        return jsonify(error="No such user"), 404
+    
+    password = data["password"].encode('utf-8')
+    
+    if user.password== hashpw(password, user.password):
+        session['logged_in'] = True    
+        return jsonify(user = user.serialize(), token=createToken(user)), 200
+    else:
+        return jsonify(error="Wrong name or password"), 400
+
+
+@app.route('/auth/logout', methods=['POST'])
+@cross_origin()
+@loginRequired
+def logout():
+    """
+    METHOD : POST
+    HEADER PARAM  : {Authorization : Bearer token}
+    BODY PARAMS : None
+    RETURNS : { 'result': 'success' }
+    """
+    session.pop('logged_in', None)
+    return jsonify({'result': 'success'}), 200

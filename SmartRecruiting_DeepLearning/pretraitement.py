@@ -24,9 +24,7 @@ Function to remove stop words and punctuation from a text
 def tokenize(text) :
     words = text.split() # split into words by white space
     words = [w.lower() for w in words] # put to lowercase
-    # remove punctuation
-    punct = str.maketrans(dict.fromkeys(string.punctuation + "•" + "’")) # To use translate in Python 3 we need to use the function maketrans
-    words = [w.translate(punct) for w in words] # translate removes characters
+    words = [''.join(letter for letter in word if letter.isalpha()) for word in words] # remove punctuation
     words = list(filter(None,filter(lambda word: word not in stop_list, words))) # remove stop words
     return words
 
@@ -39,7 +37,11 @@ Function to get the descriptor from a text
 def preprocess(text) :
     cleaned = tokenize(text)
     model = Word2Vec.load("preprocessing_model")
-    words = filter(lambda x: x in model.wv.vocab, cleaned)
+    words = list(filter(lambda x: x in model.wv.vocab, cleaned))
+    if(len(words) >= max_size) :
+        words = words[:max_size]
+    else :
+        words = words + ['x']*(max_size-len(words))
     descriptor = [model.wv[w] for w in words]
     return descriptor
 
@@ -66,7 +68,7 @@ Has to be called before using the model for the first time or if the csv contain
 def init() :
     # Input files #
     filename = 'Données_RICM_GEO_PRI7.csv'
-    sentences = []
+    sentences = [['x','x','x','x','x']]
     base_text = []
     with open(filename) as f:
         reader = csv.DictReader(f)
@@ -75,7 +77,6 @@ def init() :
             cleaned = tokenize(text)
             sentences = sentences + [cleaned] #Sentences used to build the model's vocabulary
             base_text = base_text + [text] # All the text saved for preprocessing after building the model
-
     model = Word2Vec(sentences, size=100, window=5, min_count=5, workers=4)
     model.save("preprocessing_model")
 
@@ -94,7 +95,8 @@ def reinit() :
 
 
 # Tests #
-#base = init()
+base = init()
+model = Word2Vec.load("preprocessing_model")
 #print(base[:2])
 #text = open ( 'test.txt', 'r' ).read()
 #print((text,preprocess(text)[:10]))
