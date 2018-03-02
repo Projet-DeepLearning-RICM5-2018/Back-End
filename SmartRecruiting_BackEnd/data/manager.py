@@ -93,6 +93,12 @@ class DatabaseManager():
             dB.commit()
             return True
 
+    def delete_users(self):
+        users = User.query.all()
+        for user in users:
+            dB.delete(user)
+            dB.commit()
+
     def get_all_offers(self):
         offers = Offer.query.all()
         return [o.serialize() for o in offers]
