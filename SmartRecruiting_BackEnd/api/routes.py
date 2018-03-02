@@ -697,16 +697,16 @@ def signup():
 
     user = dbManager.get_user_by_email(data["email"])
 
-    if user!=None:
+    if user != None:
         return jsonify(error="User already exist"), 404
 
     password = hashpw(data["password"].encode('utf-8'), gensalt())
 
-    if dbManager.add_user(data["name"], data["surname"], data["role"], data['email'], password,False):
+    if dbManager.add_user(data["name"], data["surname"], data["role"], data['email'], password, False):
         session['logged_in'] = True
         user = dbManager.get_user_by_email(data["email"])
         return jsonify(user = user.serialize(), token=createToken(user)), 200
-    else :
+    else:
         abort(400)
 
 
@@ -732,7 +732,7 @@ def login():
     
     password = data["password"].encode('utf-8')
     
-    if user.password== hashpw(password, user.password):
+    if user.password == hashpw(password, user.password):
         session['logged_in'] = True    
         return jsonify(user = user.serialize(), token=createToken(user)), 200
     else:
