@@ -5,7 +5,6 @@ Routes and views for the flask application.
 
 """
 
-# from datetime import datetime
 # import json
 from flask import Flask, jsonify, request, json, session, g
 from flask.json import jsonify
@@ -381,6 +380,12 @@ def get_teams():
 
 @app.route('/teams', methods=['POST'])
 def add_team():
+    """
+    Function to add a team in the database
+    :METHOD : POST
+    :HEADER PARAM  : None
+    :BODY PARAMS :{"id_prediction": int, "id_field": int, "nb_members": int}
+    """
     data = request.form
     if dbManager.add_team(data['id_prediction'], data['id_field'], data['nb_members']):
         return '', 201
@@ -390,6 +395,12 @@ def add_team():
 
 @app.route('/teams/<int:id_prediction>', methods=['PUT'])
 def update_teams(id_prediction):
+    """
+    Function to update a team in the database
+    :METHOD : PUT
+    :HEADER PARAM  : id_prediction :int
+    :BODY PARAMS :{"id_prediction": int, "id_field": int, "nb_members": int}
+    """
     data = request.form
     id_field = data.get('id_field', None)
     nb_members = data.get('nb_members', None)
@@ -570,7 +581,6 @@ def delete_contact(id_contact):
     Function to delete a contact in the database
     :METHOD : DELETE
     :HEADER PARAM  : id_contact : int
-    :BODY PARAMS :{"name": str, "surname": str, "email": str,"phone": str,"role": str,"id_field": int}
     """
 
     if dbManager.delete_contact(id_contact) is None:
@@ -581,6 +591,14 @@ def delete_contact(id_contact):
 
 @app.route('/searchOffersByField/<int:id_field>', methods=['GET'])
 def offers_by_field(id_field):
+    """
+    Function to get all the offers who correspond to a field
+    :METHOD : GET
+    :HEADER PARAM  : id_field : int
+    :BODY PARAMS : none
+    :return: {"offer":{ "title" : str, "content" : str, "descriptor" : str, "id_user" : int }}
+    """
+
     offers = dbManager.offers_by_field(id_field)
     if offers is None:
         abort(404)
@@ -590,6 +608,13 @@ def offers_by_field(id_field):
 
 @app.route('/searchFieldsByOffer/<int:id_offer>', methods=['GET'])
 def fields_by_offer(id_offer):
+    """
+    Function to get all the field who correspond to an offer
+    :METHOD : GET
+    :HEADER PARAM  : id_offer : int
+    :BODY PARAMS : none
+    :return: {"fields":{"name": str, "description": str, "descriptor": str,"website": str}}
+    """
     fields = dbManager.fields_by_offer(id_offer)
     if fields is None:
         abort(404)
@@ -599,6 +624,13 @@ def fields_by_offer(id_offer):
 
 @app.route('/searchOffersByUser/<int:id_user>', methods=['GET'])
 def offers_by_user(id_user):
+    """
+    Function to get all the offers who correspond to an user
+    :METHOD : GET
+    :HEADER PARAM  : id_user : int
+    :BODY PARAMS : none
+    :return: {"offer":{ "title" : str, "content" : str, "descriptor" : str, "id_user" : int }}
+    """
     offers = dbManager.offers_by_user(id_user)
     if offers is None:
         abort(404)
@@ -608,6 +640,13 @@ def offers_by_user(id_user):
 
 @app.route('/averageMark/', methods=['GET'])
 def average_mark():
+    """
+    Function to get the average of the prediction mark between to date
+    :METHOD : GET
+    :HEADER PARAM  : {"begin_date": date,"end_date":date}
+    :BODY PARAMS : none
+    :return: int
+    """
     begin_date = request.args.get('begin_date')
     begin_date = datetime.strptime(begin_date, "%Y-%m-%d").date()
     end_date = request.args.get('end_date')
@@ -621,6 +660,13 @@ def average_mark():
 
 @app.route('/nbPrediction/', methods=['GET'])
 def nb_prediction():
+    """
+    Function to get the number of prediction between two date
+    :METHOD : GET
+    :HEADER PARAM  : {"begin_date": date,"end_date":date}
+    :BODY PARAMS : none
+    :return: int
+    """
     begin_date = request.args.get('begin_date')
     begin_date = datetime.strptime(begin_date, "%Y-%m-%d").date()
     end_date = request.args.get('end_date')
