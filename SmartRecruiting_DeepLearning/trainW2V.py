@@ -9,24 +9,63 @@ import datetime
 
 from TextCNN import TextCNN 
 
-embedding_dim=128
-filter_sizes="3,4,5"
-num_filters=128
-l2=0.0
-num_checkpoints=5
-dropout_keep_prob=0.5
-checkpoint_every=100
-evaluate_every=100
-batch_size=64
-num_epochs=200
+embedding_dim = 128
+filter_sizes = "3,4,5"
+num_filters = 128
+l2 = 0.0
+num_checkpoints = 5
+# dropout_keep_prob = 0.5
+checkpoint_every = 100
+evaluate_every = 100
+batch_size = 64
+num_epochs = 200
 
+#changeBegin
+# Parameters
+# ==================================================
 
-base = pretraitement.init()
+# Data loading params
+tf.flags.DEFINE_float("dev_sample_percentage", .1, "Percentage of the training data to use for validation")
+tf.flags.DEFINE_string("positive_data_file", "./data/rt-polaritydata/rt-polarity.pos", "Data source for the positive data.")
+tf.flags.DEFINE_string("negative_data_file", "./data/rt-polaritydata/rt-polarity.neg", "Data source for the negative data.")
+
+# Model Hyperparameters
+tf.flags.DEFINE_integer("embedding_dim", 128, "Dimensionality of character embedding (default: 128)")
+tf.flags.DEFINE_string("filter_sizes", "3,4,5", "Comma-separated filter sizes (default: '3,4,5')")
+tf.flags.DEFINE_integer("num_filters", 128, "Number of filters per filter size (default: 128)")
+tf.flags.DEFINE_float("dropout_keep_prob", 0.5, "Dropout keep probability (default: 0.5)")
+tf.flags.DEFINE_float("l2_reg_lambda", 0.0, "L2 regularization lambda (default: 0.0)")
+
+# Training parameters
+tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")
+tf.flags.DEFINE_integer("num_epochs", 200, "Number of training epochs (default: 200)")
+tf.flags.DEFINE_integer("evaluate_every", 100, "Evaluate model on dev set after this many steps (default: 100)")
+tf.flags.DEFINE_integer("checkpoint_every", 100, "Save model after this many steps (default: 100)")
+tf.flags.DEFINE_integer("num_checkpoints", 5, "Number of checkpoints to store (default: 5)")
+# Misc Parameters
+tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")
+tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on devices")
+
+#changeEnd
+
+base = pretraitement.init() #[(string,[[float]],string)]
 #base.shape(59,) array([(,,),(),(),()*59])
-x,y=[],[]
+x, y = [], []
+
+def get_num(val) :
+    if val=="GEO" :
+        return 1
+    elif val == "RICM" :
+        return 2
+    else :
+        3
+
+
 for i in base:#[(text,preprocess(text),label)]
-    x.append(i[1])
-    y.append(i[2])#base[:,2]
+    x.append(np.array(i[1]))# liste descripteur
+    y.append(get_num(i[2]))#base[:,2] #liste label
+x = np.array(x)
+y = np.array(y)
 print("try to find")
 print(base[58][2])
 # Randomly shuffle data
@@ -40,9 +79,9 @@ y_shuffled = np.array(list(y))[shuffle_indices]
 dev_sample_index = -1 * int(.1 * float(len(y)))
 x_train, x_dev = x_shuffled[:dev_sample_index], x_shuffled[dev_sample_index:]
 y_train, y_dev = y_shuffled[:dev_sample_index], y_shuffled[dev_sample_index:]
-print("vocabulary size: %s" % len(x_train[0]))
+print("descriptor size: %s" % len(x_train[0]))
 #cross validation
-k=10
+k = 10
 cut_size = len(x_shuffled) / k
 '''
 for step in range(0,k) :
@@ -55,16 +94,24 @@ print("Train/Dev split: {:d}/{:d}".format(len(y_train), len(y_dev)))
 
 # Training
 # ==================================================
+FLAGS = tf.flags.FLAGS
 
 with tf.Graph().as_default():
-    with tf.Session() as sess:
+    #changebegin
+    session_conf = tf.ConfigProto(
+        allow_soft_placement=FLAGS.allow_soft_placement,
+        log_device_placement=FLAGS.log_device_placement)
+    #changeEnd
+
+    with tf.Session(config=session_conf) as sess:
         cnn = TextCNN(
             sequence_length=pretraitement.max_size,
-            num_classes=3,
+            num_classes=3, #TODO a recuperer dans la BD
             vocab_size=len(x_train[0]),
             embedding_size=embedding_dim,
             filter_sizes=list(map(int, filter_sizes.split(","))),
             num_filters=num_filters,
+            descriptor_size=embedding_dim,
             l2_reg_lambda=l2)
         # Define Training procedure
         global_step = tf.Variable(0, name="global_step", trainable=False)
@@ -107,12 +154,34 @@ with tf.Graph().as_default():
         def train_step(x_batch, y_batch):
             """
             A single training step
+
             """
+
+            x_batch2 = np.array(x_batch)
+            y_batch2 = np.array(y_batch)
+            print("x_bach:")
+            print(type(x_batch2))
+            print(len(x_batch2))
+            print(type(x_batch2[0]))
+
+            print(len(x_batch2[0]))
+            print(type(x_batch2[0][0]))
+            print(type(x_batch2[0][0][0]))
+            print(type(y_batch2))
+            print(type(y_batch2[0]))
+
+
+
             feed_dict = {
-              cnn.input_x: x_batch,
-              cnn.input_y: y_batch,
-              cnn.dropout_keep_prob: dropout_keep_prob
+              cnn.input_x: x_batch2,
+              cnn.input_y: y_batch2,
+              cnn.dropout_keep_prob: tf.cast(2, tf.float32)
+              #cnn.dropout_keep_prob: FLAGS.dropout_keep_prob
+
             }
+            print(type(feed_dict))
+
+
             _, step, summaries, loss, accuracy = sess.run(
                 [train_op, global_step, train_summary_op, cnn.loss, cnn.accuracy],
                 feed_dict)
@@ -125,9 +194,9 @@ with tf.Graph().as_default():
             Evaluates model on a dev set
             """
             feed_dict = {
-              cnn.input_x: x_batch,
-              cnn.input_y: y_batch,
-              cnn.dropout_keep_prob: 1.0
+              cnn.input_x: np.array(x_batch),
+              cnn.input_y: np.array(y_batch),
+              cnn.dropout_keep_prob:tf.cast(1.0, tf.float32)
             }
             step, summaries, loss, accuracy = sess.run(
                 [global_step, dev_summary_op, cnn.loss, cnn.accuracy],
@@ -137,24 +206,24 @@ with tf.Graph().as_default():
             if writer:
                 writer.add_summary(summaries, step)
 
-    def batch_iter(data, batch_size, num_epochs, shuffle=True):
-        """
-        Generates a batch iterator for a dataset.
-        """
-        data = np.array(data)
-        data_size = len(data)
-        num_batches_per_epoch = int((len(data)-1)/batch_size) + 1
-        for epoch in range(num_epochs):
-        # Shuffle the data at each epoch
-            if shuffle:
-                shuffle_indices = np.random.permutation(np.arange(data_size))
-                shuffled_data = data[shuffle_indices]
-            else:
-                shuffled_data = data
-            for batch_num in range(num_batches_per_epoch):
-                start_index = batch_num * batch_size
-                end_index = min((batch_num + 1) * batch_size, data_size)
-                yield shuffled_data[start_index:end_index]
+        def batch_iter(data, batch_size, num_epochs, shuffle=True):
+            """
+            Generates a batch iterator for a dataset.
+            """
+            data = np.array(data)
+            data_size = len(data)
+            num_batches_per_epoch = int((len(data)-1)/batch_size) + 1
+            for epoch in range(num_epochs):
+            # Shuffle the data at each epoch
+                if shuffle:
+                    shuffle_indices = np.random.permutation(np.arange(data_size))
+                    shuffled_data = data[shuffle_indices]
+                else:
+                    shuffled_data = data
+                for batch_num in range(num_batches_per_epoch):
+                    start_index = batch_num * batch_size
+                    end_index = min((batch_num + 1) * batch_size, data_size)
+                    yield shuffled_data[start_index:end_index]
 
         # Generate batches
         batches = batch_iter(
