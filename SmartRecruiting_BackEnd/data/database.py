@@ -1,3 +1,5 @@
+# encoding: utf-8
+# -*- coding: utf-8 -*-
 """
 Initializes the connection with the remote database, creates tables if necessary
 and generates the session.
@@ -6,6 +8,7 @@ Created on Fri Feb 24 22:44:09 2017
 @author: Julian
 """
 
+from SmartRecruiting_BackEnd import app
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -24,9 +27,10 @@ DB_CONN_FORMAT = "mysql+pymysql://{user}:{password}@{host}:{port}/{database}"
 
 DB_OPTIONS = "?charset=utf8&use_unicode=0"                     
 
-
-engine = create_engine((DB_CONN_FORMAT+DB_OPTIONS).format(**DB_CONFIG_DICT), pool_recycle=60)
-#engine = create_engine("sqlite+pysqlite:///test.db", pool_recycle=60)
+if app.config['TESTING']:
+    engine = create_engine("sqlite+pysqlite:///test.db", pool_recycle=60) #testing database
+else:
+    engine = create_engine((DB_CONN_FORMAT+DB_OPTIONS).format(**DB_CONFIG_DICT), pool_recycle=60)
 
 dbSession = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
 

@@ -1,3 +1,5 @@
+# encoding: utf-8
+# -*- coding: utf-8 -*-
 """
 ORM representation of tables
 
@@ -9,6 +11,7 @@ Created on Fri Feb 24 22:44:09 2017
 
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Date, Text, Float
 from sqlalchemy.orm import relationship
+from sqlalchemy.dialects.mysql import LONGTEXT
 from SmartRecruiting_BackEnd.data.database import Base
 
 
@@ -18,7 +21,7 @@ class User(Base):
     name = Column(String(100), unique=False, nullable=False)
     surname = Column(String(100), unique=False, nullable=False)
     role = Column(String(100), unique=False, nullable=True)
-    email = Column(String(100), unique=False, nullable=False)
+    email = Column(String(100), unique=True, nullable=False)
     password = Column(String(100), unique=False, nullable=False)
     is_admin = Column(Boolean, unique=False, nullable=False)
     offers = relationship("Offer")
@@ -37,7 +40,7 @@ class Offer(Base):
     id = Column(Integer, primary_key=True, nullable=False)
     title = Column(String(100), unique=False, nullable=False)
     content = Column(Text, unique=False, nullable=False)
-    descriptor = Column(Text, unique=False, nullable=False)
+    descriptor = Column(LONGTEXT, unique=False, nullable=False)
     id_user = Column(Integer, ForeignKey('user.id'), unique=False, nullable=False)
     prediction = relationship("Prediction", uselist=False)
 
@@ -53,12 +56,14 @@ class Prediction(Base):
     id = Column(Integer, primary_key=True, nullable=False)
     mark = Column(Float, unique=False, nullable=False)
     inbase = Column(Boolean, unique=False, nullable=False)
+    date = Column(Date, unique=False, nullable=False)
     id_offer = Column(Integer, ForeignKey('offer.id'), unique=False, nullable=False)
     teams = relationship("Team")
 
-    def __init__(self, mark, inbase, id_offer):
+    def __init__(self, mark, inbase, date, id_offer):
         self.mark = mark
         self.inbase = inbase
+        self.date = date
         self.id_offer = id_offer
 
 class Team(Base):

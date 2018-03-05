@@ -427,3 +427,10 @@ ASALocalRun/
 
 # MSBuild Binary and Structured Log
 *.binlog
+
+
+
+
+*test.db
+
+preprocessing_model
