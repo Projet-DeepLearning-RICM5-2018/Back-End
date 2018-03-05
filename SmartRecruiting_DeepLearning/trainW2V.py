@@ -66,6 +66,7 @@ for i in base:#[(text,preprocess(text),label)]
     y.append(np.array(get_num(i[2])))#base[:,2] #liste label
 x = np.array(x)
 y = np.array(y)
+print(y)
 print("try to find")
 print(base[58][2])
 # Randomly shuffle data

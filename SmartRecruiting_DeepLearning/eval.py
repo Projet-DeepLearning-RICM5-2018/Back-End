@@ -40,11 +40,29 @@ else:
 
 text = open ( 'test.txt', 'r' ).read()
 
+def get_num(val) :
+    if val=="GEO" :
+        return 0
+    elif val == "RICM" :
+        return 1
+    else :
+        return 2
+
+base = pretraitement.init()
+texts = []
+descs = []
+labels = []
+for b in base :
+    texts.append(b[0])
+    descs.append(b[1])
+    labels.append(get_num(b[2]))
+
 desc = pretraitement.preprocess(text)
 
-x_raw = [text]
-y_test = None
-x_test = [desc]
+x_raw = texts # [text]
+y_test = labels # None
+x_test = descs # [desc]
+
 
 '''
 # Map data into vocabulary
@@ -77,9 +95,12 @@ with graph.as_default():
 
         # Tensors we want to evaluate
         predictions = graph.get_operation_by_name("output/predictions").outputs[0]
+        scores = graph.get_operation_by_name("output/scores").outputs[0]
 
         # Generate batches for one epoch
         batches = [x_test]
+
+        pred, sc = sess.run([predictions,scores],{input_x:x_test,dropout_keep_prob: 1.0})
 
         # Collect the predictions here
         all_predictions = []
@@ -94,13 +115,10 @@ if y_test is not None:
     print("Total number of test examples: {}".format(len(y_test)))
     print("Accuracy: {:g}".format(correct_predictions/float(len(y_test))))
 
-print(all_predictions)
 
 # Save the evaluation to a csv
-'''
 predictions_human_readable = np.column_stack((np.array(x_raw), all_predictions))
 out_path = os.path.join(FLAGS.checkpoint_dir, "..", "prediction.csv")
 print("Saving evaluation to {0}".format(out_path))
 with open(out_path, 'w') as f:
     csv.writer(f).writerows(predictions_human_readable)
-'''
