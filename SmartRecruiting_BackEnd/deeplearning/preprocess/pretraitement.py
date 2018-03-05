@@ -10,10 +10,11 @@ import string
 import csv
 import numpy as np
 from gensim.models import Word2Vec
+from SmartRecruiting_BackEnd import app
 
 # Constants definition #
 max_size = 400 # The maximal size that a text should have.
-stop_list =[word for line in open("./data/stopwords_fr.txt",encoding='utf-8', mode="r") for word in line.split()]
+app.config['stop_list'] =[word for line in open("./data/stopwords_fr.txt",encoding='utf-8', mode="r") for word in line.split()]
 
 # Functions definition #
 
@@ -26,7 +27,7 @@ def tokenize(text) :
     words = text.split() # split into words by white space
     words = [w.lower() for w in words] # put to lowercase
     words = [''.join(letter for letter in word if letter.isalpha()) for word in words] # remove punctuation
-    words = list(filter(None,filter(lambda word: word not in stop_list, words))) # remove stop words
+    words = list(filter(None,filter(lambda word: word not in app.config['stop_list'], words))) # remove stop words
     return words
 
 

@@ -16,6 +16,7 @@ install: "pip install flask sqlalchemy flask-sqlalchemy pymysql coverage flask_c
 
 before_script:
   - coverage run SmartRecruiting_BackEnd/tests/test_user.py
+  - coverage run SmartRecruiting_BackEnd/tests/test_pretraitement.py
   - coverage xml -i
 script:
   - sonar-scanner

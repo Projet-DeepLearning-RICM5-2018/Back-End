@@ -39,6 +39,9 @@
     <Compile Include="SmartRecruiting_BackEnd\data\__init__.py" />
     <Compile Include="SmartRecruiting_BackEnd\deeplearning\preprocess\pretraitement.py" />
     <Compile Include="SmartRecruiting_BackEnd\deeplearning\preprocess\__init__.py" />
+    <Compile Include="SmartRecruiting_BackEnd\tests\test_pretraitement.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="SmartRecruiting_BackEnd\tests\test_user.py">
       <SubType>Code</SubType>
     </Compile>
