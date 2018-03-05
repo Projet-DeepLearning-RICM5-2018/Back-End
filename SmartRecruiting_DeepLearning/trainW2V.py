@@ -54,16 +54,16 @@ x, y = [], []
 
 def get_num(val) :
     if val=="GEO" :
-        return 1
+        return [1,0,0]
     elif val == "RICM" :
-        return 2
+        return [0,1,0]
     else :
-        3
+        return [0,0,1]
 
 
 for i in base:#[(text,preprocess(text),label)]
     x.append(np.array(i[1]))# liste descripteur
-    y.append(get_num(i[2]))#base[:,2] #liste label
+    y.append(np.array(get_num(i[2])))#base[:,2] #liste label
 x = np.array(x)
 y = np.array(y)
 print("try to find")
@@ -175,8 +175,7 @@ with tf.Graph().as_default():
             feed_dict = {
               cnn.input_x: x_batch2,
               cnn.input_y: y_batch2,
-              cnn.dropout_keep_prob: tf.cast(2, tf.float32)
-              #cnn.dropout_keep_prob: FLAGS.dropout_keep_prob
+              cnn.dropout_keep_prob: FLAGS.dropout_keep_prob
 
             }
             print(type(feed_dict))
@@ -194,9 +193,9 @@ with tf.Graph().as_default():
             Evaluates model on a dev set
             """
             feed_dict = {
-              cnn.input_x: np.array(x_batch),
-              cnn.input_y: np.array(y_batch),
-              cnn.dropout_keep_prob:tf.cast(1.0, tf.float32)
+              cnn.input_x: x_batch,
+              cnn.input_y: y_batch,
+              cnn.dropout_keep_prob: 1.0
             }
             step, summaries, loss, accuracy = sess.run(
                 [global_step, dev_summary_op, cnn.loss, cnn.accuracy],

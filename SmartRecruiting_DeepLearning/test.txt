@@ -1,15 +1,60 @@
-Météo des services (H/F) en stage
-62604, Lille, France
-Contexte du stage :
-Le département Transport participe à la conception, à la réalisation et à l'hébergement d’applications à haute exigence de performance et de fiabilité pour nos clients, à l'activité en constante évolution. Vous serez intégré au sein d’une équipe dont l’activité consiste à développer et exploiter des services pour des acteurs du monde du Transport.
-Le projet :
-Le projet consiste en la création d'un outil de Météo des Services, outil permettant de suivre en temps réels l'etat des services d'une plateforme afin d'en faciliter l'exploitation. Votre mission consistera à établir le cahier des charges de cet outil, en collectant auprès des membres de l'équipe leurs différents besoins, puis de procéder à sa réalisation. Vous accorderez une importance certaine à l'ergonomie de l'outil, de l'interface utilisateur. Vous penserez fiabilité, évolutivité et performance. Le choix des technologies sera laissé à votre jugement (l'ambition et l'innovation seront toutefois appréciés).
-A la fin du stage, vous aurez appris à :
-- Etablir une spécification fonctionnelle détaillée
-- A travailler à la fois de façon collaborative et autonome
-- A comprendre les enjeux des remontées d'informations dans la qualité d'un projet de production
-- A déployer une application sur un environnement de production
-- A approfondir vos connaissances techniques
-- A gérer l'interfaçage d'une application avec différents autres outils de Worldline
-Étudiant de 3ème année d’école d’ingénieurs ou autre Bac+5 orienté informatique
-Bon niveau d’autonomie, bonnes qualités relationnelles, curiosité, ouverture, réactivité et sens du service client associés à vos savoir-faire techniques seront vos atouts pour la réussite de ce stage.
+Partenaire
+Stage - Ingénieur études et développement ReactJS et AngularJSH/F
+Sopra Steria
+Stage (De 4 à 6 mois)Niort (France)Publiée le 29 Décembre 2017
+Début
+Dès que possible
+Expérience
+Etudiant / Jeune diplomé
+Fonction
+Développement Informatique
+Secteurs
+Audit, Conseil, SSII / Informatique, Télécoms
+Type d'entreprise
+Grande entreprise
+
+Descriptif de la societé :
+
+Sopra Steria, fort de 40 000 collaborateurs dans plus de 20 pays, propose l'un des portefeuilles d'offres les plus complets du marché : conseil, intégration de systèmes, édition de solutions métier, infrastructure management et business process services.
+
+En forte croissance, le Groupe accueillera 2 700 talents en 2017 en France pour participer à ses projets d'envergure sur l'ensemble de ses métiers.
+
+Vous aussi, rejoignez-nous et participez au monde numérique de demain !
+
+Forts de nos grands projets de transformation autour des nouvelles technologies et de l'innovation, les 1200 collaborateurs de la Division Atlantique accompagnent nos clients grands comptes sur des environnements sectoriels et technologiques variés. Les ambitions sont fortes, la croissance rapide, venez exprimer vos talents et contribuer à des projets d'envergure !
+
+Description du poste :
+
+Votre futur environnement de travail
+Vous intégrerez notre équipe accompagnant un grand acteur mutualiste en France.
+Cette équipe réalise des projets à forts enjeux dans le cadre de la transformation digitale de notre client. Afin de mener à bien votre mission, une équipe jeune et dynamique se tiendra à votre disposition pour répondre à toutes vos questions.
+
+Les missions du stage
+Vous participerez à des projets d'envergure permettant l?évolution du système d'information. Dans ce cadre, vous serez amené(e) à :
+-Réaliser des évolutions structurantes
+-Utiliser nos outils d'intégration
+-Apporter de nouvelles idées d'amélioration
+-Participer à la montée en valeur de notre client sur les technologies innovantes : Intelligence Artificielle, Mobilité, etc.
+
+Les apports du stage
+-Appréhender le cycle de développement d'un projet, de l'expression de besoin à la mise en production
+-Apprécier les outils d'industrialisation d'un projet de grande ampleur
+-Parfaire vos connaissances sur des technos récentes et innovantes comme Angular
+-Monter en compétences sur des méthodologies nouvelles comme le Fast-IT
+-Intégrer la vie d'une agence dynamique : petits-déjeuners, afterworks
+
+Technos utilisées : JAVA/J2EE, AngularJS, ReactJS
+
+Profil recherché :
+
+De formation Bac+5 (Ingénieur ou Universitaire) vous avez un bon esprit d'analyse et de synthèse. Vous aimez les challenges ? Vous avez un esprit critique ? Vous êtes rigoureux(-se) et autonome ? Ne cherchez plus, vous avez trouvé le stage de vos rêves !
+
+Tous nos postes sont ouverts à des personnes en situation de handicap.
+
+Niveau d'études : Bac +4
+
+Expérience professionnelle : 6 mois - 1 an
+
+Début du contrat : 08-12-17
+
+Durée du contrat : 6 mois

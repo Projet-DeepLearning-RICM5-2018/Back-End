@@ -18,7 +18,7 @@ class TextCNN(object):
 
         # Placeholders for input, output and dropout
         self.input_x = tf.placeholder(tf.float32, [None, sequence_length, descriptor_size], name="input_x")
-        self.input_y = tf.placeholder(tf.int16, [None, num_classes], name="input_y")
+        self.input_y = tf.placeholder(tf.float32, [None, num_classes], name="input_y")
         self.dropout_keep_prob = tf.placeholder(dtype=tf.float32, shape=None, name="dropout_keep_prob")
 
         # Keeping track of l2 regularization loss (optional)
