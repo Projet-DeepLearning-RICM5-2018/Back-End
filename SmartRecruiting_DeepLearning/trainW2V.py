@@ -7,9 +7,9 @@ import pretraitement
 import time
 import datetime
 
-from TextCNN import TextCNN 
+from TextCNN import TextCNN
 
-embedding_dim = 128
+embedding_dim = 100
 filter_sizes = "3,4,5"
 num_filters = 128
 l2 = 0.0
@@ -118,7 +118,7 @@ with tf.Graph().as_default():
         optimizer = tf.train.AdamOptimizer(1e-3)
         grads_and_vars = optimizer.compute_gradients(cnn.loss)
         train_op = optimizer.apply_gradients(grads_and_vars, global_step=global_step)
-        
+
         # Output directory for models and summaries
         timestamp = str(int(time.time()))
         out_dir = os.path.abspath(os.path.join(os.path.curdir, "runs", timestamp))
@@ -137,8 +137,8 @@ with tf.Graph().as_default():
         dev_summary_op = tf.summary.merge([loss_summary, acc_summary])
         dev_summary_dir = os.path.join(out_dir, "summaries", "dev")
         dev_summary_writer = tf.summary.FileWriter(dev_summary_dir, sess.graph)
-        
-        
+
+
         # Checkpoint directory. Tensorflow assumes this directory already exists so we need to create it
         checkpoint_dir = os.path.abspath(os.path.join(out_dir, "checkpoints"))
         checkpoint_prefix = os.path.join(checkpoint_dir, "model")

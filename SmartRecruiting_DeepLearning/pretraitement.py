@@ -39,7 +39,11 @@ Function to get the descriptor from a text
 def preprocess(text) :
     cleaned = tokenize(text)
     model = Word2Vec.load("preprocessing_model")
-    words = filter(lambda x: x in model.wv.vocab, cleaned)
+    words = list(filter(lambda x: x in model.wv.vocab, cleaned))
+    if(len(words) >= max_size) :
+        words = words[:max_size]
+    else :
+        words = words + ['x']*(max_size-len(words))
     descriptor = [model.wv[w] for w in words]
     return descriptor
 
@@ -66,7 +70,7 @@ Has to be called before using the model for the first time or if the csv contain
 def init() :
     # Input files #
     filename = 'Données_RICM_GEO_PRI7.csv'
-    sentences = []
+    sentences = [['x','x','x','x','x']]
     base_text = []
     with open(filename) as f:
         reader = csv.DictReader(f)
