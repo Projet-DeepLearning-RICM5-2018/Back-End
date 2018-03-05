@@ -46,6 +46,11 @@ tf.flags.DEFINE_integer("num_checkpoints", 5, "Number of checkpoints to store (d
 tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")
 tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on devices")
 
+#checkpoint
+#check_path=""
+#tf.flags.DEFINE_string("checkpoint_file", "./runs/"+check_path, "latest_checkpoint path")
+
+
 #changeEnd
 
 base = pretraitement.init() #[(string,[[float]],string)]
@@ -123,6 +128,11 @@ with tf.Graph().as_default():
         # Output directory for models and summaries
         timestamp = str(int(time.time()))
         out_dir = os.path.abspath(os.path.join(os.path.curdir, "runs", timestamp))
+        check_path="./runs/"+timestamp+"/checkpoints/"
+        print(check_path)
+        f = open('checkPath', 'w')
+        f.write(check_path)  # python will convert \n to os.linesep
+        f.close()
         print("Writing to {}\n".format(out_dir))
 
         # Summaries for loss and accuracy

@@ -75,7 +75,9 @@ print("\nEvaluating...\n")
 
 # Evaluation
 # ==================================================
-checkpoint_file = tf.train.latest_checkpoint("./runs/1520244181/checkpoints/")
+checkPath=open('checkPath', "r").read()
+print(checkPath)#str
+checkpoint_file = tf.train.latest_checkpoint(checkPath)
 print(checkpoint_file)
 graph = tf.Graph()
 with graph.as_default():
