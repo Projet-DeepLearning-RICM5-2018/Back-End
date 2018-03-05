@@ -157,9 +157,7 @@ with tf.Graph().as_default():
             A single training step
 
             """
-
-            x_batch2 = np.array(x_batch)
-            y_batch2 = np.array(y_batch)
+            '''
             print("x_bach:")
             print(type(x_batch2))
             print(len(x_batch2))
@@ -170,12 +168,12 @@ with tf.Graph().as_default():
             print(type(x_batch2[0][0][0]))
             print(type(y_batch2))
             print(type(y_batch2[0]))
-
+            '''
 
 
             feed_dict = {
-              cnn.input_x: x_batch2,
-              cnn.input_y: y_batch2,
+              cnn.input_x: x_batch,
+              cnn.input_y: y_batch,
               cnn.dropout_keep_prob: FLAGS.dropout_keep_prob
 
             }
