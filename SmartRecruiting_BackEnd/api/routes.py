@@ -126,6 +126,11 @@ def get_users():
     """
     return jsonify(dbManager.get_all_users()), 200
 
+@app.route('/testCom')
+@cross_origin()
+def get_test_fields() :
+    return jsonify("hello I am working :D"), 200
+
 
 @app.route('/users/<int:id_user>')
 @cross_origin()
@@ -687,7 +692,7 @@ def signup():
     METHOD : POST
     HEADER PARAM  : None
     BODY PARAMS : { "name" : str, "surname" : str, "role" : str, "email" : str, "password" : str }
-    RETURNS : 
+    RETURNS :
         {
             "token": str,
             "user": { "email": str, "id": int, "is_admin": boolean, "name": str, "password": str, "role": str, "surname": str }
@@ -717,23 +722,23 @@ def login():
     METHOD : POST
     HEADER PARAM  : None
     BODY PARAMS : { "emailUser" : str, "password" : str}
-    RETURNS : 
+    RETURNS :
         {
             "token": str,
             "user": { "email": str, "id": int, "is_admin": boolean, "name": str, "password": str, "role": str, "surname": str }
         }
     """
     data = json.loads(request.data)
-    
+
     user = dbManager.get_user_by_email(data["emailUser"])
 
     if not user:
         return jsonify(error="No such user"), 404
-    
+
     password = data["password"].encode('utf-8')
-    
+
     if user.password == hashpw(password, user.password):
-        session['logged_in'] = True    
+        session['logged_in'] = True
         return jsonify(user = user.serialize(), token=createToken(user)), 200
     else:
         return jsonify(error="Wrong name or password"), 400
