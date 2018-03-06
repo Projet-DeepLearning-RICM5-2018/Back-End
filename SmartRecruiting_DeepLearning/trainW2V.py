@@ -1,9 +1,14 @@
 #! /usr/bin/env python
-
+"""
+Created on 01/03/2018
+@author: Qianqian
+@description: after preprocessing of texts, using the descriptors (Word2Vec) to create CNN and the "train" step finishes with Evaluation.
+"""
 import tensorflow as tf
 import numpy as np
 import os
 import pretraitement
+import eval
 import time
 import datetime
 
@@ -248,3 +253,7 @@ with tf.Graph().as_default():
             if current_step % checkpoint_every == 0:
                 path = saver.save(sess, checkpoint_prefix, global_step=current_step)
                 print("Saved model checkpoint to {}\n".format(path))
+
+#eval
+print("\nEvaluating...\n")
+eval.init()

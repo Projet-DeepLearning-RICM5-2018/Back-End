@@ -14,13 +14,13 @@ import csv
 # ==================================================
 
 # Eval Parameters
-tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")
-tf.flags.DEFINE_string("checkpoint_dir", "", "Checkpoint directory from training run")
+#tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")
+tf.flags.DEFINE_string("checkpoint_dir", "./runs/", "Checkpoint directory from training run")
 tf.flags.DEFINE_boolean("eval_train", False, "Evaluate on all training data")
 
 # Misc Parameters
-tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")
-tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on devices")
+#tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")
+#tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on devices")
 
 
 FLAGS = tf.flags.FLAGS
@@ -36,9 +36,8 @@ if FLAGS.eval_train:
     y_test = np.argmax(y_test, axis=1)
 else:
 '''
-# DATA LOADING
 
-text = open ( 'test.txt', 'r' ).read()
+
 
 def get_num(val) :
     if val=="GEO" :
@@ -48,6 +47,8 @@ def get_num(val) :
     else :
         return 2
 
+
+# DATA LOADING
 base = pretraitement.init()
 texts = []
 descs = []
@@ -57,70 +58,79 @@ for b in base :
     descs.append(b[1])
     labels.append(get_num(b[2]))
 
-desc = pretraitement.preprocess(text)
+"""
+Function to initialize the model and BDD
+Has to be called before using the model for the first time or if the csv containing the base changed
+@return the preprocessed descriptors
+"""
+def init() :
+    # DATA LOADING
 
-x_raw = texts # [text]
-y_test = labels # None
-x_test = descs # [desc]
+    text = open ( 'test.txt', 'r' ).read()
+    desc = pretraitement.preprocess(text)
+
+    x_raw = texts # [text]
+    y_test = labels # None
+    x_test = descs # [desc]
 
 
-'''
+    '''
 # Map data into vocabulary
 vocab_path = os.path.join(FLAGS.checkpoint_dir, "..", "vocab")
 vocab_processor = learn.preprocessing.VocabularyProcessor.restore(vocab_path)
 x_test = np.array(list(vocab_processor.transform(x_raw)))
-'''
+    '''
 
-print("\nEvaluating...\n")
+    print("\nEvaluating...\n")
 
 # Evaluation
 # ==================================================
-checkPath=open('checkPath', "r").read()
-print(checkPath)#str
-checkpoint_file = tf.train.latest_checkpoint(checkPath)
-print(checkpoint_file)
-graph = tf.Graph()
-with graph.as_default():
-    session_conf = tf.ConfigProto(
-      allow_soft_placement=FLAGS.allow_soft_placement,
-      log_device_placement=FLAGS.log_device_placement)
-    sess = tf.Session(config=session_conf)
-    with sess.as_default():
+    checkPath=open('checkPath', "r").read()
+    print(checkPath)#str
+    checkpoint_file = tf.train.latest_checkpoint(checkPath)
+    print(checkpoint_file)
+    graph = tf.Graph()
+    with graph.as_default():
+        session_conf = tf.ConfigProto(
+          allow_soft_placement=FLAGS.allow_soft_placement,
+          log_device_placement=FLAGS.log_device_placement)
+        sess = tf.Session(config=session_conf)
+        with sess.as_default():
         # Load the saved meta graph and restore variables
-        saver = tf.train.import_meta_graph("{}.meta".format(checkpoint_file))
-        saver.restore(sess, checkpoint_file)
+            saver = tf.train.import_meta_graph("{}.meta".format(checkpoint_file))
+            saver.restore(sess, checkpoint_file)
 
         # Get the placeholders from the graph by name
-        input_x = graph.get_operation_by_name("input_x").outputs[0]
+            input_x = graph.get_operation_by_name("input_x").outputs[0]
         # input_y = graph.get_operation_by_name("input_y").outputs[0]
-        dropout_keep_prob = graph.get_operation_by_name("dropout_keep_prob").outputs[0]
+            dropout_keep_prob = graph.get_operation_by_name("dropout_keep_prob").outputs[0]
 
         # Tensors we want to evaluate
-        predictions = graph.get_operation_by_name("output/predictions").outputs[0]
-        scores = graph.get_operation_by_name("output/scores").outputs[0]
+            predictions = graph.get_operation_by_name("output/predictions").outputs[0]
+            scores = graph.get_operation_by_name("output/scores").outputs[0]
 
         # Generate batches for one epoch
-        batches = [x_test]
+            batches = [x_test]
 
-        pred, sc = sess.run([predictions,scores],{input_x:x_test,dropout_keep_prob: 1.0})
+            pred, sc = sess.run([predictions,scores],{input_x:x_test,dropout_keep_prob: 1.0})
 
         # Collect the predictions here
-        all_predictions = []
+            all_predictions = []
 
-        for x_test_batch in batches:
-            batch_predictions = sess.run(predictions, {input_x: x_test_batch, dropout_keep_prob: 1.0})
-            all_predictions = np.concatenate([all_predictions, batch_predictions])
+            for x_test_batch in batches:
+                batch_predictions = sess.run(predictions, {input_x: x_test_batch, dropout_keep_prob: 1.0})
+                all_predictions = np.concatenate([all_predictions, batch_predictions])
 
 # Print accuracy if y_test is defined
-if y_test is not None:
-    correct_predictions = float(sum(all_predictions == y_test))
-    print("Total number of test examples: {}".format(len(y_test)))
-    print("Accuracy: {:g}".format(correct_predictions/float(len(y_test))))
+    if y_test is not None:
+        correct_predictions = float(sum(all_predictions == y_test))
+        print("Total number of test examples: {}".format(len(y_test)))
+        print("Accuracy: {:g}".format(correct_predictions/float(len(y_test))))
 
 
 # Save the evaluation to a csv
-predictions_human_readable = np.column_stack((np.array(x_raw), all_predictions))
-out_path = os.path.join(FLAGS.checkpoint_dir, "..", "prediction.csv")
-print("Saving evaluation to {0}".format(out_path))
-with open(out_path, 'w') as f:
-    csv.writer(f).writerows(predictions_human_readable)
+    predictions_human_readable = np.column_stack((np.array(x_raw), all_predictions))
+    out_path = os.path.join(FLAGS.checkpoint_dir, "..", "prediction.csv")
+    print("Saving evaluation to {0}".format(out_path))
+    with open(out_path, 'w') as f:
+        csv.writer(f).writerows(predictions_human_readable)
