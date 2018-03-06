@@ -221,5 +221,4 @@ Set information for the field name
 """
 def set_field_information(dbManager, name, description, website):
     id = get_id_field(dbManager, name)
-    print(id)
-    print(dbManager.update_field(id, name, description, None, website))
+    dbManager.update_field(id, name, description, None, website)
