@@ -157,7 +157,7 @@ def add_user():
     HEADER PARAM  : None
     BODY PARAMS : { "name" : str, "surname" : str, "role" : str, "email" : str, "password" : str, "is_admin" : bool }
     """
-    data = request.form
+    data = json.loads(request.data)
     role = data.get('role', None)
     if dbManager.add_user(data['name'], data['surname'], role, data['email'], data['password'], data['is_admin']):
         return '', 201
@@ -174,7 +174,7 @@ def update_user(id_user):
     HEADER PARAM  : id_user: int
     BODY PARAMS : { "name" : str, "surname" : str, "role" : str, "email" : str, "password" : str,"is_admin" : bool }
     """
-    data = request.form
+    data = json.loads(request.data)
     name = data.get('name', None)
     surname = data.get('surname', None)
     role = data.get('role', None)
@@ -241,7 +241,7 @@ def add_offer():
     HEADER PARAM  : None
     BODY PARAMS : { "title" : str, "content" : str, "descriptor" : str, "id_user" : int }
     """
-    data = request.form
+    data = json.loads(request.data)
     if dbManager.add_offer(data['title'], data['content'], data['descriptor'], data['id_user']):
         return '', 201
     else:
@@ -257,7 +257,7 @@ def update_offer(id_offer):
     HEADER PARAM  : id_offer :int
     BODY PARAMS : { "title" : str, "content" : str, "descriptor" : str, "id_user" : int }
     """
-    data = request.form
+    data = json.loads(request.data)
     title = data.get('title', None)
     content = data.get('content', None)
     descriptor = data.get('descriptor', None)
@@ -324,7 +324,7 @@ def add_prediction():
     :HEADER PARAM  : None
     :BODY PARAMS :{"mark": int, "inbase": bool, "id_offer": int}
     """
-    data = request.form
+    data = json.loads(request.data)
     if dbManager.add_prediction(data['mark'], data['inbase'], data['id_offer']):
         return '', 201
     else:
@@ -342,7 +342,7 @@ def update_prediction(id_prediction):
     :BODY PARAMS :{"mark": int, "inbase": bool, "id_offer": int}
     """
     "TODO la mise a jour de inbase ne fonctionne pas pour une raison obscure"
-    data = request.form
+    data = json.loads(request.data)
     mark = data.get('mark', None)
     inbase = data.get('inbase', None)
     id_offer = data.get('id_offer', None)
@@ -391,7 +391,7 @@ def add_team():
     :HEADER PARAM  : None
     :BODY PARAMS :{"id_prediction": int, "id_field": int, "nb_members": int}
     """
-    data = request.form
+    data = json.loads(request.data)
     if dbManager.add_team(data['id_prediction'], data['id_field'], data['nb_members']):
         return '', 201
     else:
@@ -406,7 +406,7 @@ def update_teams(id_prediction):
     :HEADER PARAM  : id_prediction :int
     :BODY PARAMS :{"id_prediction": int, "id_field": int, "nb_members": int}
     """
-    data = request.form
+    data = json.loads(request.data)
     id_field = data.get('id_field', None)
     nb_members = data.get('nb_members', None)
     response = dbManager.update_team(id_prediction, id_field, nb_members)
@@ -421,7 +421,7 @@ def update_teams(id_prediction):
 
 @app.route('/fields')
 @cross_origin()
-@loginAdminRequired
+#@loginAdminRequired
 def get_fields():
     """
     Function to get all the field in the database
@@ -448,7 +448,7 @@ def get_field(id_field):
 
 @app.route('/fields', methods=['POST'])
 @cross_origin()
-@loginAdminRequired
+#@loginAdminRequired
 def add_field():
     """
     Function to add a field in the database
@@ -456,16 +456,18 @@ def add_field():
     :HEADER PARAM  : None
     :BODY PARAMS :{"name": str, "description": str, "descriptor": str,"website": str}
     """
-    data = request.form
-    if dbManager.add_field(data['name'], data['description'], data['descriptor'], data['website']):
-        return '', 201
+    data = json.loads(request.data)
+    print(data['name'])
+    field = dbManager.add_field(data['name'], data['description'], data['descriptor'], data['website'])
+    if field != None:
+        return jsonify(field), 201
     else:
         abort(400)
 
 
 @app.route('/fields/<int:id_field>', methods=['PUT'])
 @cross_origin()
-@loginAdminRequired
+#@loginAdminRequired
 def update_field(id_field):
     """
     Function to update a field in the database
@@ -473,7 +475,7 @@ def update_field(id_field):
     :HEADER PARAM  : id_field : int
     :BODY PARAMS :{"name": str, "description": str, "descriptor": str,"website": str}
     """
-    data = request.form
+    data = json.loads(request.data)
     name = data.get('name', None)
     description = data.get('description', None)
     descriptor = data.get('descriptor', None)
@@ -490,7 +492,7 @@ def update_field(id_field):
 
 @app.route('/fields/<int:id_field>', methods=['DELETE'])
 @cross_origin()
-@loginAdminRequired
+#@loginAdminRequired
 def delete_field(id_field):
     """
     Function to delete a field in the database
@@ -541,7 +543,7 @@ def add_contact():
     :BODY PARAMS :{"name": str, "surname": str, "email": str,"phone": str,"role": str,"id_field": int}
     """
 
-    data = request.form
+    data = json.loads(request.data)
     email = data.get('email', None)
     phone = data.get('phone', None)
     role = data.get('role', None)
@@ -561,7 +563,7 @@ def update_contact(id_contact):
     :HEADER PARAM  : id_contact : int
     :BODY PARAMS :{"name": str, "surname": str, "email": str,"phone": str,"role": str,"id_field": int}
     """
-    data = request.form
+    data = json.loads(request.data)
     name = data.get('name', None)
     surname = data.get('surname',None)
     email = data.get('email', None)

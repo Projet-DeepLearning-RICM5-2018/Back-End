@@ -176,7 +176,7 @@ class DatabaseManager():
         except Exception as e:
             dB.rollback()
             return False
-    
+
     def add_prediction_v2(self, mark, inbase, id_offer):
         date = datetime.datetime.now()
         prediction = Prediction(mark, inbase == 1, date, id_offer)
@@ -267,17 +267,17 @@ class DatabaseManager():
 
     def get_field_by_name(self, name):
         return Field.query.filter_by(name=name).first()
-   
+
 
     def add_field(self, name, description, descriptor, website):
         field = Field(name, description, descriptor, website)
         dB.add(field)
         try:
             dB.commit()
-            return True
+            return field.serialize()
         except Exception as e:
             dB.rollback()
-            return False
+            return None
 
     def add_field_v2(self, name, description, descriptor, website):
         field = Field(name, description, descriptor, website)
