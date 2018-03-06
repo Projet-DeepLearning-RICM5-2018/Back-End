@@ -427,22 +427,31 @@ def get_fields():
     Function to get all the field in the database
     :return: {"fields":{"name": str, "description": str, "descriptor": str,"website": str}}
     """
-    return jsonify(dbManager.get_all_fields()), 200
+    def complete_field(f) :
+        f['contacts'] = dbManager.get_field_contacts(f['id'])
+        return f
+    fields = dbManager.get_all_fields()
+    if fields :
+        fields = [complete_field(f) for f in fields]
+    else :
+        abort(404)
+    return jsonify(fields), 200
 
 
 @app.route('/fields/<int:id_field>')
 @cross_origin()
-@loginRequired
 def get_field(id_field):
     """
     Function to get a field in the database
     :param id_field: int
-    :return: {"field":{"mark": int, "inbase": bool, "id_offer": int}}
+    :return: {"field":{"id": int, "name": str, "description": str, "descriptor": str,"website": str, "contacts":}}
     """
     field = dbManager.get_field_by_id(id_field)
     if field is None:
         abort(404)
     else:
+        contacts = dbManager.get_field_contacts(field.id)
+        field["contacts"] = contacts
         return jsonify(field), 200
 
 
@@ -454,12 +463,21 @@ def add_field():
     Function to add a field in the database
     :METHOD : POST
     :HEADER PARAM  : None
-    :BODY PARAMS :{"name": str, "description": str, "descriptor": str,"website": str}
+    :BODY PARAMS :{"name": str, "description": str, "descriptor": str,"website": str, "contacts":
+        [{"name": str, "surname": str, "email": str,"phone": str,"role": str,"id_field": int}, ...]
+    }
     """
     data = json.loads(request.data)
-    print(data['name'])
+    print(data['contacts'])
     field = dbManager.add_field(data['name'], data['description'], data['descriptor'], data['website'])
     if field != None:
+        field['contacts'] = []
+        for contact in data['contacts'] :
+            created_contact = dbManager.add_contact(contact['name'],contact['surname'],contact['email'],contact['phone'],contact['role'],field['id'])
+            if created_contact :
+                field['contacts'].append(created_contact)
+            else :
+                abort(400)
         return jsonify(field), 201
     else:
         abort(400)
@@ -534,7 +552,7 @@ def get_contact(id_contact):
 
 @app.route('/contacts', methods=['POST'])
 @cross_origin()
-@loginAdminRequired
+#@loginAdminRequired
 def add_contact():
     """
     Function to add a contact in the database
@@ -547,15 +565,16 @@ def add_contact():
     email = data.get('email', None)
     phone = data.get('phone', None)
     role = data.get('role', None)
-    if dbManager.add_contact(data['name'], data['surname'], email, phone, role, data['id_field']):
-        return '', 201
+    contact = dbManager.add_contact(data['name'], data['surname'], email, phone, role, data['id_field'])
+    if contact != None :
+        return jsonify(contact), 201
     else:
         abort(400)
 
 
 @app.route('/contacts/<int:id_contact>', methods=['PUT'])
 @cross_origin()
-@loginAdminRequired
+#@loginAdminRequired
 def update_contact(id_contact):
     """
     Function to update a contact in the database
@@ -582,7 +601,7 @@ def update_contact(id_contact):
 
 @app.route('/contacts/<int:id_contact>', methods=['DELETE'])
 @cross_origin()
-@loginAdminRequired
+#@loginAdminRequired
 def delete_contact(id_contact):
     """
     Function to delete a contact in the database
