@@ -58,6 +58,7 @@ tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on 
 
 #changeEnd
 
+
 base = pretraitement.init() #[(string,[[float]],string)]
 #base.shape(59,) array([(,,),(),(),()*59])
 x, y = [], []
