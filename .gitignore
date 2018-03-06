@@ -434,3 +434,4 @@ ASALocalRun/
 *test.db
 
 preprocessing_model
+data/offers.csv

@@ -56,8 +56,11 @@ def preprocessAll(file_name) :
     learning_base = []
     with open(file_name,encoding='utf-8', mode="r") as f:
         reader = csv.DictReader(f)
+        i = 1
         for row in reader:
-            text = row['Offre initiale '] # Get the text from the initial offer
+            print('preprocess offer ' + str(i))
+            i+=1
+            text = row['Offre initiale'] # Get the text from the initial offer
             label = row['Formation']
             learning_base = learning_base + [(text,preprocess(text),label)] # All the text saved for preprocessing after building the model
     return learning_base
@@ -69,12 +72,15 @@ Has to be called before using the model for the first time or if the csv contain
 """
 def init(dbManager) :
     # Input files #
-    filename = './data/Données_RICM_GEO_PRI7.csv'
+    filename = './data/offers.csv'
     sentences = [['x','x','x','x','x']]
     with open(filename,encoding='utf-8', mode="r") as f:
         reader = csv.DictReader(f)
+        i = 1
         for row in reader:
-            text = row['Offre initiale '] # Get the text from the initial offer
+            text = row['Offre initiale'] # Get the text from the initial offer
+            print('init offer ' + str(i))
+            i+=1
             cleaned = tokenize(text)
             sentences = sentences + [cleaned] #Sentences used to build the model's vocabulary
     model = Word2Vec(sentences, size=100, window=5, min_count=5, workers=4)
@@ -83,6 +89,13 @@ def init(dbManager) :
     # Put everything in the DB for the first time"
     base = preprocessAll(filename)
     add_base_to_database(dbManager,base)
+
+    # Add fields
+    filename = './data/fields.csv'
+    with open(filename,encoding='utf-8', mode="r") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            set_field_information(dbManager, row['name'], row['description'], row['website'])
 
 
 """
@@ -170,7 +183,10 @@ Add all preprocessed offer in the database
 """
 def add_base_to_database(dbManager, base):
     adminId = dbManager.get_one_admin().id
+    i = 1
     for offer in base :
+        print('add to database offer ' + str(i))
+        i+=1
         nameField = offer[2]
         idOffer = add_an_offer(dbManager, offer, adminId)
         if idOffer!=-1 :
@@ -196,3 +212,14 @@ def get_id_field(dbManager, name)  :
          return id
       else :
          return -1
+
+"""
+Set information for the field name
+@param name : name of the field to update
+@param description
+@param website
+"""
+def set_field_information(dbManager, name, description, website):
+    id = get_id_field(dbManager, name)
+    print(id)
+    print(dbManager.update_field(id, name, description, None, website))

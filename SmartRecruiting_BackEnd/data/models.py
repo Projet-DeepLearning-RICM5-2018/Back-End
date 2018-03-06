@@ -80,10 +80,10 @@ class Team(Base):
 class Field (Base):
     __tablename__ = 'field'
     id = Column(Integer, primary_key=True, nullable=False)
-    name = Column(String(100), unique=True, nullable=False)
+    name = Column(String(500), unique=True, nullable=False)
     description = Column(Text, unique=False, nullable=True)
     descriptor = Column(Text, unique=False, nullable=False)
-    website = Column(String(100), unique=False, nullable=True)
+    website = Column(String(500), unique=False, nullable=True)
     teams = relationship("Team")
     contacts = relationship("Contact")
 
