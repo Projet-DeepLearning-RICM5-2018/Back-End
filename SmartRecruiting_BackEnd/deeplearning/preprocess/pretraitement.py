@@ -97,6 +97,13 @@ def init(dbManager) :
         for row in reader:
             set_field_information(dbManager, row['name'], row['description'], row['website'])
 
+    # Add contacts
+    filename = './data/contacts.csv'
+    with open(filename,encoding='utf-8', mode="r") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            add_contact(dbManager, row['field'], row['name'], row['surname'], row['role'], row['email'], row['phone'])
+
 
 """
 To reinit the model, and calculate all the descriptors when the DB changed
@@ -222,3 +229,16 @@ Set information for the field name
 def set_field_information(dbManager, name, description, website):
     id = get_id_field(dbManager, name)
     dbManager.update_field(id, name, description, None, website)
+
+"""
+Insert contact in the database
+@param fieldName
+@param name
+@param surname
+@param role
+@param email
+@param phone
+"""
+def add_contact(dbManager, fieldName, name, surname, role, email, phone):
+    id_field = get_id_field(dbManager, fieldName)
+    dbManager.add_contact(name, surname, email, phone, role, id_field)
