@@ -1,6 +1,8 @@
 import tensorflow as tf
 import numpy as np
 import os
+import pickle
+
 
 import time
 import datetime
@@ -28,6 +30,9 @@ def train(db_manager):
     # get the data from the database
     x, y, dic_cores = get_data_from_database(db_manager)
     # TODO sauvegarder le dic
+    with open('dic', 'wb') as file:
+        mon_pickler = pickle.Pickler(file)
+    
 
     # suffled the data
     x_shuffled, y_shuffled = randomly_shuffle_data(x, y)
@@ -192,7 +197,6 @@ def train_step(x_batch, y_batch, cnn, FLAGS, sess, train_op, global_step, train_
         cnn.dropout_keep_prob: FLAGS.dropout_keep_prob
 
     }
-    print(type(feed_dict))
 
     _, step, summaries, loss, accuracy = sess.run(
         [train_op, global_step, train_summary_op, cnn.loss, cnn.accuracy],
