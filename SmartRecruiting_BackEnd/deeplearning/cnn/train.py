@@ -30,7 +30,7 @@ def train(db_manager):
     # get the data from the database
     x, y, dic_cores = get_data_from_database(db_manager)
     # TODO sauvegarder le dic
-    with open('dic', 'wb') as file:
+    with open('./data/dic', 'wb') as file:
         mon_pickler = pickle.Pickler(file)
     
 

@@ -60,7 +60,7 @@ def checkPath():
     return checkpoint_file
 
 def getDic():
-    with open('dic','rb') as fichier:
+    with open('../SmartRecruiting_BackEnd/data/dic','rb') as fichier:
        mypic=pickle.Unpickler(fichier)
        dic=mypic.load()
     return dic
