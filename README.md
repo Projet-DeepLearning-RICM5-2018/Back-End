@@ -2,3 +2,4 @@
 
 jenkins is up
 
+test script
