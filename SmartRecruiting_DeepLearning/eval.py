@@ -5,8 +5,8 @@ import numpy as np
 import os
 import time
 import datetime
-import pretraitement
-from TextCNN import TextCNN
+from SmartRecruiting_BackEnd.deeplearning.preprocess import pretraitement
+from SmartRecruiting_BackEnd.deeplearning.cnn import textCnn
 from tensorflow.contrib import learn
 import csv
 
@@ -14,13 +14,13 @@ import csv
 # ==================================================
 
 # Eval Parameters
-#tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")
+tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")#
 tf.flags.DEFINE_string("checkpoint_dir", "./runs/", "Checkpoint directory from training run")
 tf.flags.DEFINE_boolean("eval_train", False, "Evaluate on all training data")
 
 # Misc Parameters
-#tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")
-#tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on devices")
+tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")#
+tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on devices")#
 
 
 FLAGS = tf.flags.FLAGS
@@ -49,6 +49,7 @@ def get_num(val) :
 
 
 # DATA LOADING
+'''
 base = pretraitement.init()
 texts = []
 descs = []
@@ -57,12 +58,56 @@ for b in base :
     texts.append(b[0])
     descs.append(b[1])
     labels.append(get_num(b[2]))
+'''
 
 """
-Function to initialize the model and BDD
-Has to be called before using the model for the first time or if the csv containing the base changed
-@return the preprocessed descriptors
+Function to get the path of checkpoint
+@return the path
 """
+def checkPath():
+    checkPath=open('checkPath', "r").read()
+    print(checkPath)#str
+    checkpoint_file = tf.train.latest_checkpoint(checkPath)
+    return checkpoint_file
+
+
+"""
+Function to compute the field for an offer
+@return the field
+"""
+def FormationByOffer(text):
+    x_test = pretraitement.preprocess(text)
+    checkpoint_file=checkPath()
+    graph = tf.Graph()
+    pred=[]
+    with graph.as_default():
+        session_conf = tf.ConfigProto(
+          allow_soft_placement=FLAGS.allow_soft_placement,
+          log_device_placement=FLAGS.log_device_placement)
+        sess = tf.Session(config=session_conf)
+        with sess.as_default():
+        # Load the saved meta graph and restore variables
+            saver = tf.train.import_meta_graph("{}.meta".format(checkpoint_file))
+            saver.restore(sess, checkpoint_file)
+
+        # Get the placeholders from the graph by name
+            input_x = graph.get_operation_by_name("input_x").outputs[0]
+        # input_y = graph.get_operation_by_name("input_y").outputs[0]
+            dropout_keep_prob = graph.get_operation_by_name("dropout_keep_prob").outputs[0]
+
+        # Tensors we want to evaluate
+            predictions = graph.get_operation_by_name("output/predictions").outputs[0]
+            scores = graph.get_operation_by_name("output/scores").outputs[0]
+
+        # Generate batches for one epoch
+            pred, sc = sess.run([predictions,scores],{input_x:x_test,dropout_keep_prob: 1.0})
+            #print(pred)#[2]
+    return pred[0]
+
+#text = open ( 'test.txt', 'r' ).read()
+#desc = pretraitement.preprocess(text)
+#FormationByOffer(desc)
+
 def init() :
     # DATA LOADING
 
@@ -85,10 +130,8 @@ x_test = np.array(list(vocab_processor.transform(x_raw)))
 
 # Evaluation
 # ==================================================
-    checkPath=open('checkPath', "r").read()
-    print(checkPath)#str
-    checkpoint_file = tf.train.latest_checkpoint(checkPath)
-    print(checkpoint_file)
+    
+    checkpoint_file=checkPath()
     graph = tf.Graph()
     with graph.as_default():
         session_conf = tf.ConfigProto(

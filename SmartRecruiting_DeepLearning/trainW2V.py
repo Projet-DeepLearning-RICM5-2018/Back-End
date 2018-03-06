@@ -255,5 +255,5 @@ with tf.Graph().as_default():
                 print("Saved model checkpoint to {}\n".format(path))
 
 #eval
-print("\nEvaluating...\n")
-eval.init()
+#print("\nEvaluating...\n")
+#eval.init()
