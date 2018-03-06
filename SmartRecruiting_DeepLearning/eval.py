@@ -9,18 +9,19 @@ from SmartRecruiting_BackEnd.deeplearning.preprocess import pretraitement
 from SmartRecruiting_BackEnd.deeplearning.cnn import textCnn
 from tensorflow.contrib import learn
 import csv
+import pickle
 
 # Parameters
 # ==================================================
 
 # Eval Parameters
-tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")#
+#tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")#
 tf.flags.DEFINE_string("checkpoint_dir", "./runs/", "Checkpoint directory from training run")
 tf.flags.DEFINE_boolean("eval_train", False, "Evaluate on all training data")
 
 # Misc Parameters
-tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")#
-tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on devices")#
+#tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")#
+#tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on devices")#
 
 
 FLAGS = tf.flags.FLAGS
@@ -48,18 +49,6 @@ def get_num(val) :
         return 2
 
 
-# DATA LOADING
-'''
-base = pretraitement.init()
-texts = []
-descs = []
-labels = []
-for b in base :
-    texts.append(b[0])
-    descs.append(b[1])
-    labels.append(get_num(b[2]))
-'''
-
 """
 Function to get the path of checkpoint
 @return the path
@@ -70,7 +59,11 @@ def checkPath():
     checkpoint_file = tf.train.latest_checkpoint(checkPath)
     return checkpoint_file
 
-
+def getDic():
+    with open('dic','rb') as fichier:
+       mypic=pickle.Unpickler(fichier)
+       dic=mypic.load()
+    return dic
 """
 Function to compute the field for an offer
 @return the field
@@ -101,7 +94,7 @@ def FormationByOffer(text):
 
         # Generate batches for one epoch
             pred, sc = sess.run([predictions,scores],{input_x:x_test,dropout_keep_prob: 1.0})
-            #print(pred)#[2]
+            #print(pred)#[2][0]
     return pred[0]
 
 #text = open ( 'test.txt', 'r' ).read()
@@ -111,6 +104,17 @@ def FormationByOffer(text):
 def init() :
     # DATA LOADING
 
+    
+    base = pretraitement.init()
+    texts = []
+    descs = []
+    labels = []
+    for b in base :
+        texts.append(b[0])
+        descs.append(b[1])
+        labels.append(get_num(b[2]))
+    
+    
     text = open ( 'test.txt', 'r' ).read()
     desc = pretraitement.preprocess(text)
 
