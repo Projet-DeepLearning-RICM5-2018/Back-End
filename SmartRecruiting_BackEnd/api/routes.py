@@ -11,6 +11,7 @@ from flask import Flask, jsonify, request, json, session, g
 from flask.json import jsonify
 from flask import render_template, abort, request
 from SmartRecruiting_BackEnd import app, dbManager
+from SmartRecruiting_DeepLearning.eval import FormationByOffer
 
 from flask_cors import CORS, cross_origin
 from functools import wraps
@@ -460,6 +461,43 @@ def fields_by_offer(id_offer):
         abort(404)
     else:
         return jsonify(fields), 200
+
+
+@app.route('/generatePrediction', methods=['POST'])
+@cross_origin()
+def generatePrediction():
+    """
+    METHOD : POST
+    HEADER PARAM  : None
+    BODY PARAMS : { "title" : str, "content" : str, "descriptor" : str, "id_user" : int }
+    RETURNS : 
+        {
+            "field": { "name": str, "description": str, "descriptor": str, "website": str }
+        }
+    """
+    data = json.loads(request.data)
+    id_field=FormationByOffer(data['content'])
+    field = dbManager.get_field_by_id(id_field)
+    if field is None:
+        abort(404)
+    else:
+        return jsonify(field), 200
+
+
+@app.route('/SaveGeneratePrediction', methods=['POST'])
+@cross_origin()
+@loginRequired
+def generatePrediction_save():
+    '''
+    data.descriptor
+    '''
+    data = json.loads(request.data)
+    field = dbManager.get_field_by_id(FormationByOffer(data.descriptor)[0])
+    dbManager.add_offer(data['title'], data['content'], data['descriptor'], data['id_user'])
+    if field is None:
+        abort(404)
+    else:
+        return jsonify(field), 200
 
 
 @app.route('/searchOffersByUser/<int:id_user>', methods=['GET'])
