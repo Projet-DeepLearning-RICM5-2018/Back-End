@@ -492,7 +492,8 @@ def generatePrediction_save():
     data.descriptor
     '''
     data = json.loads(request.data)
-    field = dbManager.get_field_by_id(FormationByOffer(data.descriptor)[0])
+    idfield = FormationByOffer(data['content'])
+    field = dbManager.get_field_by_id(idfield)
     dbManager.add_offer(data['title'], data['content'], data['descriptor'], data['id_user'])
     if field is None:
         abort(404)

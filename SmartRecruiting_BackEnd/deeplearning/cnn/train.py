@@ -172,7 +172,7 @@ def create_cores_id_field(db_manager):
         ten[i] = 1
         dic[id_field[i][0]] = ten
     return dic
-
+#{1: array([0, 1, 0]), 2: array([0, 0, 1]), 3: array([1, 0, 0])}
 
 def change_y(dic_cores, y):
     """
