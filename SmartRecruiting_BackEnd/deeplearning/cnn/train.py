@@ -28,8 +28,7 @@ def train(db_manager):
     num_epochs = 200
 
     # get the data from the database
-    x, y, dic_cores = get_data_from_database(db_manager)
-    # TODO sauvegarder le dic
+    x, y, dic_cores, nb_classes = get_data_from_database(db_manager)
     with open('./data/dic', 'wb') as file:
         mon_pickler = pickle.Pickler(file)
         mon_pickler.dump(dic_cores)
@@ -55,7 +54,7 @@ def train(db_manager):
         with tf.Session(config=session_conf) as sess:
             cnn = TextCNN(
                 sequence_length=pretraitement.max_size,
-                num_classes=3,  # TODO a recuperer dans la BD
+                num_classes=nb_classes,
                 vocab_size=len(x_train[0]),
                 embedding_size=embedding_dim,
                 filter_sizes=list(map(int, filter_sizes.split(","))),
@@ -130,10 +129,10 @@ def get_data_from_database(db_manager):
         x.append(string_to_descripteur(p[0]))
         y.append(p[1])
 
-    dic_cores = create_cores_id_field(db_manager)
+    dic_cores, nb_classes = create_cores_id_field(db_manager)
     y = change_y(dic_cores, y)
     print(dic_cores)
-    return x, y, dic_cores
+    return x, y, dic_cores, nb_classes
 
 
 def string_to_descripteur(chaine):
@@ -169,14 +168,14 @@ def create_cores_id_field(db_manager):
     :return: a dictionaire with the corepondance
     """
     id_field = db_manager.get_all_id_field()
-    nb = len(list(id_field))
-    print(nb)
+    nb_classes = len(list(id_field))
+    print(nb_classes)
     dic = dict()
-    for i in range(0, nb):
-        ten = np.zeros(3, int)
+    for i in range(0, nb_classes):
+        ten = np.zeros(nb_classes, int)
         ten[i] = 1
         dic[id_field[i][0]] = ten
-    return dic
+    return dic , nb_classes
 #{1: array([0, 1, 0]), 2: array([0, 0, 1]), 3: array([1, 0, 0])}
 
 def change_y(dic_cores, y):

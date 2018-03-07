@@ -10,6 +10,8 @@ Created on Sun Feb 26 16:23:02 2017
 from SmartRecruiting_BackEnd.data.models import *
 from SmartRecruiting_BackEnd.data.database import init_db, dbSession as dB
 from SmartRecruiting_BackEnd import app
+from SmartRecruiting_BackEnd.deeplearning.cnn.train import train
+from SmartRecruiting_BackEnd.deeplearning.cnn.eval import eval_all, save_eval
 from SmartRecruiting_BackEnd.deeplearning.preprocess.pretraitement import init, reinit, preprocess, descriptor_to_string
 import datetime
 

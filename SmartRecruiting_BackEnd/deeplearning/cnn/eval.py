@@ -37,7 +37,10 @@ def FormationByOffer(text):
     :param text:
     :return:the field
     """
-    def_flags()
+    # Eval Parameters
+    tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")#
+    tf.flags.DEFINE_string("checkpoint_dir", "./runs/", "Checkpoint directory from training run")
+    tf.flags.DEFINE_boolean("eval_train", False, "Evaluate on all training data")
     FLAGS = tf.flags.FLAGS
     x_test = pretraitement.preprocess(text)
     #print(x_test)
@@ -66,7 +69,7 @@ def FormationByOffer(text):
         # Generate batches for one epoch
             pred, sc = sess.run([predictions,scores],{input_x:[x_test],dropout_keep_prob: 1.0})
             print(pred)#[2][0]
-    ten = np.zeros(len(getDic()), int)
+    ten = np.zeros(3, int)
     ten[pred[0]] = 1
     print(getDic())
     #print(list(getDic().keys())[list(getDic().values()).index(ten)])
@@ -78,9 +81,12 @@ def FormationByOffer(text):
 
 def eval_all(db_manager) :
 
-    def_flags()
+    # Misc Parameters
+    tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")#
+    tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on devices")
+
     FLAGS = tf.flags.FLAGS
-    x, y, dic, nb_classes = get_data_from_database(db_manager)
+    x, y, dic = get_data_from_database(db_manager)
     y_test = y
     x_test = x
 
@@ -152,16 +158,6 @@ def load_eval():
         accuracy = mon_pickler.load()
     return nb_test, accuracy
 
-
-def def_flags():
-    # Eval Parameters
-    # tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")#
-    #tf.flags.DEFINE_string("checkpoint_dir", "./runs/", "Checkpoint directory from training run")
-    tf.flags.DEFINE_boolean("eval_train", False, "Evaluate on all training data")
-
-    # Misc Parameters
-    tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")#
-    tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on devices")#
 
 def ind_1(ten):
     ind =0
