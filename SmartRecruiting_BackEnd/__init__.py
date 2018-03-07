@@ -15,7 +15,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-t', '--testing', action='store_true') #to use the testing database
 parser.add_argument('-i', '--init', action='store_true') #to use the testing database
 parser.add_argument('-r', '--reinit', action='store_true') #to use the testing database
-args = parser.parse_args()
+args = parser.parse_known_args()
 
 #remove arguments to not interfere with unittest
 import sys
@@ -52,9 +52,9 @@ app.config['CORS_HEADERS'] = ['Content-Type', 'Authorization']
 app.config['CORS_AUTOMATIC_OPTIONS'] = True
 CORS(app)
 
-app.config['TESTING'] = args.testing
-app.config['INIT'] = args.init
-app.config['REINIT'] = args.reinit
+app.config['TESTING'] = args[0].testing
+app.config['INIT'] = args[0].init
+app.config['REINIT'] = args[0].reinit
 
 from SmartRecruiting_BackEnd.data import DatabaseManager
 dbManager = DatabaseManager()

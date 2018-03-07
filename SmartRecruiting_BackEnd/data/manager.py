@@ -47,10 +47,6 @@ class DatabaseManager():
 
     def get_one_admin(self):
         return User.query.filter_by(is_admin=1).first()
-        """if user is None:
-            return None
-        else:
-            return user.serialize()"""
 
 
     def add_user(self, name, surname, role, email, password, is_admin):
@@ -180,7 +176,7 @@ class DatabaseManager():
         except Exception as e:
             dB.rollback()
             return False
-    
+
     def add_prediction_v2(self, mark, inbase, id_offer):
         date = datetime.datetime.now()
         prediction = Prediction(mark, inbase == 1, date, id_offer)
@@ -271,17 +267,17 @@ class DatabaseManager():
 
     def get_field_by_name(self, name):
         return Field.query.filter_by(name=name).first()
-   
+
 
     def add_field(self, name, description, descriptor, website):
         field = Field(name, description, descriptor, website)
         dB.add(field)
         try:
             dB.commit()
-            return True
+            return field.serialize()
         except Exception as e:
             dB.rollback()
-            return False
+            return None
 
     def add_field_v2(self, name, description, descriptor, website):
         field = Field(name, description, descriptor, website)
@@ -319,6 +315,8 @@ class DatabaseManager():
         if field is None:
             return None
         else:
+            for contact in field.contacts :
+                self.delete_contact(contact.id)
             dB.delete(field)
             dB.commit()
             return True
@@ -339,10 +337,10 @@ class DatabaseManager():
         dB.add(contact)
         try:
             dB.commit()
-            return True
+            return contact.serialize()
         except Exception as e:
             dB.rollback()
-            return False
+            return None
 
     def update_contact(self, id_contact, name, surname, email, phone, role, id_field):
         contact = Contact.query.get(id_contact)
@@ -405,10 +403,6 @@ class DatabaseManager():
             "TODO"
 
     def offers_by_field(self,id_field):
-        "offre associes a une formation"
-        "Idoffers = Prediction.query\
-            .join(Team, Team.id_prediction == Prediction.id)\
-            .filter(Team.id_field == id_field)"
         offers = Offer.query\
             .join(Prediction, Prediction.id_offer == Offer.id)\
             .join(Team, Team.id_prediction == Prediction.id)\

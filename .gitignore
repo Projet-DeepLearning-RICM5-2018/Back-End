@@ -434,6 +434,10 @@ ASALocalRun/
 *test.db
 
 preprocessing_model
+
 data/offers.csv
 data/fields.csv
 data/contacts.csv
+
+#Database
+database.py
