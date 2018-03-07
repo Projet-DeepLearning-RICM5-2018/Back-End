@@ -13,53 +13,12 @@ import pickle
 from SmartRecruiting_BackEnd.deeplearning.cnn.train import get_data_from_database
 
 
-# Eval Parameters
-#tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")#
-tf.flags.DEFINE_string("checkpoint_dir", "./runs/", "Checkpoint directory from training run")
-tf.flags.DEFINE_boolean("eval_train", False, "Evaluate on all training data")
-
-# Misc Parameters
-#tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")#
-#tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on devices")#
-
-
-FLAGS = tf.flags.FLAGS
-#FLAGS._parse_flags()
-print("\nParameters:")
-for attr, value in sorted(FLAGS.__flags.items()):
-    print("{}={}".format(attr.upper(), value))
-print("")
-'''
-# CHANGE THIS: Load data. Load your own data here
-if FLAGS.eval_train:
-    x_raw, y_test = data_helpers.load_data_and_labels(FLAGS.positive_data_file, FLAGS.negative_data_file)
-    y_test = np.argmax(y_test, axis=1)
-else:
-'''
-
-
-
-def get_num(val) :
-    if val=="GEO" :
-        return 0
-    elif val == "RICM" :
-        return 1
-    else :
-        return 2
-
-
-"""
-Function to get the path of checkpoint
-@return the path
-"""
 def checkPath():
-    checkPath=open('./data/checkPath', "r").read()
-    print(checkPath)#str
     """
     Function to get the path of checkpoint
     :return:the path
     """
-    checkPath = open('checkPath', "r").read()
+    checkPath = open('./data/checkPath', "r").read()
     print(checkPath)
     checkpoint_file = tf.train.latest_checkpoint(checkPath)
     return checkpoint_file
@@ -201,8 +160,8 @@ def def_flags():
     tf.flags.DEFINE_boolean("eval_train", False, "Evaluate on all training data")
 
     # Misc Parameters
-    tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")#
-    tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on devices")#
+    #tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")#
+    #tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on devices")#
 
 def ind_1(ten):
     ind =0
