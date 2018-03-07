@@ -30,7 +30,7 @@ class DatabaseManager():
             init(self)
             print ("init")
         elif (app.config['REINIT']):
-            reinit(self)
+            #reinit(self)
             print("reinit")
         if(app.config['INIT'] or app.config['REINIT']):
             print ("-------------------------------------train ----------------------------------------")

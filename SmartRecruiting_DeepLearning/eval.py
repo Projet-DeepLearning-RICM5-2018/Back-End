@@ -15,13 +15,13 @@ import pickle
 # ==================================================
 
 # Eval Parameters
-#tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")#
+tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")#
 tf.flags.DEFINE_string("checkpoint_dir", "./runs/", "Checkpoint directory from training run")
 tf.flags.DEFINE_boolean("eval_train", False, "Evaluate on all training data")
 
 # Misc Parameters
-#tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")#
-#tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on devices")#
+tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")#
+tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on devices")#
 
 
 FLAGS = tf.flags.FLAGS
@@ -54,15 +54,16 @@ Function to get the path of checkpoint
 @return the path
 """
 def checkPath():
-    checkPath=open('../SmartRecruiting_BackEnd/data/checkPath', "r").read()
+    checkPath=open('./data/checkPath', "r").read()
     print(checkPath)#str
     checkpoint_file = tf.train.latest_checkpoint(checkPath)
     return checkpoint_file
 
 def getDic():
-    with open('../SmartRecruiting_BackEnd/data/dic','rb') as fichier:
+    with open('./data/dic','rb') as fichier:
        mypic=pickle.Unpickler(fichier)
        dic=mypic.load()
+       print(type(dic))
     return dic
 """
 Function to compute the field for an offer
@@ -70,6 +71,7 @@ Function to compute the field for an offer
 """
 def FormationByOffer(text):
     x_test = pretraitement.preprocess(text)
+    #print(x_test)
     checkpoint_file=checkPath()
     graph = tf.Graph()
     pred=[]
@@ -93,11 +95,16 @@ def FormationByOffer(text):
             scores = graph.get_operation_by_name("output/scores").outputs[0]
 
         # Generate batches for one epoch
-            pred, sc = sess.run([predictions,scores],{input_x:x_test,dropout_keep_prob: 1.0})
-            #print(pred)#[2][0]
+            pred, sc = sess.run([predictions,scores],{input_x:[x_test],dropout_keep_prob: 1.0})
+            print(pred)#[2][0]
     ten = np.zeros(3, int)
     ten[pred[0]] = 1
-    return getDic().index(ten)
+    print(getDic())
+    #print(list(getDic().keys())[list(getDic().values()).index(ten)])
+    for idf, arrf in getDic().items():    # for name, age in list.items(): iteritems (for Python 3.x)
+        if (arrf == ten).all():
+            print(idf)
+    return idf
 
 #text = open ( 'test.txt', 'r' ).read()
 #desc = pretraitement.preprocess(text)
