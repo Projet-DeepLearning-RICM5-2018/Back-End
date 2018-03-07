@@ -275,12 +275,13 @@ def update_offer(id_offer):
 
 @app.route('/offers/<int:id_offer>', methods=['DELETE'])
 @cross_origin()
-@loginRequired
+#@loginRequired
 def delete_offer(id_offer):
     """
     METHOD : DELETE
     HEADER PARAM  : id_offer :int
     """
+
     if dbManager.delete_offer(id_offer) is None:
         abort(404)
     else:

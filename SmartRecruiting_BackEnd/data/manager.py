@@ -157,9 +157,21 @@ class DatabaseManager():
         if offer is None:
             return None
         else:
-            dB.delete(offer)
-            dB.commit()
-            return True
+            prediction = Prediction.query.filter_by(id_offer=id_offer).first()
+            print(prediction)
+            if prediction is None:
+                return None
+            else :
+                team = Team.query.filter_by(id_prediction=prediction.id).first()
+                print(team)
+                if team is None:
+                    return None
+                else :
+                    dB.delete(offer)
+                    dB.delete(team)
+                    dB.delete(prediction)
+                    dB.commit()
+                    return True
 
     def get_all_predictions(self):
         predictions = Prediction.query.all()
