@@ -126,6 +126,11 @@ def get_users():
     """
     return jsonify(dbManager.get_all_users()), 200
 
+@app.route('/testCom')
+@cross_origin()
+def get_test_fields() :
+    return jsonify("hello I am working :D"), 200
+
 
 @app.route('/users/<int:id_user>')
 @cross_origin()
@@ -152,7 +157,7 @@ def add_user():
     HEADER PARAM  : None
     BODY PARAMS : { "name" : str, "surname" : str, "role" : str, "email" : str, "password" : str, "is_admin" : bool }
     """
-    data = request.form
+    data = json.loads(request.data)
     role = data.get('role', None)
     if dbManager.add_user(data['name'], data['surname'], role, data['email'], data['password'], data['is_admin']):
         return '', 201
@@ -169,7 +174,7 @@ def update_user(id_user):
     HEADER PARAM  : id_user: int
     BODY PARAMS : { "name" : str, "surname" : str, "role" : str, "email" : str, "password" : str,"is_admin" : bool }
     """
-    data = request.form
+    data = json.loads(request.data)
     name = data.get('name', None)
     surname = data.get('surname', None)
     role = data.get('role', None)
@@ -236,7 +241,7 @@ def add_offer():
     HEADER PARAM  : None
     BODY PARAMS : { "title" : str, "content" : str, "descriptor" : str, "id_user" : int }
     """
-    data = request.form
+    data = json.loads(request.data)
     if dbManager.add_offer(data['title'], data['content'], data['descriptor'], data['id_user']):
         return '', 201
     else:
@@ -252,7 +257,7 @@ def update_offer(id_offer):
     HEADER PARAM  : id_offer :int
     BODY PARAMS : { "title" : str, "content" : str, "descriptor" : str, "id_user" : int }
     """
-    data = request.form
+    data = json.loads(request.data)
     title = data.get('title', None)
     content = data.get('content', None)
     descriptor = data.get('descriptor', None)
@@ -319,7 +324,7 @@ def add_prediction():
     :HEADER PARAM  : None
     :BODY PARAMS :{"mark": int, "inbase": bool, "id_offer": int}
     """
-    data = request.form
+    data = json.loads(request.data)
     if dbManager.add_prediction(data['mark'], data['inbase'], data['id_offer']):
         return '', 201
     else:
@@ -337,7 +342,7 @@ def update_prediction(id_prediction):
     :BODY PARAMS :{"mark": int, "inbase": bool, "id_offer": int}
     """
     "TODO la mise a jour de inbase ne fonctionne pas pour une raison obscure"
-    data = request.form
+    data = json.loads(request.data)
     mark = data.get('mark', None)
     inbase = data.get('inbase', None)
     id_offer = data.get('id_offer', None)
@@ -386,7 +391,7 @@ def add_team():
     :HEADER PARAM  : None
     :BODY PARAMS :{"id_prediction": int, "id_field": int, "nb_members": int}
     """
-    data = request.form
+    data = json.loads(request.data)
     if dbManager.add_team(data['id_prediction'], data['id_field'], data['nb_members']):
         return '', 201
     else:
@@ -401,7 +406,7 @@ def update_teams(id_prediction):
     :HEADER PARAM  : id_prediction :int
     :BODY PARAMS :{"id_prediction": int, "id_field": int, "nb_members": int}
     """
-    data = request.form
+    data = json.loads(request.data)
     id_field = data.get('id_field', None)
     nb_members = data.get('nb_members', None)
     response = dbManager.update_team(id_prediction, id_field, nb_members)
@@ -416,51 +421,71 @@ def update_teams(id_prediction):
 
 @app.route('/fields')
 @cross_origin()
-@loginAdminRequired
+#@loginAdminRequired
 def get_fields():
     """
     Function to get all the field in the database
     :return: {"fields":{"name": str, "description": str, "descriptor": str,"website": str}}
     """
-    return jsonify(dbManager.get_all_fields()), 200
+    def complete_field(f) :
+        f['contacts'] = dbManager.get_field_contacts(f['id'])
+        return f
+    fields = dbManager.get_all_fields()
+    if fields :
+        fields = [complete_field(f) for f in fields]
+    else :
+        abort(404)
+    return jsonify(fields), 200
 
 
 @app.route('/fields/<int:id_field>')
 @cross_origin()
-@loginRequired
 def get_field(id_field):
     """
     Function to get a field in the database
     :param id_field: int
-    :return: {"field":{"mark": int, "inbase": bool, "id_offer": int}}
+    :return: {"field":{"id": int, "name": str, "description": str, "descriptor": str,"website": str, "contacts":}}
     """
     field = dbManager.get_field_by_id(id_field)
     if field is None:
         abort(404)
     else:
+        contacts = dbManager.get_field_contacts(field.id)
+        field["contacts"] = contacts
         return jsonify(field), 200
 
 
 @app.route('/fields', methods=['POST'])
 @cross_origin()
-@loginAdminRequired
+#@loginAdminRequired
 def add_field():
     """
     Function to add a field in the database
     :METHOD : POST
     :HEADER PARAM  : None
-    :BODY PARAMS :{"name": str, "description": str, "descriptor": str,"website": str}
+    :BODY PARAMS :{"name": str, "description": str, "descriptor": str,"website": str, "contacts":
+        [{"name": str, "surname": str, "email": str,"phone": str,"role": str,"id_field": int}, ...]
+    }
     """
-    data = request.form
-    if dbManager.add_field(data['name'], data['description'], data['descriptor'], data['website']):
-        return '', 201
+    data = json.loads(request.data)
+    print(data['contacts'])
+    field = dbManager.add_field(data['name'], data['description'], data['descriptor'], data['website'])
+    if field != None:
+        field['contacts'] = []
+        for contact in data['contacts'] :
+            created_contact = dbManager.add_contact(contact['name'],contact['surname'],contact['email'],contact['phone'],contact['role'],field['id'])
+            if created_contact :
+                field['contacts'].append(created_contact)
+            else :
+                abort(400)
+        return jsonify(field), 201
     else:
         abort(400)
 
 
 @app.route('/fields/<int:id_field>', methods=['PUT'])
 @cross_origin()
-@loginAdminRequired
+#@loginAdminRequired
 def update_field(id_field):
     """
     Function to update a field in the database
@@ -468,7 +493,7 @@ def update_field(id_field):
     :HEADER PARAM  : id_field : int
     :BODY PARAMS :{"name": str, "description": str, "descriptor": str,"website": str}
     """
-    data = request.form
+    data = json.loads(request.data)
     name = data.get('name', None)
     description = data.get('description', None)
     descriptor = data.get('descriptor', None)
@@ -485,7 +510,7 @@ def update_field(id_field):
 
 @app.route('/fields/<int:id_field>', methods=['DELETE'])
 @cross_origin()
-@loginAdminRequired
+#@loginAdminRequired
 def delete_field(id_field):
     """
     Function to delete a field in the database
@@ -527,7 +552,7 @@ def get_contact(id_contact):
 
 @app.route('/contacts', methods=['POST'])
 @cross_origin()
-@loginAdminRequired
+#@loginAdminRequired
 def add_contact():
     """
     Function to add a contact in the database
@@ -536,19 +561,20 @@ def add_contact():
     :BODY PARAMS :{"name": str, "surname": str, "email": str,"phone": str,"role": str,"id_field": int}
     """
 
-    data = request.form
+    data = json.loads(request.data)
     email = data.get('email', None)
     phone = data.get('phone', None)
     role = data.get('role', None)
-    if dbManager.add_contact(data['name'], data['surname'], email, phone, role, data['id_field']):
-        return '', 201
+    contact = dbManager.add_contact(data['name'], data['surname'], email, phone, role, data['id_field'])
+    if contact != None :
+        return jsonify(contact), 201
     else:
         abort(400)
 
 
 @app.route('/contacts/<int:id_contact>', methods=['PUT'])
 @cross_origin()
-@loginAdminRequired
+#@loginAdminRequired
 def update_contact(id_contact):
     """
     Function to update a contact in the database
@@ -556,7 +582,7 @@ def update_contact(id_contact):
     :HEADER PARAM  : id_contact : int
     :BODY PARAMS :{"name": str, "surname": str, "email": str,"phone": str,"role": str,"id_field": int}
     """
-    data = request.form
+    data = json.loads(request.data)
     name = data.get('name', None)
     surname = data.get('surname',None)
     email = data.get('email', None)
@@ -575,7 +601,7 @@ def update_contact(id_contact):
 
 @app.route('/contacts/<int:id_contact>', methods=['DELETE'])
 @cross_origin()
-@loginAdminRequired
+#@loginAdminRequired
 def delete_contact(id_contact):
     """
     Function to delete a contact in the database
@@ -687,7 +713,7 @@ def signup():
     METHOD : POST
     HEADER PARAM  : None
     BODY PARAMS : { "name" : str, "surname" : str, "role" : str, "email" : str, "password" : str }
-    RETURNS : 
+    RETURNS :
         {
             "token": str,
             "user": { "email": str, "id": int, "is_admin": boolean, "name": str, "password": str, "role": str, "surname": str }
@@ -717,23 +743,23 @@ def login():
     METHOD : POST
     HEADER PARAM  : None
     BODY PARAMS : { "emailUser" : str, "password" : str}
-    RETURNS : 
+    RETURNS :
         {
             "token": str,
             "user": { "email": str, "id": int, "is_admin": boolean, "name": str, "password": str, "role": str, "surname": str }
         }
     """
     data = json.loads(request.data)
-    
+
     user = dbManager.get_user_by_email(data["emailUser"])
 
     if not user:
         return jsonify(error="No such user"), 404
-    
+
     password = data["password"].encode('utf-8')
-    
+
     if user.password == hashpw(password, user.password):
-        session['logged_in'] = True    
+        session['logged_in'] = True
         return jsonify(user = user.serialize(), token=createToken(user)), 200
     else:
         return jsonify(error="Wrong name or password"), 400

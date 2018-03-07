@@ -16,8 +16,9 @@ from SmartRecruiting_BackEnd import app
 max_size = 400 # The maximal size that a text should have.
 app.config['stop_list'] =[word for line in open("./data/stopwords_fr.txt",encoding='utf-8', mode="r") for word in line.split()]
 
-# Functions definition #
-
+########################
+# FUNCTIONS DEFINITION #
+########################
 """
 Function to remove stop words and punctuation from a text
 @param text : string, the input text
@@ -80,9 +81,7 @@ def init(dbManager) :
     model = Word2Vec(sentences, size=100, window=5, min_count=5, workers=4)
     model.save("preprocessing_model")
 
-    # TODO : Put everything in the DB for the first time"
-
-    print("ADD IN THE BDD ALL OFFERS")
+    # Put everything in the DB for the first time"
     base = preprocessAll(filename)
     add_base_to_database(dbManager,base)
 
@@ -92,7 +91,7 @@ To reinit the model, and calculate all the descriptors when the DB changed
 So not taking data from the CSV but DB
 """
 def reinit(dbManager) :
-    # TODO : Get all offers from dB"
+    # Get all offers from dB"
     offers = dbManager.get_all_offers()
 
     # Rebuild the model #
@@ -198,14 +197,3 @@ def get_id_field(dbManager, name)  :
          return id
       else :
          return -1
-
-
-
-
-
-# Tests #
-#base = init()
-#with open('./data/test.txt',encoding='utf-8', mode="w") as f:
-#   f.write(str(base))
-#text = open ( 'test.txt', 'r' ).read()
-#print((text,preprocess(text)[:10]))
