@@ -93,6 +93,12 @@ class DatabaseManager():
             dB.commit()
             return True
 
+    def delete_users(self):
+        users = User.query.all()
+        for user in users:
+            dB.delete(user)
+            dB.commit()
+
     def get_all_offers(self):
         offers = Offer.query.all()
         return [o.serialize() for o in offers]
@@ -151,9 +157,21 @@ class DatabaseManager():
         if offer is None:
             return None
         else:
-            dB.delete(offer)
-            dB.commit()
-            return True
+            prediction = Prediction.query.filter_by(id_offer=id_offer).first()
+            print(prediction)
+            if prediction is None:
+                return None
+            else :
+                team = Team.query.filter_by(id_prediction=prediction.id).first()
+                print(team)
+                if team is None:
+                    return None
+                else :
+                    dB.delete(offer)
+                    dB.delete(team)
+                    dB.delete(prediction)
+                    dB.commit()
+                    return True
 
     def get_all_predictions(self):
         predictions = Prediction.query.all()
@@ -176,7 +194,7 @@ class DatabaseManager():
         except Exception as e:
             dB.rollback()
             return False
-    
+
     def add_prediction_v2(self, mark, inbase, id_offer):
         date = datetime.datetime.now()
         prediction = Prediction(mark, inbase == 1, date, id_offer)
@@ -279,17 +297,17 @@ class DatabaseManager():
 
     def get_field_by_name(self, name):
         return Field.query.filter_by(name=name).first()
-   
+
 
     def add_field(self, name, description, descriptor, website):
         field = Field(name, description, descriptor, website)
         dB.add(field)
         try:
             dB.commit()
-            return True
+            return field.serialize()
         except Exception as e:
             dB.rollback()
-            return False
+            return None
 
     def add_field_v2(self, name, description, descriptor, website):
         field = Field(name, description, descriptor, website)
@@ -327,6 +345,8 @@ class DatabaseManager():
         if field is None:
             return None
         else:
+            for contact in field.contacts :
+                self.delete_contact(contact.id)
             dB.delete(field)
             dB.commit()
             return True
@@ -347,10 +367,10 @@ class DatabaseManager():
         dB.add(contact)
         try:
             dB.commit()
-            return True
+            return contact.serialize()
         except Exception as e:
             dB.rollback()
-            return False
+            return None
 
     def update_contact(self, id_contact, name, surname, email, phone, role, id_field):
         contact = Contact.query.get(id_contact)

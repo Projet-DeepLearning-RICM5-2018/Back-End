@@ -10,13 +10,15 @@ import string
 import csv
 import numpy as np
 from gensim.models import Word2Vec
+from SmartRecruiting_BackEnd import app
 
 # Constants definition #
 max_size = 400 # The maximal size that a text should have.
-stop_list =[word for line in open("./data/stopwords_fr.txt",encoding='utf-8', mode="r") for word in line.split()]
+app.config['stop_list'] =[word for line in open("./data/stopwords_fr.txt",encoding='utf-8', mode="r") for word in line.split()]
 
-# Functions definition #
-
+########################
+# FUNCTIONS DEFINITION #
+########################
 """
 Function to remove stop words and punctuation from a text
 @param text : string, the input text
@@ -26,7 +28,7 @@ def tokenize(text) :
     words = text.split() # split into words by white space
     words = [w.lower() for w in words] # put to lowercase
     words = [''.join(letter for letter in word if letter.isalpha()) for word in words] # remove punctuation
-    words = list(filter(None,filter(lambda word: word not in stop_list, words))) # remove stop words
+    words = list(filter(None,filter(lambda word: word not in app.config['stop_list'], words))) # remove stop words
     return words
 
 
@@ -70,34 +72,98 @@ def init(dbManager) :
     # Input files #
     filename = './data/Données_RICM_GEO_PRI7.csv'
     sentences = [['x','x','x','x','x']]
-    base_text = []
     with open(filename,encoding='utf-8', mode="r") as f:
         reader = csv.DictReader(f)
         for row in reader:
             text = row['Offre initiale '] # Get the text from the initial offer
             cleaned = tokenize(text)
             sentences = sentences + [cleaned] #Sentences used to build the model's vocabulary
-            base_text = base_text + [text] # All the text saved for preprocessing after building the model
     model = Word2Vec(sentences, size=100, window=5, min_count=5, workers=4)
     model.save("preprocessing_model")
 
-    # TODO : Put everything in the DB for the first time"
-    
-    print("ADD IN THE BDD ALL OFFERS")
+    # Put everything in the DB for the first time"
     base = preprocessAll(filename)
     add_base_to_database(dbManager,base)
-    
+
 
 """
 To reinit the model, and calculate all the descriptors when the DB changed
 So not taking data from the CSV but DB
 """
 def reinit(dbManager) :
-    # TODO : Get all offers from dB"
+    # Get all offers from dB"
+    offers = dbManager.get_all_offers()
+
     # Rebuild the model #
+    sentences = [['x','x','x','x','x']]
+    for o in offers :
+        text = o['content']
+        cleaned = tokenize(text)
+        sentences = sentences + [cleaned] #Sentences used to build the model's vocabulary
+    model = Word2Vec(sentences, size=100, window=5, min_count=5, workers=4)
+    model.save("preprocessing_model")
+
     # Recompute all descriptors and put them in the DB #
-    base = dbManager.get_all_offers()
-    print(base)
+    res  = recompute_all_descriptors(offers)
+    update_all_offers(dbManager,res)
+
+"""
+Recompute descriptor for each offer given
+@param offers : a list of offers
+@return a list of (id, descriptors)
+"""
+def recompute_all_descriptors(offers) :
+    res = []
+    for o in offers :
+        desc = preprocess(o['content'])
+        id = o['id']
+        res = res + [{'id':id,'desc':desc}]
+    return res
+
+###########################################
+# FUNCTIONS REGARDING THE DATABASE ACCESS #
+###########################################
+"""
+Add a preprocessed offer in the database
+@param offer : (text,descriptor,label) the processed offer
+@return id : int, id of the newly created offer
+"""
+def add_an_offer(dbManager, offer, idAdmin) :
+    #Make title
+    title = offer[0].split(' ')
+    title = title[:5]
+    title = ' '.join(title)
+
+    #Make descriptor
+    desc = (np.array2string(o, precision=5, separator=' ', suppress_small=False) for o in offer[1])
+    desc = ','.join(desc)
+
+    id = dbManager.add_offer_v2(title, offer[0], desc, idAdmin)
+    return id
+
+"""
+Update the descriptor of an offer
+@param dbManager
+@param offer_id
+@param descriptor
+@return 1 if successful, -1 else.
+"""
+def update_descriptor_of_offer_by_id(dbManager,id,descriptor) :
+    desc = (np.array2string(word_vector, precision=5, separator=' ', suppress_small=False) for word_vector in descriptor)
+    desc = ','.join(desc)
+    if dbManager.update_offer(id,None,None,desc,None) :
+        return 1
+    else :
+        return -1
+
+"""
+Update all given offers by id (in the DB)
+@param dbManager
+@param list : list of (id, descriptors)
+"""
+def update_all_offers(dbManager,list) :
+    for item in list :
+        update_descriptor_of_offer_by_id(dbManager,item['id'],item['desc'])
 
 """
 Add all preprocessed offer in the database
@@ -114,26 +180,12 @@ def add_base_to_database(dbManager, base):
                 idField = get_id_field(dbManager,nameField)
                 if idField!=-1 :
                     dbManager.add_team(idPredic , idField, 1)
-"""
-Add a preprocessed offer in the database
-@param offer : (text,descriptor,label) the processed offer
-"""
-def add_an_offer(dbManager, offer, idAdmin) :
-    #Make title
-    title = offer[0].split(' ')
-    title = title[:5]
-    title = ' '.join(title)
 
-    #Make descriptor
-    desc = (np.array2string(o, precision=5, separator=' ', suppress_small=False) for o in offer[1])
-    desc = ','.join(desc)
-    
-    id = dbManager.add_offer_v2(title, offer[0], desc, idAdmin)
-    return id
 
 """
-Add id of the named field or crete the field and get the id if the field doesn't exist
+Add id of the named field or create the field and get the id if the field doesn't exist
 @param offer : name of the field (string)
+@return id of the offer if succesful, -1 if not
 """
 def get_id_field(dbManager, name)  :
    field = dbManager.get_field_by_name(name)
@@ -145,23 +197,3 @@ def get_id_field(dbManager, name)  :
          return id
       else :
          return -1
-      
-
-"""
-Add a preprocessed offer in the database
-@param offer : 
-"""
-"""
-def update_an_offer(offer) :
-    title = offer[0].split(' ')
-    title = title[:8]
-    title = ' '.join(title)
-    dbManager.add_offer(title, offer[0], offer[2], None)
-"""
-
-# Tests #
-#base = init()
-#with open('./data/test.txt',encoding='utf-8', mode="w") as f:
-#   f.write(str(base))
-#text = open ( 'test.txt', 'r' ).read()
-#print((text,preprocess(text)[:10]))

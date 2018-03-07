@@ -13,7 +13,11 @@ from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Date, Text,
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.mysql import LONGTEXT
 from SmartRecruiting_BackEnd.data.database import Base
+from SmartRecruiting_BackEnd import app
 
+long_text = LONGTEXT
+if app.config['TESTING']:
+    long_text = Text
 
 class User(Base):
     __tablename__ = 'user'
@@ -40,7 +44,7 @@ class Offer(Base):
     id = Column(Integer, primary_key=True, nullable=False)
     title = Column(String(100), unique=False, nullable=False)
     content = Column(Text, unique=False, nullable=False)
-    descriptor = Column(LONGTEXT, unique=False, nullable=False)
+    descriptor = Column(long_text, unique=False, nullable=False)
     id_user = Column(Integer, ForeignKey('user.id'), unique=False, nullable=False)
     prediction = relationship("Prediction", uselist=False)
 
