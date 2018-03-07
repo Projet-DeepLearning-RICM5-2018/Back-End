@@ -115,7 +115,10 @@ def reinit(dbManager) :
 
     # Rebuild the model #
     sentences = [['x','x','x','x','x']]
+    i = 1
     for o in offers :
+        print('reinit offer ' + str(i))
+        i+=1
         text = o['content']
         cleaned = tokenize(text)
         sentences = sentences + [cleaned] #Sentences used to build the model's vocabulary
@@ -133,7 +136,10 @@ Recompute descriptor for each offer given
 """
 def recompute_all_descriptors(offers) :
     res = []
+    i = 1
     for o in offers :
+        print('recompute offer ' + str(i))
+        i+=1
         desc = preprocess(o['content'])
         id = o['id']
         res = res + [{'id':id,'desc':desc}]
@@ -181,7 +187,10 @@ Update all given offers by id (in the DB)
 @param list : list of (id, descriptors)
 """
 def update_all_offers(dbManager,list) :
+    i = 1
     for item in list :
+        print('update offer ' + str(i))
+        i+=1
         update_descriptor_of_offer_by_id(dbManager,item['id'],item['desc'])
 
 """
