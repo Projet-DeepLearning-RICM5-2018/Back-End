@@ -66,7 +66,7 @@ def FormationByOffer(text):
         # Generate batches for one epoch
             pred, sc = sess.run([predictions,scores],{input_x:[x_test],dropout_keep_prob: 1.0})
             print(pred)#[2][0]
-    ten = np.zeros(3, int)
+    ten = np.zeros(len(getDic()), int)
     ten[pred[0]] = 1
     print(getDic())
     #print(list(getDic().keys())[list(getDic().values()).index(ten)])
@@ -80,7 +80,7 @@ def eval_all(db_manager) :
 
     def_flags()
     FLAGS = tf.flags.FLAGS
-    x, y, dic = get_data_from_database(db_manager)
+    x, y, dic, nb_classes = get_data_from_database(db_manager)
     y_test = y
     x_test = x
 
