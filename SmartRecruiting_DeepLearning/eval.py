@@ -13,7 +13,48 @@ import pickle
 from SmartRecruiting_BackEnd.deeplearning.cnn.train import get_data_from_database
 
 
+# Eval Parameters
+#tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")#
+tf.flags.DEFINE_string("checkpoint_dir", "./runs/", "Checkpoint directory from training run")
+tf.flags.DEFINE_boolean("eval_train", False, "Evaluate on all training data")
+
+# Misc Parameters
+#tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")#
+#tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on devices")#
+
+
+FLAGS = tf.flags.FLAGS
+#FLAGS._parse_flags()
+print("\nParameters:")
+for attr, value in sorted(FLAGS.__flags.items()):
+    print("{}={}".format(attr.upper(), value))
+print("")
+'''
+# CHANGE THIS: Load data. Load your own data here
+if FLAGS.eval_train:
+    x_raw, y_test = data_helpers.load_data_and_labels(FLAGS.positive_data_file, FLAGS.negative_data_file)
+    y_test = np.argmax(y_test, axis=1)
+else:
+'''
+
+
+
+def get_num(val) :
+    if val=="GEO" :
+        return 0
+    elif val == "RICM" :
+        return 1
+    else :
+        return 2
+
+
+"""
+Function to get the path of checkpoint
+@return the path
+"""
 def checkPath():
+    checkPath=open('./data/checkPath', "r").read()
+    print(checkPath)#str
     """
     Function to get the path of checkpoint
     :return:the path
@@ -40,6 +81,7 @@ def FormationByOffer(text):
     def_flags()
     FLAGS = tf.flags.FLAGS
     x_test = pretraitement.preprocess(text)
+    #print(x_test)
     checkpoint_file=checkPath()
     graph = tf.Graph()
     pred=[]
@@ -63,9 +105,16 @@ def FormationByOffer(text):
             scores = graph.get_operation_by_name("output/scores").outputs[0]
 
         # Generate batches for one epoch
-            pred, sc = sess.run([predictions,scores],{input_x:x_test,dropout_keep_prob: 1.0})
-            #print(pred)#[2][0]
-    return pred[0]
+            pred, sc = sess.run([predictions,scores],{input_x:[x_test],dropout_keep_prob: 1.0})
+            print(pred)#[2][0]
+    ten = np.zeros(3, int)
+    ten[pred[0]] = 1
+    print(getDic())
+    #print(list(getDic().keys())[list(getDic().values()).index(ten)])
+    for idf, arrf in getDic().items():    # for name, age in list.items(): iteritems (for Python 3.x)
+        if (arrf == ten).all():
+            print(idf)
+    return idf
 
 
 def eval_all(db_manager) :
