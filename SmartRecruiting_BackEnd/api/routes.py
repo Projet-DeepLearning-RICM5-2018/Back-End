@@ -438,7 +438,7 @@ def get_fields():
         abort(404)
     return jsonify(fields), 200
 
-@app.route('/fields_name')
+@app.route('/fields/nameonly')
 @cross_origin()
 @loginAdminRequired
 def get_fields_name():
@@ -716,7 +716,7 @@ def nb_prediction():
     else:
         return jsonify(number), 200
 
-@app.route('/update_prediction_by_id_offer/', methods=['POST'])
+@app.route('/update_prediction_by_id_offer', methods=['POST'])
 @cross_origin()
 @loginAdminRequired
 def update_prediction_by_id_offer():

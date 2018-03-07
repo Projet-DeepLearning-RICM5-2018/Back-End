@@ -295,7 +295,9 @@ class DatabaseManager():
 
     def get_all_fields_name(self):
         fields = Field.query.with_entities(Field.id, Field.name).all()
-        return [p.serialize() for p in fields]
+        fields = np.array(fields)
+        #return fields
+        return [f.serialize() for f in fields]
 
     def get_field_by_id(self, id_prog):
         field = Field.query.get(id_prog)
