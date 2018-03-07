@@ -72,6 +72,11 @@ def train(db_manager):
             # Output directory for models and summaries
             timestamp = str(int(time.time()))
             out_dir = os.path.abspath(os.path.join(os.path.curdir, "runs", timestamp))
+            check_path="./runs/"+timestamp+"/checkpoints/"
+            print(check_path)
+            f = open('./data/checkPath', 'w')
+            f.write(check_path)  # python will convert \n to os.linesep
+            f.close()
             print("Writing to {}\n".format(out_dir))
 
             # Summaries for loss and accuracy

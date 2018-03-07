@@ -476,10 +476,11 @@ def generatePrediction():
         }
     """
     data = json.loads(request.data)
+    print ("-------------------------------------JSON data ----------------------------------------")
+    print(data['content'])
     idfield=FormationByOffer(data['content'])
-    ten = np.zeros(3, int)
-    ten[idfield] = 1
-    field = dbManager.get_field_by_id(getDic().index(ten))
+
+    field = dbManager.get_field_by_id(idfield)
     if field is None:
         abort(404)
     else:
@@ -495,9 +496,9 @@ def generatePrediction_save():
     '''
     data = json.loads(request.data)
     idfield = FormationByOffer(data['content'])
-    ten = np.zeros(3, int)
-    ten[idfield] = 1
-    field = dbManager.get_field_by_id(getDic().index(ten))
+    #ten = np.zeros(3, int)
+    #ten[idfield] = 1
+    field = dbManager.get_field_by_id(idfield)
     dbManager.add_offer(data['title'], data['content'], data['descriptor'], data['id_user'])
     if field is None:
         abort(404)

@@ -54,7 +54,7 @@ Function to get the path of checkpoint
 @return the path
 """
 def checkPath():
-    checkPath=open('checkPath', "r").read()
+    checkPath=open('../SmartRecruiting_BackEnd/data/checkPath', "r").read()
     print(checkPath)#str
     checkpoint_file = tf.train.latest_checkpoint(checkPath)
     return checkpoint_file
@@ -95,7 +95,9 @@ def FormationByOffer(text):
         # Generate batches for one epoch
             pred, sc = sess.run([predictions,scores],{input_x:x_test,dropout_keep_prob: 1.0})
             #print(pred)#[2][0]
-    return pred[0]
+    ten = np.zeros(3, int)
+    ten[pred[0]] = 1
+    return getDic().index(ten)
 
 #text = open ( 'test.txt', 'r' ).read()
 #desc = pretraitement.preprocess(text)

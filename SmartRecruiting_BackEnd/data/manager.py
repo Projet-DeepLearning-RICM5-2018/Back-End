@@ -34,7 +34,7 @@ class DatabaseManager():
             print("reinit")
         if(app.config['INIT'] or app.config['REINIT']):
             print ("-------------------------------------train ----------------------------------------")
-            train(self)
+            #train(self) #step 3*200
 
     def get_all_users(self):
         users = User.query.all()
