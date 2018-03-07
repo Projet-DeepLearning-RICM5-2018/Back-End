@@ -14,6 +14,7 @@ from SmartRecruiting_BackEnd.deeplearning.cnn.train import train
 from SmartRecruiting_BackEnd.deeplearning.preprocess.pretraitement import init, reinit
 from SmartRecruiting_DeepLearning.eval import eval_all, save_eval
 from SmartRecruiting_BackEnd.deeplearning.preprocess.pretraitement import init, reinit,preprocess
+from SmartRecruiting_BackEnd.deeplearning.cnn.eval import eval_all, save_eval
 import datetime
 from sqlalchemy.sql import func
 

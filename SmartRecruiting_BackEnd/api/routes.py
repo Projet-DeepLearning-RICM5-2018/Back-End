@@ -10,7 +10,7 @@ from flask import Flask, jsonify, request, json, session, g
 from flask.json import jsonify
 from flask import render_template, abort, request
 from SmartRecruiting_BackEnd import app, dbManager
-from SmartRecruiting_DeepLearning.eval import FormationByOffer
+from SmartRecruiting_BackEnd.deeplearning.cnn.eval import FormationByOffer
 
 from flask_cors import CORS, cross_origin
 from functools import wraps
@@ -19,7 +19,7 @@ from jwt import encode, decode, DecodeError, ExpiredSignature
 from datetime import datetime, timedelta
 
 from datetime import datetime
-from SmartRecruiting_DeepLearning.eval import load_eval
+from SmartRecruiting_BackEnd.deeplearning.cnn.eval import load_eval
 
 
 def createToken(user):
