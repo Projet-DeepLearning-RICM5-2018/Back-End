@@ -30,7 +30,7 @@ def train(db_manager):
     # get the data from the database
     x, y, dic_cores = get_data_from_database(db_manager)
     # TODO sauvegarder le dic
-    with open('dic', 'wb') as file:
+    with open('./data/dic', 'wb') as file:
         mon_pickler = pickle.Pickler(file)
         mon_pickler.dump(dic_cores)
 
@@ -172,7 +172,7 @@ def create_cores_id_field(db_manager):
         ten[i] = 1
         dic[id_field[i][0]] = ten
     return dic
-
+#{1: array([0, 1, 0]), 2: array([0, 0, 1]), 3: array([1, 0, 0])}
 
 def change_y(dic_cores, y):
     """

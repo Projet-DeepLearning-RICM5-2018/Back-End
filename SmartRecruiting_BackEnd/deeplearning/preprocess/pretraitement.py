@@ -38,7 +38,7 @@ Function to get the descriptor from a text
 """
 def preprocess(text) :
     cleaned = tokenize(text)
-    model = Word2Vec.load("preprocessing_model")
+    model = Word2Vec.load("./data/preprocessing_model")
     words = list(filter(lambda x: x in model.wv.vocab, cleaned))
     if(len(words) >= max_size) :
         words = words[:max_size]
@@ -78,7 +78,7 @@ def init(dbManager) :
             cleaned = tokenize(text)
             sentences = sentences + [cleaned] #Sentences used to build the model's vocabulary
     model = Word2Vec(sentences, size=100, window=5, min_count=5, workers=4)
-    model.save("preprocessing_model")
+    model.save("./data/preprocessing_model")
 
     # Put everything in the DB for the first time"
     base = preprocessAll(filename)
@@ -100,7 +100,7 @@ def reinit(dbManager) :
         cleaned = tokenize(text)
         sentences = sentences + [cleaned] #Sentences used to build the model's vocabulary
     model = Word2Vec(sentences, size=100, window=5, min_count=5, workers=4)
-    model.save("preprocessing_model")
+    model.save("./data/preprocessing_model")#path root
 
     # Recompute all descriptors and put them in the DB #
     res  = recompute_all_descriptors(offers)
