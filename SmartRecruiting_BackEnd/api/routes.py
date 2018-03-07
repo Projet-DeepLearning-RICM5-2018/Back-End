@@ -447,10 +447,11 @@ def get_field(id_field):
     :return: {"field":{"id": int, "name": str, "description": str, "descriptor": str,"website": str, "contacts":}}
     """
     field = dbManager.get_field_by_id(id_field)
+    print(field)
     if field is None:
         abort(404)
     else:
-        contacts = dbManager.get_field_contacts(field.id)
+        contacts = dbManager.get_field_contacts(field['id'])
         field["contacts"] = contacts
         return jsonify(field), 200
 
