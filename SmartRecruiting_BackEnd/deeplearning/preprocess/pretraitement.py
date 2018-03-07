@@ -38,14 +38,20 @@ Function to get the descriptor from a text
 @return [[float]] the text's descriptor
 """
 def preprocess(text) :
+    print('ok1')
     cleaned = tokenize(text)
+    print('ok2')
     model = Word2Vec.load("./data/preprocessing_model")
+    print('ok3')
     words = list(filter(lambda x: x in model.wv.vocab, cleaned))
+    print('ok4')
     if(len(words) >= max_size) :
         words = words[:max_size]
     else :
         words = words + ['x']*(max_size-len(words))
+    print('ok5')
     descriptor = [model.wv[w] for w in words]
+    print('ok6')
     return descriptor
 
 """
@@ -123,6 +129,18 @@ def recompute_all_descriptors(offers) :
 ###########################################
 # FUNCTIONS REGARDING THE DATABASE ACCESS #
 ###########################################
+
+"""
+Transforms a descriptor into a text
+@param a descriptor [[float]]
+@return str
+"""
+def descriptor_to_string(descriptor) :
+    desc = (np.array2string(word_vector, precision=5, separator=' ', suppress_small=False) for word_vector in descriptor)
+    desc = ','.join(desc)
+    return desc
+
+
 """
 Add a preprocessed offer in the database
 @param offer : (text,descriptor,label) the processed offer
@@ -135,8 +153,7 @@ def add_an_offer(dbManager, offer, idAdmin) :
     title = ' '.join(title)
 
     #Make descriptor
-    desc = (np.array2string(o, precision=5, separator=' ', suppress_small=False) for o in offer[1])
-    desc = ','.join(desc)
+    desc = descriptor_to_string(offer[1])
 
     id = dbManager.add_offer_v2(title, offer[0], desc, idAdmin)
     return id
@@ -149,8 +166,7 @@ Update the descriptor of an offer
 @return 1 if successful, -1 else.
 """
 def update_descriptor_of_offer_by_id(dbManager,id,descriptor) :
-    desc = (np.array2string(word_vector, precision=5, separator=' ', suppress_small=False) for word_vector in descriptor)
-    desc = ','.join(desc)
+    desc = descriptor_to_string(descriptor)
     if dbManager.update_offer(id,None,None,desc,None) :
         return 1
     else :

@@ -247,18 +247,19 @@ def add_offer():
     else:
         abort(400)
 
-@app.route('/offers_link', methods=['POST'])
+@app.route('/offers/link', methods=['POST'])
 @cross_origin()
 @loginAdminRequired
 def add_offer_link_field():
     """
     METHOD : POST
     HEADER PARAM  : None
-    BODY PARAMS : { "title" : str, "content" : str, "id_user" : int, "id_field" : int, "inbas" : bool }
+    BODY PARAMS : { "title" : str, "content" : str, "id_user" : int, "id_field" : int, "inbase" : bool }
     """
     data = json.loads(request.data)
-    if dbManager.add_offer_link_field(data['title'], data['content'], data['id_user'], data['id_field'], data['inbase']):
-        return '', 201
+    id = dbManager.add_offer_link_field(data['title'], data['content'], data['id_user'], data['id_field'], data['inbase'])
+    if id != -1 :
+        return jsonify(id), 201
     else:
         abort(400)
 
