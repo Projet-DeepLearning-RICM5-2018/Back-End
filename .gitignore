@@ -441,3 +441,8 @@ data/contacts.csv
 
 #Database
 database.py
+
+runs/
+data/checkPath
+data/dic
+data/eval
