@@ -32,7 +32,7 @@ def train(db_manager):
     # TODO sauvegarder le dic
     with open('dic', 'wb') as file:
         mon_pickler = pickle.Pickler(file)
-    
+        mon_pickler.dump(dic_cores)
 
     # suffled the data
     x_shuffled, y_shuffled = randomly_shuffle_data(x, y)
