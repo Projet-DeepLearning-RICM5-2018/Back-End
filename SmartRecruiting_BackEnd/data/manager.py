@@ -10,11 +10,12 @@ Created on Sun Feb 26 16:23:02 2017
 from SmartRecruiting_BackEnd.data.models import *
 from SmartRecruiting_BackEnd.data.database import init_db, dbSession as dB
 from SmartRecruiting_BackEnd import app
+from SmartRecruiting_BackEnd.deeplearning.cnn.train import train
+from SmartRecruiting_BackEnd.deeplearning.preprocess.pretraitement import init, reinit
+from SmartRecruiting_DeepLearning.eval import eval_all, save_eval
 from SmartRecruiting_BackEnd.deeplearning.preprocess.pretraitement import init, reinit,preprocess
 import datetime
-
 from sqlalchemy.sql import func
-# from sqlalchemy.orm import join
 
 
 class DatabaseManager():
@@ -27,8 +28,17 @@ class DatabaseManager():
         init_db()
         if(app.config['INIT']):
             init(self)
+            print ("init")
         elif (app.config['REINIT']):
             reinit(self)
+            print("reinit")
+        if(app.config['INIT'] or app.config['REINIT']):
+            print ("-------------------------------------train ----------------------------------------")
+            train(self)
+            nb_test, accuracy = eval_all(self)
+            save_eval(nb_test, accuracy)
+
+
 
     def get_all_users(self):
         users = User.query.all()
@@ -186,6 +196,19 @@ class DatabaseManager():
         predictions = Prediction.query.all()
         return [p.serialize() for p in predictions]
 
+    def get_all_predictions_with_field(self):
+        predictions = Prediction.query.join(Team, Team.id_prediction == Prediction.id)
+        return predictions
+
+    def get_all_offers_with_field_in_base(self):
+        offers = Offer.query\
+            .with_entities(Offer.descriptor, Team.id_field)\
+            .join(Prediction, Offer.id == Prediction.id_offer) \
+            .filter_by(inbase=1)\
+            .join(Team, Team.id_prediction == Prediction.id)
+
+        return offers
+
     def get_prediction_by_id(self, id_prediction):
         prediction = Prediction.query.get(id_prediction)
         if prediction is None:
@@ -318,6 +341,11 @@ class DatabaseManager():
 
     def get_field_by_name(self, name):
         return Field.query.filter_by(name=name).first()
+   
+    def get_all_id_field(self):
+        field = Field.query \
+            .with_entities(Field.id)
+        return field
 
 
     def add_field(self, name, description, descriptor, website):
