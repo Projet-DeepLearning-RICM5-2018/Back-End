@@ -424,6 +424,15 @@ def get_fields():
     """
     return jsonify(dbManager.get_all_fields()), 200
 
+@app.route('/fields_name')
+@cross_origin()
+@loginAdminRequired
+def get_fields_name():
+    """
+    Function to get all the field in the database
+    :return: {"fields":{"name": str, "description": str, "descriptor": str,"website": str}}
+    """
+    return jsonify(dbManager.get_all_fields_name()), 200
 
 @app.route('/fields/<int:id_field>')
 @cross_origin()
@@ -659,6 +668,8 @@ def average_mark():
 
 
 @app.route('/nbPrediction/', methods=['GET'])
+@cross_origin()
+@loginAdminRequired
 def nb_prediction():
     """
     Function to get the number of prediction between two date
@@ -676,6 +687,18 @@ def nb_prediction():
         abort(404)
     else:
         return jsonify(number), 200
+
+@app.route('/update_prediction_by_id_offer/', methods=['POST'])
+@cross_origin()
+@loginAdminRequired
+def update_prediction_by_id_offer():
+    data = json.loads(request.data)
+    if dbManager.update_prediction_by_id_offer(data['id_offer'], data['id_field']):
+        return '', 201
+    else:
+        abort(400)
+
+
 
 # #############################AUTHETIFICATION
 

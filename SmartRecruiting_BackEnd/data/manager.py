@@ -206,6 +206,14 @@ class DatabaseManager():
                 dB.rollback()
                 return False
 
+    def update_prediction_by_id_offer(self,id_offer, id_field):
+        offer = Offer.query.get(id_offer)
+        prediction = offer.prediction
+        teams = prediction.teams
+        for team in teams:
+            team.id_field = id_field
+        prediction.inbase == 1
+
     def delete_prediction(self, id_prediction):
         prediction = Prediction.query.get(id_prediction)
         if prediction is None:
@@ -256,6 +264,10 @@ class DatabaseManager():
 
     def get_all_fields(self):
         fields = Field.query.all()
+        return [p.serialize() for p in fields]
+
+    def get_all_fields_name(self):
+        fields = Field.query.with_entities(Field.id, Field.name).all()
         return [p.serialize() for p in fields]
 
     def get_field_by_id(self, id_prog):
