@@ -231,6 +231,15 @@ class DatabaseManager():
         for team in teams:
             team.id_field = id_field
         prediction.inbase == 1
+        if offer is None:
+            return None
+        else:
+            try:
+                dB.commit()
+                return True
+            except Exception as e:
+                dB.rollback()
+                return False
 
     def delete_prediction(self, id_prediction):
         prediction = Prediction.query.get(id_prediction)
