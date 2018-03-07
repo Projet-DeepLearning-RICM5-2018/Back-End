@@ -1,1 +1,12 @@
-Flask<1
+flask
+sqlalchemy
+flask-sqlalchemy
+pymysql
+coverage
+flask_cors
+cffi
+bcrypt
+PyJWT
+gensim
+google_compute_engine
+tensorflow
