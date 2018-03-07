@@ -10,6 +10,7 @@ from flask import Flask, jsonify, request, json, session, g
 from flask.json import jsonify
 from flask import render_template, abort, request
 from SmartRecruiting_BackEnd import app, dbManager
+from SmartRecruiting_DeepLearning.eval import FormationByOffer
 
 from flask_cors import CORS, cross_origin
 from functools import wraps
@@ -18,6 +19,7 @@ from jwt import encode, decode, DecodeError, ExpiredSignature
 from datetime import datetime, timedelta
 
 from datetime import datetime
+from SmartRecruiting_DeepLearning.eval import load_eval
 
 
 def createToken(user):
@@ -674,6 +676,49 @@ def fields_by_offer(id_offer):
         return jsonify(fields), 200
 
 
+@app.route('/generatePrediction', methods=['POST'])
+@cross_origin()
+def generatePrediction():
+    """
+    METHOD : POST
+    HEADER PARAM  : None
+    BODY PARAMS : { "title" : str, "content" : str, "descriptor" : str, "id_user" : int }
+    RETURNS : 
+        {
+            "field": { "name": str, "description": str, "descriptor": str, "website": str }
+        }
+    """
+    data = json.loads(request.data)
+    print ("-------------------------------------JSON data ----------------------------------------")
+    print(data['content'])
+    idfield=FormationByOffer(data['content'])
+
+    field = dbManager.get_field_by_id(idfield)
+    if field is None:
+        abort(404)
+    else:
+        return jsonify(field), 200
+
+
+@app.route('/SaveGeneratePrediction', methods=['POST'])
+@cross_origin()
+@loginRequired
+def generatePrediction_save():
+    '''
+    not data.descriptor
+    '''
+    data = json.loads(request.data)
+    idfield = FormationByOffer(data['content'])
+    #ten = np.zeros(3, int)
+    #ten[idfield] = 1
+    field = dbManager.get_field_by_id(idfield)
+    dbManager.add_offer(data['title'], data['content'], data['descriptor'], data['id_user'])
+    if field is None:
+        abort(404)
+    else:
+        return jsonify(field), 200
+
+
 @app.route('/searchOffersByUser/<int:id_user>', methods=['GET'])
 def offers_by_user(id_user):
     """
@@ -731,6 +776,19 @@ def nb_prediction():
     else:
         return jsonify(number), 200
 
+@app.route('/accuracy', methods=['GET'])
+@cross_origin()
+@loginAdminRequired
+def get_accuracy():
+    nb_test, accuracy = load_eval()
+
+    if nb_test is None or accuracy is None:
+        abort(404)
+    else:
+        return jsonify(nb_test, accuracy), 200
+
+
+##############################AUTHETIFICATION
 @app.route('/update_prediction_by_id_offer', methods=['POST'])
 @cross_origin()
 @loginAdminRequired
