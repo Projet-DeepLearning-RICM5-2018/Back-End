@@ -434,3 +434,6 @@ ASALocalRun/
 *test.db
 
 preprocessing_model
+
+#Database
+database.py

@@ -37,6 +37,11 @@
     <Compile Include="SmartRecruiting_BackEnd\data\manager.py" />
     <Compile Include="SmartRecruiting_BackEnd\data\models.py" />
     <Compile Include="SmartRecruiting_BackEnd\data\__init__.py" />
+    <Compile Include="SmartRecruiting_BackEnd\deeplearning\preprocess\pretraitement.py" />
+    <Compile Include="SmartRecruiting_BackEnd\deeplearning\preprocess\__init__.py" />
+    <Compile Include="SmartRecruiting_BackEnd\tests\test_pretraitement.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="SmartRecruiting_BackEnd\tests\test_user.py">
       <SubType>Code</SubType>
     </Compile>
@@ -46,10 +51,15 @@
     <Folder Include="SmartRecruiting_BackEnd\" />
     <Folder Include="SmartRecruiting_BackEnd\api\" />
     <Folder Include="SmartRecruiting_BackEnd\data\" />
+    <Folder Include="SmartRecruiting_BackEnd\deeplearning\" />
+    <Folder Include="SmartRecruiting_BackEnd\deeplearning\preprocess\" />
+    <Folder Include="SmartRecruiting_BackEnd\deeplearning\preprocess\__pycache__\" />
     <Folder Include="SmartRecruiting_BackEnd\tests\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="requirements.txt" />
+    <Content Include="SmartRecruiting_BackEnd\deeplearning\preprocess\__pycache__\pretraitement.cpython-36.pyc" />
+    <Content Include="SmartRecruiting_BackEnd\deeplearning\preprocess\__pycache__\__init__.cpython-36.pyc" />
   </ItemGroup>
   <ItemGroup>
     <Interpreter Include="env\">
