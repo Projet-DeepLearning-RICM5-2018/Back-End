@@ -233,17 +233,17 @@ class DatabaseManager():
                 dB.rollback()
                 return False
 
-    def update_prediction_by_id_offer(self,id_offer, id_field):
+    def update_prediction_by_id_offer(self, id_offer, id_field):
         offer = Offer.query.get(id_offer)
-        prediction = offer.prediction
-        teams = prediction.teams
-        for team in teams:
-            team.id_field = id_field
-        prediction.inbase == 1
         if offer is None:
             return None
         else:
             try:
+                prediction = offer.prediction
+                teams = prediction.teams
+                for team in teams:
+                    team.id_field = id_field
+                prediction.inbase == 1
                 dB.commit()
                 return True
             except Exception as e:
