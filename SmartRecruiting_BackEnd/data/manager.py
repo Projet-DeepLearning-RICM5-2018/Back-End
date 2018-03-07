@@ -12,7 +12,7 @@ from SmartRecruiting_BackEnd.data.database import init_db, dbSession as dB
 from SmartRecruiting_BackEnd import app
 from SmartRecruiting_BackEnd.deeplearning.cnn.train import train
 from SmartRecruiting_BackEnd.deeplearning.preprocess.pretraitement import init, reinit
-from SmartRecruiting_DeepLearning.eval import eval_all, save_eval
+from SmartRecruiting_BackEnd.deeplearning.cnn.eval import eval_all, save_eval
 import datetime
 from sqlalchemy.sql import func
 
