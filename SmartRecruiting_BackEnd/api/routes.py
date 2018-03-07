@@ -20,6 +20,7 @@ from jwt import encode, decode, DecodeError, ExpiredSignature
 from datetime import datetime, timedelta
 
 from datetime import datetime
+from SmartRecruiting_DeepLearning.eval import load_eval
 
 
 def createToken(user):
@@ -476,7 +477,7 @@ def generatePrediction():
         }
     """
     data = json.loads(request.data)
-    idfield=FormationByOffer(data['content'])
+    idfield = FormationByOffer(data['content'])
     ten = np.zeros(3, int)
     ten[idfield] = 1
     field = dbManager.get_field_by_id(getDic().index(ten))
@@ -538,6 +539,18 @@ def nb_prediction():
         abort(404)
     else:
         return jsonify(number), 200
+
+@app.route('/accuracy', methods=['GET'])
+@cross_origin()
+@loginAdminRequired
+def get_accuracy():
+    nb_test, accuracy = load_eval()
+
+    if nb_test is None or accuracy is None:
+        abort(404)
+    else:
+        return jsonify(nb_test, accuracy), 200
+
 
 ##############################AUTHETIFICATION
 @app.route('/auth/signup', methods=['POST'])

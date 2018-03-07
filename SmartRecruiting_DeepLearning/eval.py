@@ -10,65 +10,35 @@ from SmartRecruiting_BackEnd.deeplearning.cnn import textCnn
 from tensorflow.contrib import learn
 import csv
 import pickle
-
-# Parameters
-# ==================================================
-
-# Eval Parameters
-#tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")#
-tf.flags.DEFINE_string("checkpoint_dir", "./runs/", "Checkpoint directory from training run")
-tf.flags.DEFINE_boolean("eval_train", False, "Evaluate on all training data")
-
-# Misc Parameters
-#tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")#
-#tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on devices")#
+from SmartRecruiting_BackEnd.deeplearning.cnn.train import get_data_from_database
 
 
-FLAGS = tf.flags.FLAGS
-#FLAGS._parse_flags()
-print("\nParameters:")
-for attr, value in sorted(FLAGS.__flags.items()):
-    print("{}={}".format(attr.upper(), value))
-print("")
-'''
-# CHANGE THIS: Load data. Load your own data here
-if FLAGS.eval_train:
-    x_raw, y_test = data_helpers.load_data_and_labels(FLAGS.positive_data_file, FLAGS.negative_data_file)
-    y_test = np.argmax(y_test, axis=1)
-else:
-'''
-
-
-
-def get_num(val) :
-    if val=="GEO" :
-        return 0
-    elif val == "RICM" :
-        return 1
-    else :
-        return 2
-
-
-"""
-Function to get the path of checkpoint
-@return the path
-"""
 def checkPath():
-    checkPath=open('checkPath', "r").read()
-    print(checkPath)#str
+    """
+    Function to get the path of checkpoint
+    :return:the path
+    """
+    checkPath = open('checkPath', "r").read()
+    print(checkPath)
     checkpoint_file = tf.train.latest_checkpoint(checkPath)
     return checkpoint_file
 
+
 def getDic():
-    with open('../SmartRecruiting_BackEnd/data/dic','rb') as fichier:
-       mypic=pickle.Unpickler(fichier)
-       dic=mypic.load()
+    with open('./data/dic','rb') as fichier:
+        mypic = pickle.Unpickler(fichier)
+        dic = mypic.load()
     return dic
-"""
-Function to compute the field for an offer
-@return the field
-"""
+
+
 def FormationByOffer(text):
+    """
+    Function to compute the field for an offer
+    :param text:
+    :return:the field
+    """
+    def_flags()
+    FLAGS = tf.flags.FLAGS
     x_test = pretraitement.preprocess(text)
     checkpoint_file=checkPath()
     graph = tf.Graph()
@@ -97,45 +67,21 @@ def FormationByOffer(text):
             #print(pred)#[2][0]
     return pred[0]
 
-#text = open ( 'test.txt', 'r' ).read()
-#desc = pretraitement.preprocess(text)
-#FormationByOffer(desc)
 
-def init() :
-    # DATA LOADING
+def eval_all(db_manager) :
 
-    
-    base = pretraitement.init()
-    texts = []
-    descs = []
-    labels = []
-    for b in base :
-        texts.append(b[0])
-        descs.append(b[1])
-        labels.append(get_num(b[2]))
-    
-    
-    text = open ( 'test.txt', 'r' ).read()
-    desc = pretraitement.preprocess(text)
-
-    x_raw = texts # [text]
-    y_test = labels # None
-    x_test = descs # [desc]
-
-
-    '''
-# Map data into vocabulary
-vocab_path = os.path.join(FLAGS.checkpoint_dir, "..", "vocab")
-vocab_processor = learn.preprocessing.VocabularyProcessor.restore(vocab_path)
-x_test = np.array(list(vocab_processor.transform(x_raw)))
-    '''
+    def_flags()
+    FLAGS = tf.flags.FLAGS
+    x, y, dic = get_data_from_database(db_manager)
+    y_test = y
+    x_test = x
 
     print("\nEvaluating...\n")
 
-# Evaluation
-# ==================================================
+    # Evaluation
+    # ==================================================
     
-    checkpoint_file=checkPath()
+    checkpoint_file = checkPath()
     graph = tf.Graph()
     with graph.as_default():
         session_conf = tf.ConfigProto(
@@ -143,41 +89,75 @@ x_test = np.array(list(vocab_processor.transform(x_raw)))
           log_device_placement=FLAGS.log_device_placement)
         sess = tf.Session(config=session_conf)
         with sess.as_default():
-        # Load the saved meta graph and restore variables
+            # Load the saved meta graph and restore variables
             saver = tf.train.import_meta_graph("{}.meta".format(checkpoint_file))
             saver.restore(sess, checkpoint_file)
 
-        # Get the placeholders from the graph by name
+            # Get the placeholders from the graph by name
             input_x = graph.get_operation_by_name("input_x").outputs[0]
-        # input_y = graph.get_operation_by_name("input_y").outputs[0]
+            input_y = graph.get_operation_by_name("input_y").outputs[0]
             dropout_keep_prob = graph.get_operation_by_name("dropout_keep_prob").outputs[0]
 
-        # Tensors we want to evaluate
+            # Tensors we want to evaluate
             predictions = graph.get_operation_by_name("output/predictions").outputs[0]
             scores = graph.get_operation_by_name("output/scores").outputs[0]
 
-        # Generate batches for one epoch
+            # Generate batches for one epoch
             batches = [x_test]
+            # TODO utiliser batch iter
 
-            pred, sc = sess.run([predictions,scores],{input_x:x_test,dropout_keep_prob: 1.0})
+            pred, sc = sess.run([predictions, scores], {input_x: x_test, dropout_keep_prob: 1.0})
 
-        # Collect the predictions here
+            # Collect the predictions here
             all_predictions = []
 
             for x_test_batch in batches:
                 batch_predictions = sess.run(predictions, {input_x: x_test_batch, dropout_keep_prob: 1.0})
                 all_predictions = np.concatenate([all_predictions, batch_predictions])
 
-# Print accuracy if y_test is defined
+    # Print accuracy if y_test is defined
     if y_test is not None:
-        correct_predictions = float(sum(all_predictions == y_test))
-        print("Total number of test examples: {}".format(len(y_test)))
-        print("Accuracy: {:g}".format(correct_predictions/float(len(y_test))))
+        #correct_predictions = float(sum(all_predictions == y_test))
+        correct_predictions = 0.0
+        for i in range(0, len(all_predictions)):
+            print("predicion : {}".format(all_predictions[i]))
+            print("y:.{}, {}".format(y_test[i], ind_1(y_test[i])))
+            if all_predictions[i] == ind_1(y_test[i]):
+                correct_predictions += 1
+        nb_test = len(y_test)
+        print("Total number of test examples: {}".format(nb_test))
+        accuracy = correct_predictions/float(nb_test)
+        print("Accuracy: {:g}".format(accuracy))
+        print("correct_predictions: {}".format(correct_predictions))
+    return nb_test, accuracy
+
+def save_eval(nb_test, accuracy):
+    with open('./data/eval', 'wb') as file:
+        mon_pickler = pickle.Pickler(file)
+        mon_pickler.dump(nb_test)
+        mon_pickler.dump(accuracy)
+
+def load_eval():
+    with open('./data/eval', 'rb') as file:
+        mon_pickler = pickle.Unpickler(file)
+        nb_test = mon_pickler.load()
+        accuracy = mon_pickler.load()
+    return nb_test, accuracy
 
 
-# Save the evaluation to a csv
-    predictions_human_readable = np.column_stack((np.array(x_raw), all_predictions))
-    out_path = os.path.join(FLAGS.checkpoint_dir, "..", "prediction.csv")
-    print("Saving evaluation to {0}".format(out_path))
-    with open(out_path, 'w') as f:
-        csv.writer(f).writerows(predictions_human_readable)
+def def_flags():
+    # Eval Parameters
+    # tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")#
+    tf.flags.DEFINE_string("checkpoint_dir", "./runs/", "Checkpoint directory from training run")
+    tf.flags.DEFINE_boolean("eval_train", False, "Evaluate on all training data")
+
+    # Misc Parameters
+    tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")#
+    tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on devices")#
+
+def ind_1(ten):
+    ind =0
+    for t in ten:
+        if t==1: return ind
+        else : ind += 1
+    return ind

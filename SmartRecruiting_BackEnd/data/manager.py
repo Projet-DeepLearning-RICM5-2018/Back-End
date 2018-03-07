@@ -12,10 +12,9 @@ from SmartRecruiting_BackEnd.data.database import init_db, dbSession as dB
 from SmartRecruiting_BackEnd import app
 from SmartRecruiting_BackEnd.deeplearning.cnn.train import train
 from SmartRecruiting_BackEnd.deeplearning.preprocess.pretraitement import init, reinit
+from SmartRecruiting_DeepLearning.eval import eval_all, save_eval
 import datetime
-
 from sqlalchemy.sql import func
-# from sqlalchemy.orm import join
 
 
 class DatabaseManager():
@@ -35,6 +34,10 @@ class DatabaseManager():
         if(app.config['INIT'] or app.config['REINIT']):
             print ("-------------------------------------train ----------------------------------------")
             train(self)
+            nb_test, accuracy = eval_all(self)
+            save_eval(nb_test, accuracy)
+
+
 
     def get_all_users(self):
         users = User.query.all()
