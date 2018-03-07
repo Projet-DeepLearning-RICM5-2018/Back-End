@@ -10,7 +10,7 @@ Created on Sun Feb 26 16:23:02 2017
 from SmartRecruiting_BackEnd.data.models import *
 from SmartRecruiting_BackEnd.data.database import init_db, dbSession as dB
 from SmartRecruiting_BackEnd import app
-from SmartRecruiting_BackEnd.deeplearning.preprocess.pretraitement import init, reinit
+from SmartRecruiting_BackEnd.deeplearning.preprocess.pretraitement import init, reinit,preprocess
 import datetime
 
 from sqlalchemy.sql import func
@@ -132,6 +132,15 @@ class DatabaseManager():
             dB.rollback()
             return -1
 
+    def add_offer_link_field(self, title, content, id_user, id_field, inbase):
+        id_offer = self.add_offer_v2(title, content, preprocess(content), id_user)
+        if id_offer != -1:
+            id_prediction = self.add_prediction_v2(0, inbase, id_offer)
+            if id_prediction != -1:
+                self.add_team(id_prediction, id_field, 1)
+                return True
+        return False
+
     def update_offer(self, id_offer, title, content, descriptor, id_user):
         offer = Offer.query.get(id_offer)
         if offer is None:
@@ -224,17 +233,17 @@ class DatabaseManager():
                 dB.rollback()
                 return False
 
-    def update_prediction_by_id_offer(self,id_offer, id_field):
+    def update_prediction_by_id_offer(self, id_offer, id_field):
         offer = Offer.query.get(id_offer)
-        prediction = offer.prediction
-        teams = prediction.teams
-        for team in teams:
-            team.id_field = id_field
-        prediction.inbase == 1
         if offer is None:
             return None
         else:
             try:
+                prediction = offer.prediction
+                teams = prediction.teams
+                for team in teams:
+                    team.id_field = id_field
+                prediction.inbase == 1
                 dB.commit()
                 return True
             except Exception as e:
@@ -269,6 +278,7 @@ class DatabaseManager():
         except Exception as e:
             dB.rollback()
             return False
+
 
     def update_team(self, id_prediction, id_field, nb_members):
         "change la formation associe a une prediction "
