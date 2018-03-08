@@ -31,6 +31,9 @@ class DatabaseManager():
             init(self)
         elif (app.config['REINIT']):
             reinit(self)
+        if(app.config['INIT'] or app.config['REINIT']):
+            print ("-------------------------------------train ----------------------------------------")
+            train(self)
 
     def get_all_users(self):
         users = User.query.all()

@@ -41,7 +41,7 @@ def preprocess(text) :
     print('ok1')
     cleaned = tokenize(text)
     print('ok2')
-    model = Word2Vec.load("./data/preprocessing_model")
+    model = Word2Vec.load("./data/frwiki.gensim")#./data/preprocessing_model
     print('ok3')
     words = list(filter(lambda x: x in model.wv.vocab, cleaned))
     print('ok4')
@@ -79,7 +79,7 @@ Has to be called before using the model for the first time or if the csv contain
 """
 def init(dbManager) :
     # Input files #
-    filename = './data/offers.csv'
+    filename = './data/Données_RICM_GEO_PRI7.csv'
     sentences = [['x','x','x','x','x']]
     with open(filename,encoding='utf-8', mode="r") as f:
         reader = csv.DictReader(f)
