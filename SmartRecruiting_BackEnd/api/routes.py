@@ -683,8 +683,8 @@ def generatePrediction():
     """
     METHOD : POST
     HEADER PARAM  : None
-    BODY PARAMS : { "title" : str, "content" : str, "descriptor" : str, "id_user" : int }
-    RETURNS : 
+    BODY PARAMS : { "title" : str, "content" : str }
+    RETURNS :
         {
             "field": { "name": str, "description": str, "descriptor": str, "website": str }
         }

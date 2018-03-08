@@ -31,6 +31,9 @@ class DatabaseManager():
             init(self)
         elif (app.config['REINIT']):
             reinit(self)
+        train(self)
+        nb_test, accuracy = eval_all(self)
+        save_eval(nb_test, accuracy)
 
     def get_all_users(self):
         users = User.query.all()
