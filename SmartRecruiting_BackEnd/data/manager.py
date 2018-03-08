@@ -157,13 +157,15 @@ class DatabaseManager():
             return -1
 
     def add_offer_link_field(self, title, content, id_user, id_field, inbase):
-        id_offer = self.add_offer_v2(title, content, preprocess(content), id_user)
+        descriptor = preprocess(content)
+        descriptor = descriptor_to_string(descriptor)
+        id_offer = self.add_offer_v2(title, content, descriptor, id_user)
         if id_offer != -1:
             id_prediction = self.add_prediction_v2(0, inbase, id_offer)
             if id_prediction != -1:
                 self.add_team(id_prediction, id_field, 1)
-                return True
-        return False
+                return id_offer
+        return -1
 
     def update_offer(self, id_offer, title, content, descriptor, id_user):
         offer = Offer.query.get(id_offer)
@@ -184,6 +186,7 @@ class DatabaseManager():
             except Exception as e:
                 dB.rollback()
                 return False
+
 
     def delete_offer(self, id_offer):
         offer = Offer.query.get(id_offer)
@@ -228,6 +231,23 @@ class DatabaseManager():
         except Exception as e:
             dB.rollback()
             return False
+
+    def update_prediction_by_id_offer(self, id_offer, id_field):
+        offer = Offer.query.get(id_offer)
+        if offer is None:
+            return None
+        else:
+            try:
+                prediction = offer.prediction
+                teams = prediction.teams
+                for team in teams:
+                    team.id_field = id_field
+                prediction.inbase == 1
+                dB.commit()
+                return True
+            except Exception as e:
+                dB.rollback()
+                return False
 
     def add_prediction_v2(self, mark, inbase, id_offer):
         date = datetime.datetime.now()
