@@ -522,7 +522,11 @@ class DatabaseManager():
     def recherche(self, nboffre_par_page, num_page_voulue):
         if nboffre_par_page not in range(0,50):
             nboffre_par_page = 50
-        offers = Offer.query.all()
+        offers = Offer.query\
+            .with_entities(Offer, Field.id, Field.name)\
+            .join(Prediction, Prediction.id_offer == Offer.id)\
+            .join(Team, Team.id_prediction == Prediction.id)
+
         nb_offer = len(offers)
         nb_pages = int(nb_offer / nboffre_par_page)+1
         ind_inf = (num_page_voulue - 1) * nboffre_par_page
