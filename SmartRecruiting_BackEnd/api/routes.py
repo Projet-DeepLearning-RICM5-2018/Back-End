@@ -251,7 +251,7 @@ def add_offer():
 
 @app.route('/offers/link', methods=['POST'])
 @cross_origin()
-@loginAdminRequired
+@loginRequired
 def add_offer_link_field():
     """
     METHOD : POST
@@ -475,7 +475,7 @@ def get_field(id_field):
     :return: {"field":{"id": int, "name": str, "description": str, "descriptor": str,"website": str, "contacts":}}
     """
     field = dbManager.get_field_by_id(id_field)
-    print(field)
+    #print(field)
     if field is None:
         abort(404)
     else:

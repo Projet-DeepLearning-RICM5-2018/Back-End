@@ -12,7 +12,6 @@ import csv
 import pickle
 from SmartRecruiting_BackEnd.deeplearning.cnn.train import get_data_from_database
 
-
 def checkPath():
     """
     Function to get the path of checkpoint
@@ -41,6 +40,12 @@ def FormationByOffer(text):
     tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")#
     tf.flags.DEFINE_string("checkpoint_dir", "./runs/", "Checkpoint directory from training run")
     tf.flags.DEFINE_boolean("eval_train", False, "Evaluate on all training data")
+
+    #MODIF_BEGIN TODO
+    tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")#
+    tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on devices")
+    #MODIF_END TODO
+
     FLAGS = tf.flags.FLAGS
     x_test = pretraitement.preprocess(text)
     #print(x_test)
@@ -69,7 +74,7 @@ def FormationByOffer(text):
         # Generate batches for one epoch
             pred, sc = sess.run([predictions,scores],{input_x:[x_test],dropout_keep_prob: 1.0})
             print(pred)#[2][0]
-    ten = np.zeros(3, int)
+    ten = np.zeros(len(getDic()), int)
     ten[pred[0]] = 1
     print(getDic())
     #print(list(getDic().keys())[list(getDic().values()).index(ten)])
@@ -82,11 +87,12 @@ def FormationByOffer(text):
 def eval_all(db_manager) :
 
     # Misc Parameters
-    tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")#
-    tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on devices")
+
+    #tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")#
+    #tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on devices")
 
     FLAGS = tf.flags.FLAGS
-    x, y, dic = get_data_from_database(db_manager)
+    x, y, dic, nb_classes = get_data_from_database(db_manager)
     y_test = y
     x_test = x
 
@@ -94,7 +100,7 @@ def eval_all(db_manager) :
 
     # Evaluation
     # ==================================================
-    
+
     checkpoint_file = checkPath()
     graph = tf.Graph()
     with graph.as_default():
