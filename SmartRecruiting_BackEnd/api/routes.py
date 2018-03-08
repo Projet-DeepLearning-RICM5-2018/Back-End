@@ -217,6 +217,29 @@ def get_offers():
     """
     return jsonify(dbManager.get_all_offers()), 200
 
+@app.route('/offers/page', methods=['POST'])
+@cross_origin()
+@loginAdminRequired
+def recherche_page():
+    """
+    Function to get a page of the offers
+    :METHOD : GET
+    :HEADER PARAM  : none
+    :BODY PARAMS : {"nb_offre": int ,"num_page":int}
+    :return: number of the page, number total of page, a boolean to say
+    if the page is the last, and the list of the offers
+    """
+    """
+        Function to get the number of prediction between two date
+        :return: int
+        """
+    data = json.loads(request.data)
+    num_page_voulue, nb_pages, derniere_page, list_offre = dbManager.recherche(data['nb_offre'], data['num_page'])
+    if list_offre is None or derniere_page is None or nb_pages is None or num_page_voulue is None:
+        abort(404)
+    else:
+
+        return jsonify({"page": num_page_voulue, "nb_pages": nb_pages, "is_last": derniere_page, "data": list_offre})
 
 @app.route('/offers/<int:id_offer>')
 @cross_origin()

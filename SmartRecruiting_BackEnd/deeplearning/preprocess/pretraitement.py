@@ -38,20 +38,14 @@ Function to get the descriptor from a text
 @return [[float]] the text's descriptor
 """
 def preprocess(text) :
-    print('ok1')
     cleaned = tokenize(text)
-    print('ok2')
     model = Word2Vec.load("./data/preprocessing_model")
-    print('ok3')
     words = list(filter(lambda x: x in model.wv.vocab, cleaned))
-    print('ok4')
     if(len(words) >= max_size) :
         words = words[:max_size]
     else :
         words = words + ['x']*(max_size-len(words))
-    print('ok5')
     descriptor = [model.wv[w] for w in words]
-    print('ok6')
     return descriptor
 
 """
