@@ -79,7 +79,7 @@ Has to be called before using the model for the first time or if the csv contain
 """
 def init(dbManager) :
     # Input files #
-    filename = './data/Données_RICM_GEO_PRI7.csv'
+    filename = './data/offers.csv'
     sentences = [['x','x','x','x','x']]
     with open(filename,encoding='utf-8', mode="r") as f:
         reader = csv.DictReader(f)
