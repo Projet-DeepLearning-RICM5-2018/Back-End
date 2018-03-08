@@ -238,6 +238,7 @@ def recherche_page():
     if list_offre is None or derniere_page is None or nb_pages is None or num_page_voulue is None:
         abort(404)
     else:
+
         return jsonify({"page": num_page_voulue, "nb_pages": nb_pages, "is_last": derniere_page, "data": list_offre})
 
 @app.route('/offers/<int:id_offer>')

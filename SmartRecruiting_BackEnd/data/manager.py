@@ -393,7 +393,7 @@ class DatabaseManager():
         if field is None:
             return None
         else:
-            for contact in field.contacts :
+            for contact in field.contacts:
                 self.delete_contact(contact.id)
             for team in field.teams:
                 prediction = Prediction.query.get(team.id_prediction)
@@ -533,5 +533,32 @@ class DatabaseManager():
         ind_sup = (num_page_voulue * nboffre_par_page)
         list_offre = offers[ind_inf: ind_sup]
         derniere_page = nb_offer < ind_sup #peut etre <=
-        lis = [l.serialize() for l in list_offre]
+        lis = ()
+        for l in list_offre:
+            l_dict = l.__dict__
+            del l_dict['_sa_instance_state']
+            lis.append(l_dict)
         return num_page_voulue, nb_pages, derniere_page, lis
+
+    def recherche_offers_by_date_and_id(self, begin_date, end_date, id_field ):
+        if begin_date is not None and end_date is not None and id_field is not None:
+            offers = Offer.query \
+                .join(Prediction, Prediction.id_offer == Offer.id) \
+                .join(Team, Team.id_prediction == Prediction.id)\
+                .filter(Prediction.date <= end_date, Prediction.date >= begin_date, Team.id_field == id_field).all()
+        elif id_field is not None:
+            offers = Offer.query \
+                .join(Prediction, Prediction.id_offer == Offer.id) \
+                .join(Team, Team.id_prediction == Prediction.id)\
+                .filter(Team.id_field == id_field).all()
+        elif begin_date is not None and end_date is not None:
+            offers = Offer.query \
+                .join(Prediction, Prediction.id_offer == Offer.id) \
+                .join(Team, Team.id_prediction == Prediction.id) \
+                .filter(Prediction.date <= end_date, Prediction.date >= begin_date).all()
+        else :
+            offers = Offer.query \
+                .join(Prediction, Prediction.id_offer == Offer.id) \
+                .join(Team, Team.id_prediction == Prediction.id) \
+                .all()
+        return offers
