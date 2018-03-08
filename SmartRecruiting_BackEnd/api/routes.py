@@ -217,6 +217,28 @@ def get_offers():
     """
     return jsonify(dbManager.get_all_offers()), 200
 
+@app.route('/offers/page', methodes=['GET'])
+@cross_origin()
+@loginAdminRequired
+def recherche_page():
+    """
+    Function to get a page of the offers
+    :METHOD : GET
+    :HEADER PARAM  : none
+    :BODY PARAMS : {"nb_offre": int ,"num_page":int}
+    :return: number of the page, number total of page, a boolean to say
+    if the page is the last, and the list of the offers
+    """
+    """
+        Function to get the number of prediction between two date
+        :return: int
+        """
+    data = json.load(request.data)
+    num_page_voulue, nb_pages, derniere_page, list_offre = dbManager.recherche(data['nb_offre'], data['num_page'])
+    if list_offre is None or derniere_page is None or nb_pages is None or num_page_voulue is None:
+        abort(404)
+    else:
+        return jsonify(num_page_voulue, nb_pages, derniere_page, list_offre)
 
 @app.route('/offers/<int:id_offer>')
 @cross_origin()
@@ -684,7 +706,7 @@ def generatePrediction():
     METHOD : POST
     HEADER PARAM  : None
     BODY PARAMS : { "title" : str, "content" : str, "descriptor" : str, "id_user" : int }
-    RETURNS : 
+    RETURNS :
         {
             "field": { "name": str, "description": str, "descriptor": str, "website": str }
         }
@@ -788,28 +810,6 @@ def get_accuracy():
     else:
         return jsonify(nb_test, accuracy), 200
 
-@app.route('/search_page', methodes=['GET'])
-@cross_origin()
-@loginAdminRequired
-def recherche_page():
-    """
-    Function to get a page of the offers
-    :METHOD : GET
-    :HEADER PARAM  : none
-    :BODY PARAMS : {"nb_offre": int ,"num_page":int}
-    :return: number of the page, number total of page, a boolean to say
-    if the page is the last, and the list of the offers
-    """
-    """
-        Function to get the number of prediction between two date
-        :return: int
-        """
-    data = json.load(request.data)
-    num_page_voulue, nb_pages, derniere_page, list_offre = dbManager.recherche(data['nb_offre'], data['num_page'])
-    if list_offre is None or derniere_page is None or nb_pages is None or num_page_voulue is None:
-        abort(404)
-    else:
-        return jsonify(num_page_voulue, nb_pages, derniere_page, list_offre)
 
 ##############################AUTHETIFICATION
 @app.route('/update_prediction_by_id_offer', methods=['POST'])
