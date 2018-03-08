@@ -29,11 +29,17 @@ class DatabaseManager():
         init_db()
         if(app.config['INIT']):
             init(self)
+            print ("init")
         elif (app.config['REINIT']):
             reinit(self)
-        train(self)
-        nb_test, accuracy = eval_all(self)
-        save_eval(nb_test, accuracy)
+            print("reinit")
+        if(app.config['INIT'] or app.config['REINIT']):
+            print ("-------------------------------------train ----------------------------------------")
+            train(self)
+            nb_test, accuracy = eval_all(self)
+            save_eval(nb_test, accuracy)
+
+
 
     def get_all_users(self):
         users = User.query.all()
@@ -52,6 +58,10 @@ class DatabaseManager():
 
     def get_one_admin(self):
         return User.query.filter_by(is_admin=1).first()
+        """if user is None:
+            return None
+        else:
+            return user.serialize()"""
 
 
     def add_user(self, name, surname, role, email, password, is_admin):
@@ -98,12 +108,6 @@ class DatabaseManager():
             dB.commit()
             return True
 
-    def delete_users(self):
-        users = User.query.all()
-        for user in users:
-            dB.delete(user)
-            dB.commit()
-
     def get_all_offers(self):
         offers = Offer.query.all()
         return [o.serialize() for o in offers]
@@ -137,17 +141,6 @@ class DatabaseManager():
             dB.rollback()
             return -1
 
-    def add_offer_link_field(self, title, content, id_user, id_field, inbase):
-        descriptor = preprocess(content)
-        descriptor = descriptor_to_string(descriptor)
-        id_offer = self.add_offer_v2(title, content, descriptor, id_user)
-        if id_offer != -1:
-            id_prediction = self.add_prediction_v2(0, inbase, id_offer)
-            if id_prediction != -1:
-                self.add_team(id_prediction, id_field, 1)
-                return id_offer
-        return -1
-
     def update_offer(self, id_offer, title, content, descriptor, id_user):
         offer = Offer.query.get(id_offer)
         if offer is None:
@@ -173,25 +166,26 @@ class DatabaseManager():
         if offer is None:
             return None
         else:
-            prediction = Prediction.query.filter_by(id_offer=id_offer).first()
-            print(prediction)
-            if prediction is None:
-                return None
-            else :
-                team = Team.query.filter_by(id_prediction=prediction.id).first()
-                print(team)
-                if team is None:
-                    return None
-                else :
-                    dB.delete(offer)
-                    dB.delete(team)
-                    dB.delete(prediction)
-                    dB.commit()
-                    return True
+            dB.delete(offer)
+            dB.commit()
+            return True
 
     def get_all_predictions(self):
         predictions = Prediction.query.all()
         return [p.serialize() for p in predictions]
+
+    def get_all_predictions_with_field(self):
+        predictions = Prediction.query.join(Team, Team.id_prediction == Prediction.id)
+        return predictions
+
+    def get_all_offers_with_field_in_base(self):
+        offers = Offer.query\
+            .with_entities(Offer.descriptor, Team.id_field)\
+            .join(Prediction, Offer.id == Prediction.id_offer) \
+            .filter_by(inbase=1)\
+            .join(Team, Team.id_prediction == Prediction.id)
+
+        return offers
 
     def get_prediction_by_id(self, id_prediction):
         prediction = Prediction.query.get(id_prediction)
@@ -240,23 +234,6 @@ class DatabaseManager():
                 dB.rollback()
                 return False
 
-    def update_prediction_by_id_offer(self, id_offer, id_field):
-        offer = Offer.query.get(id_offer)
-        if offer is None:
-            return None
-        else:
-            try:
-                prediction = offer.prediction
-                teams = prediction.teams
-                for team in teams:
-                    team.id_field = id_field
-                prediction.inbase == 1
-                dB.commit()
-                return True
-            except Exception as e:
-                dB.rollback()
-                return False
-
     def delete_prediction(self, id_prediction):
         prediction = Prediction.query.get(id_prediction)
         if prediction is None:
@@ -286,7 +263,6 @@ class DatabaseManager():
             dB.rollback()
             return False
 
-
     def update_team(self, id_prediction, id_field, nb_members):
         "change la formation associe a une prediction "
         "on suppose qu'il y a une seule formation associe a une prediction dans un premier temps"
@@ -310,12 +286,6 @@ class DatabaseManager():
         fields = Field.query.all()
         return [p.serialize() for p in fields]
 
-    def get_all_fields_name(self):
-        fields = Field.query.with_entities(Field.id, Field.name).all()
-        fields = np.array(fields)
-        #return fields
-        return [f.serialize() for f in fields]
-
     def get_field_by_id(self, id_prog):
         field = Field.query.get(id_prog)
         if field is None:
@@ -326,16 +296,20 @@ class DatabaseManager():
     def get_field_by_name(self, name):
         return Field.query.filter_by(name=name).first()
 
+    def get_all_id_field(self):
+        field = Field.query \
+            .with_entities(Field.id)
+        return field
 
     def add_field(self, name, description, descriptor, website):
         field = Field(name, description, descriptor, website)
         dB.add(field)
         try:
             dB.commit()
-            return field.serialize()
+            return True
         except Exception as e:
             dB.rollback()
-            return None
+            return False
 
     def add_field_v2(self, name, description, descriptor, website):
         field = Field(name, description, descriptor, website)
@@ -373,8 +347,6 @@ class DatabaseManager():
         if field is None:
             return None
         else:
-            for contact in field.contacts :
-                self.delete_contact(contact.id)
             dB.delete(field)
             dB.commit()
             return True
@@ -395,10 +367,10 @@ class DatabaseManager():
         dB.add(contact)
         try:
             dB.commit()
-            return contact.serialize()
+            return True
         except Exception as e:
             dB.rollback()
-            return None
+            return False
 
     def update_contact(self, id_contact, name, surname, email, phone, role, id_field):
         contact = Contact.query.get(id_contact)
@@ -461,6 +433,10 @@ class DatabaseManager():
             "TODO"
 
     def offers_by_field(self,id_field):
+        "offre associes a une formation"
+        "Idoffers = Prediction.query\
+            .join(Team, Team.id_prediction == Prediction.id)\
+            .filter(Team.id_field == id_field)"
         offers = Offer.query\
             .join(Prediction, Prediction.id_offer == Offer.id)\
             .join(Team, Team.id_prediction == Prediction.id)\
