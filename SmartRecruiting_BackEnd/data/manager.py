@@ -526,7 +526,8 @@ class DatabaseManager():
         offers = Offer.query\
             .with_entities(Offer.id, Offer.id_user, Offer.content, Offer.title, Field.id, Field.name)\
             .join(Prediction, Prediction.id_offer == Offer.id)\
-            .join(Team, Team.id_prediction == Prediction.id).all()
+            .join(Team, Team.id_prediction == Prediction.id)\
+            .join(Field, Field.id == Team.id_field).all()
 
         nb_offer = len(offers)
         nb_pages = int(nb_offer / nboffre_par_page)+1
