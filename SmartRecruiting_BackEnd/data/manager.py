@@ -333,9 +333,10 @@ class DatabaseManager():
 
     def get_all_fields_name(self):
         fields = Field.query.with_entities(Field.id, Field.name).all()
-        fields = np.array(fields)
-        #return fields
-        return [f.serialize() for f in fields]
+        result = []
+        for f in fields :
+            result.append({'id': f[0], 'name': f[1].decode("utf-8")})
+        return result
 
     def get_field_by_id(self, id_prog):
         field = Field.query.get(id_prog)
@@ -520,10 +521,10 @@ class DatabaseManager():
         return nb_prediction
 
     def recherche(self, nboffre_par_page, num_page_voulue):
-        if nboffre_par_page not in range(0,50):
+        if nboffre_par_page not in range(0, 50):
             nboffre_par_page = 50
         offers = Offer.query\
-            .with_entities(Offer, Field.id, Field.name)\
+            .with_entities(Offer.id, Offer.id_user, Offer.content, Offer.title, Field.id, Field.name)\
             .join(Prediction, Prediction.id_offer == Offer.id)\
             .join(Team, Team.id_prediction == Prediction.id).all()
 
@@ -540,9 +541,16 @@ class DatabaseManager():
 
     def serialize_offer_and_field(self,item):
         return {
-            'offre'     : item[0].serialize(),
-            'id_field'  : item[1],
-            'name_field': item[2].decode("utf-8")
+            'offer': {
+                'id'        : item[0],
+                'id_user'   : item[1],
+                'content'   : item[2].decode("utf-8"),
+                'title'     : item[3].decode("utf-8"),
+            },
+            'field':{
+                'id'  : item[4],
+                'name': item[5].decode("utf-8")
+            }
         }
 
 
