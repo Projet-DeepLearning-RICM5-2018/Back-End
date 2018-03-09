@@ -209,12 +209,6 @@ class DatabaseManager():
                     dB.commit()
                     return True
 
-    def delete_offers(self):
-        offers = Offer.query.all()
-        for offer in offers:
-            self.delete_offer(offer.id)
-            dB.commit()
-
     def get_all_predictions(self):
         predictions = Prediction.query.all()
         return [p.serialize() for p in predictions]
