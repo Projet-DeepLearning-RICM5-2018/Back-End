@@ -195,19 +195,15 @@ class DatabaseManager():
         else:
             prediction = Prediction.query.filter_by(id_offer=id_offer).first()
             print(prediction)
-            if prediction is None:
-                return None
-            else :
+            if prediction is not None:
                 team = Team.query.filter_by(id_prediction=prediction.id).first()
                 print(team)
-                if team is None:
-                    return None
-                else : 
+                if team is not None:
                     dB.delete(team)
-                    dB.delete(prediction)
-                    dB.delete(offer)
-                    dB.commit()
-                    return True
+                dB.delete(prediction)
+            dB.delete(offer)
+            dB.commit()
+            return True
 
     def get_all_predictions(self):
         predictions = Prediction.query.all()
