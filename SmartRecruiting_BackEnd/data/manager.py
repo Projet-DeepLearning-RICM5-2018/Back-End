@@ -199,19 +199,15 @@ class DatabaseManager():
         else:
             prediction = Prediction.query.filter_by(id_offer=id_offer).first()
             print(prediction)
-            if prediction is None:
-                return None
-            else :
+            if prediction is not None:
                 team = Team.query.filter_by(id_prediction=prediction.id).first()
                 print(team)
-                if team is None:
-                    return None
-                else :
+                if team is not None:
                     dB.delete(team)
-                    dB.delete(prediction)
-                    dB.delete(offer)
-                    dB.commit()
-                    return True
+                dB.delete(prediction)
+            dB.delete(offer)
+            dB.commit()
+            return True
 
     def get_all_predictions(self):
         predictions = Prediction.query.all()
@@ -557,7 +553,7 @@ class DatabaseManager():
         offers = Offer.query\
             .with_entities(Offer, Field.id, Field.name)\
             .join(Prediction, Prediction.id_offer == Offer.id)\
-            .join(Team, Team.id_prediction == Prediction.id)
+            .join(Team, Team.id_prediction == Prediction.id).all()
 
         nb_offer = len(offers)
         nb_pages = int(nb_offer / nboffre_par_page)+1
