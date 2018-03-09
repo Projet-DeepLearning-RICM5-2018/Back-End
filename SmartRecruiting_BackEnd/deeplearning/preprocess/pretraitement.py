@@ -16,6 +16,9 @@ from SmartRecruiting_BackEnd import app
 max_size = 400 # The maximal size that a text should have.
 app.config['stop_list'] =[word for line in open("./data/stopwords_fr.txt",encoding='utf-8', mode="r") for word in line.split()]
 
+#load model FR
+model = Word2Vec.load("./data/frwiki.gensim")
+
 ########################
 # FUNCTIONS DEFINITION #
 ########################
@@ -40,8 +43,8 @@ Function to get the descriptor from a text
 def preprocess(text) :
     print('ok1')
     cleaned = tokenize(text)
-    print('ok2')
-    model = Word2Vec.load("./data/frwiki.gensim")#./data/preprocessing_model
+    print('ok2 load only once !')
+    #model = Word2Vec.load("./data/frwiki.gensim")#./data/preprocessing_model
     print('ok3')
     words = list(filter(lambda x: x in model.wv.vocab, cleaned))
     print('ok4')
@@ -50,7 +53,11 @@ def preprocess(text) :
     else :
         words = words + ['x']*(max_size-len(words))
     print('ok5')
-    descriptor = [model.wv[w] for w in words]
+    sentences = [['x','x','x','x','x','x','x','x','x','x']]
+    model.build_vocab(sentence, update=True)#训练该行
+    model.train(sentence)
+    print('Update Voc W2V fr.wiki->OK ?')
+    descriptor = [model.wv[w] for w in words]#
     print('ok6')
     return descriptor
 
@@ -67,7 +74,7 @@ def preprocessAll(file_name) :
         for row in reader:
             print('preprocess offer ' + str(i))
             i+=1
-            text = row['Offre initiale'] # Get the text from the initial offer
+            text = row['Offre initiale '] # Get the text from the initial offer
             label = row['Formation']
             learning_base = learning_base + [(text,preprocess(text),label)] # All the text saved for preprocessing after building the model
     return learning_base
@@ -79,19 +86,19 @@ Has to be called before using the model for the first time or if the csv contain
 """
 def init(dbManager) :
     # Input files #
-    filename = './data/offers.csv'
+    filename = './data/Données_RICM_GEO_PRI7.csv'
     sentences = [['x','x','x','x','x']]
     with open(filename,encoding='utf-8', mode="r") as f:
         reader = csv.DictReader(f)
         i = 1
         for row in reader:
-            text = row['Offre initiale'] # Get the text from the initial offer
+            text = row['Offre initiale '] # Get the text from the initial offer
             print('init offer ' + str(i))
             i+=1
             cleaned = tokenize(text)
             sentences = sentences + [cleaned] #Sentences used to build the model's vocabulary
-    model = Word2Vec(sentences, size=100, window=5, min_count=5, workers=4)
-    model.save("./data/preprocessing_model")
+    #model = Word2Vec(sentences, size=100, window=5, min_count=5, workers=4)
+    #model.save("./data/preprocessing_model")
 
     # Put everything in the DB for the first time"
     base = preprocessAll(filename)
@@ -129,8 +136,8 @@ def reinit(dbManager) :
         text = o['content']
         cleaned = tokenize(text)
         sentences = sentences + [cleaned] #Sentences used to build the model's vocabulary
-    model = Word2Vec(sentences, size=100, window=5, min_count=5, workers=4)
-    model.save("./data/preprocessing_model")#path root
+    #model = Word2Vec(sentences, size=100, window=5, min_count=5, workers=4)
+    #model.save("./data/preprocessing_model")#path root
 
     # Recompute all descriptors and put them in the DB #
     res  = recompute_all_descriptors(offers)
