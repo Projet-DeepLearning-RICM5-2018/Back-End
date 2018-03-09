@@ -825,7 +825,8 @@ def get_accuracy():
 def update_prediction_by_id_offer():
     data = json.loads(request.data)
     in_base = data.get('in_base', None)
-    if dbManager.update_prediction_by_id_offer(data['id_offer'], data['id_field'],in_base):
+    id_field = data.get('in_base', None)
+    if dbManager.update_prediction_by_id_offer(data['id_offer'], id_field, in_base):
         return '', 201
     else:
         abort(400)

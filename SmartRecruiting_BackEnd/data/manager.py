@@ -253,11 +253,12 @@ class DatabaseManager():
         else:
             try:
                 prediction = offer.prediction
-                teams = prediction.teams
-                for team in teams:
-                    team.id_field = id_field
+                if id_field != None :
+                    teams = prediction.teams
+                    for team in teams:
+                        team.id_field = id_field
                 if in_base != None :
-                    prediction.inbase == in_base
+                    prediction.inbase = (in_base == 1)
                 print(prediction.inbase)
                 dB.commit()
                 return True
@@ -577,4 +578,3 @@ class DatabaseManager():
             offers = offers.filter(Prediction.date <= end_date, Prediction.date >= begin_date)
 
         return offers.order_by(Offer.id.desc()).all()
-
