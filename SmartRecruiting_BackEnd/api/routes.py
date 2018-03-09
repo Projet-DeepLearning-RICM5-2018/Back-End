@@ -169,7 +169,7 @@ def add_user():
 
 @app.route('/users/<int:id_user>', methods=['PUT'])
 @cross_origin()
-@loginAdminRequired
+@loginRequired
 def update_user(id_user):
     """
     METHOD : PUT
@@ -182,6 +182,9 @@ def update_user(id_user):
     role = data.get('role', None)
     email = data.get('email', None)
     password = data.get('password', None)
+    if password!=None :
+        password = hashpw(password.encode('utf-8'), gensalt())
+    print(password)
     is_admin = data.get('is_admin', None)
     response = dbManager.update_user(id_user, name, surname, role, email, password, is_admin)
     if response is None:
@@ -195,7 +198,7 @@ def update_user(id_user):
 
 @app.route('/users/<int:id_user>', methods=['DELETE'])
 @cross_origin()
-@loginAdminRequired
+@loginRequired
 def delete_user(id_user):
     """
     METHOD : DELETE
@@ -234,11 +237,17 @@ def recherche_page():
         :return: int
         """
     data = json.loads(request.data)
-    num_page_voulue, nb_pages, derniere_page, list_offre = dbManager.recherche(data['nb_offre'], data['num_page'])
+    begin_date = data.get('begin_date', None)
+    end_date = data.get('end_date', None)
+    id_field = data.get('id_field', None)
+    num_page_voulue, nb_pages, derniere_page, list_offre = dbManager.recherche(data['nb_offre'],
+                                                                               data['num_page'],
+                                                                               begin_date,
+                                                                               end_date,
+                                                                               id_field)
     if list_offre is None or derniere_page is None or nb_pages is None or num_page_voulue is None:
         abort(404)
     else:
-
         return jsonify({"page": num_page_voulue, "nb_pages": nb_pages, "is_last": derniere_page, "data": list_offre})
 
 @app.route('/offers/<int:id_offer>')

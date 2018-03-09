@@ -201,19 +201,15 @@ class DatabaseManager():
         else:
             prediction = Prediction.query.filter_by(id_offer=id_offer).first()
             print(prediction)
-            if prediction is None:
-                return None
-            else :
+            if prediction is not None:
                 team = Team.query.filter_by(id_prediction=prediction.id).first()
                 print(team)
-                if team is None:
-                    return None
-                else :
+                if team is not None:
                     dB.delete(team)
-                    dB.delete(prediction)
-                    dB.delete(offer)
-                    dB.commit()
-                    return True
+                dB.delete(prediction)
+            dB.delete(offer)
+            dB.commit()
+            return True
 
     def get_all_predictions(self):
         predictions = Prediction.query.all()
@@ -362,6 +358,13 @@ class DatabaseManager():
     def get_all_fields(self):
         fields = Field.query.all()
         return [p.serialize() for p in fields]
+
+    def get_all_fields_name(self):
+        fields = Field.query.with_entities(Field.id, Field.name).all()
+        result = []
+        for f in fields :
+            result.append({'id': f[0], 'name': f[1].decode("utf-8")})
+        return result
 
     def get_field_by_id(self, id_prog):
         field = Field.query.get(id_prog)
@@ -553,13 +556,10 @@ class DatabaseManager():
             .first().number
         return nb_prediction
 
-    def recherche(self, nboffre_par_page, num_page_voulue):
-        if nboffre_par_page not in range(0,50):
+    def recherche(self, nboffre_par_page, num_page_voulue, begin_date, end_date, id_field):
+        if nboffre_par_page not in range(0, 50):
             nboffre_par_page = 50
-        offers = Offer.query\
-            .with_entities(Offer, Field.id, Field.name)\
-            .join(Prediction, Prediction.id_offer == Offer.id)\
-            .join(Team, Team.id_prediction == Prediction.id).all()
+        offers = self.recherche_offers_by_date_and_id(begin_date, end_date, id_field)
 
         nb_offer = len(offers)
         nb_pages = int(nb_offer / nboffre_par_page)+1
@@ -567,32 +567,35 @@ class DatabaseManager():
         ind_sup = (num_page_voulue * nboffre_par_page)
         list_offre = offers[ind_inf: ind_sup]
         derniere_page = nb_offer < ind_sup #peut etre <=
-        lis = ()
-        for l in list_offre:
-            l_dict = l.__dict__
-            del l_dict['_sa_instance_state']
-            lis.append(l_dict)
+
+        lis = [self.serialize_offer_and_field(item) for item in list_offre]
         return num_page_voulue, nb_pages, derniere_page, lis
 
+    def serialize_offer_and_field(self,item):
+        return {
+            'offer': {
+                'id'        : item[0],
+                'id_user'   : item[1],
+                'content'   : item[2].decode("utf-8"),
+                'title'     : item[3].decode("utf-8"),
+            },
+            'field':{
+                'id'  : item[4],
+                'name': item[5].decode("utf-8")
+            }
+        }
+
     def recherche_offers_by_date_and_id(self, begin_date, end_date, id_field ):
-        if begin_date is not None and end_date is not None and id_field is not None:
-            offers = Offer.query \
-                .join(Prediction, Prediction.id_offer == Offer.id) \
-                .join(Team, Team.id_prediction == Prediction.id)\
-                .filter(Prediction.date <= end_date, Prediction.date >= begin_date, Team.id_field == id_field).all()
-        elif id_field is not None:
-            offers = Offer.query \
-                .join(Prediction, Prediction.id_offer == Offer.id) \
-                .join(Team, Team.id_prediction == Prediction.id)\
-                .filter(Team.id_field == id_field).all()
-        elif begin_date is not None and end_date is not None:
-            offers = Offer.query \
-                .join(Prediction, Prediction.id_offer == Offer.id) \
-                .join(Team, Team.id_prediction == Prediction.id) \
-                .filter(Prediction.date <= end_date, Prediction.date >= begin_date).all()
-        else :
-            offers = Offer.query \
-                .join(Prediction, Prediction.id_offer == Offer.id) \
-                .join(Team, Team.id_prediction == Prediction.id) \
-                .all()
-        return offers
+        offers =Offer.query \
+            .with_entities(Offer.id, Offer.id_user, Offer.content, Offer.title, Field.id, Field.name) \
+            .join(Prediction, Prediction.id_offer == Offer.id) \
+            .join(Team, Team.id_prediction == Prediction.id) \
+            .join(Field, Field.id == Team.id_field) \
+            .filter(Prediction.inbase == 1)
+        if id_field is not None:
+            offers = offers.filter(Team.id_field == id_field)
+        if begin_date is not None and end_date is not None:
+            offers = offers.filter(Prediction.date <= end_date, Prediction.date >= begin_date)
+
+        return offers.order_by(Offer.id.desc()).all()
+
