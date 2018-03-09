@@ -234,7 +234,14 @@ def recherche_page():
         :return: int
         """
     data = json.loads(request.data)
-    num_page_voulue, nb_pages, derniere_page, list_offre = dbManager.recherche(data['nb_offre'], data['num_page'])
+    begin_date = data.get('begin_date', None)
+    end_date = data.get('end_date', None)
+    id_field = data.get('id_field', None)
+    num_page_voulue, nb_pages, derniere_page, list_offre = dbManager.recherche(data['nb_offre'],
+                                                                               data['num_page'],
+                                                                               begin_date,
+                                                                               end_date,
+                                                                               id_field)
     if list_offre is None or derniere_page is None or nb_pages is None or num_page_voulue is None:
         abort(404)
     else:
