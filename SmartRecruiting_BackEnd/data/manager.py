@@ -525,7 +525,7 @@ class DatabaseManager():
         offers = Offer.query\
             .with_entities(Offer, Field.id, Field.name)\
             .join(Prediction, Prediction.id_offer == Offer.id)\
-            .join(Team, Team.id_prediction == Prediction.id)
+            .join(Team, Team.id_prediction == Prediction.id).all()
 
         nb_offer = len(offers)
         nb_pages = int(nb_offer / nboffre_par_page)+1
@@ -533,12 +533,18 @@ class DatabaseManager():
         ind_sup = (num_page_voulue * nboffre_par_page)
         list_offre = offers[ind_inf: ind_sup]
         derniere_page = nb_offer < ind_sup #peut etre <=
-        lis = ()
-        for l in list_offre:
-            l_dict = l.__dict__
-            del l_dict['_sa_instance_state']
-            lis.append(l_dict)
+
+        lis = [self.serialize_offer_and_field(item) for item in list_offre]
         return num_page_voulue, nb_pages, derniere_page, lis
+
+
+    def serialize_offer_and_field(self,item):
+        return {
+            'offre'     : item[0].serialize(),
+            'id_field'  : item[1],
+            'name_field': item[2].decode("utf-8")
+        }
+
 
     def recherche_offers_by_date_and_id(self, begin_date, end_date, id_field ):
         if begin_date is not None and end_date is not None and id_field is not None:
