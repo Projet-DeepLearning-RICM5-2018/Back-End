@@ -7,11 +7,9 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../..'))
 
 sys.argv.append('-t')
 
-from SmartRecruiting_BackEnd import app
-from SmartRecruiting_BackEnd.data import DatabaseManager, Base, User
+from SmartRecruiting_BackEnd import app, dbManager
+from SmartRecruiting_BackEnd.data import Base, User
 from SmartRecruiting_BackEnd.data import init_db, dbSession as dB
-
-dbManager = DatabaseManager()
 
 class Test_user(unittest.TestCase):
     serialized_test_user = {'id':1,'name':'test_name','surname':'test_surname','role':'test_role','email':'test_email','password':'test_password','is_admin':True};

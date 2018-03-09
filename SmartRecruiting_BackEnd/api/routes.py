@@ -169,7 +169,7 @@ def add_user():
 
 @app.route('/users/<int:id_user>', methods=['PUT'])
 @cross_origin()
-@loginAdminRequired
+@loginRequired
 def update_user(id_user):
     """
     METHOD : PUT
@@ -182,6 +182,9 @@ def update_user(id_user):
     role = data.get('role', None)
     email = data.get('email', None)
     password = data.get('password', None)
+    if password!=None :
+        password = hashpw(password.encode('utf-8'), gensalt())
+    print(password)
     is_admin = data.get('is_admin', None)
     response = dbManager.update_user(id_user, name, surname, role, email, password, is_admin)
     if response is None:
@@ -195,7 +198,7 @@ def update_user(id_user):
 
 @app.route('/users/<int:id_user>', methods=['DELETE'])
 @cross_origin()
-@loginAdminRequired
+@loginRequired
 def delete_user(id_user):
     """
     METHOD : DELETE
@@ -280,7 +283,7 @@ def add_offer():
 
 @app.route('/offers/link', methods=['POST'])
 @cross_origin()
-@loginAdminRequired
+@loginRequired
 def add_offer_link_field():
     """
     METHOD : POST
@@ -504,7 +507,7 @@ def get_field(id_field):
     :return: {"field":{"id": int, "name": str, "description": str, "descriptor": str,"website": str, "contacts":}}
     """
     field = dbManager.get_field_by_id(id_field)
-    print(field)
+    #print(field)
     if field is None:
         abort(404)
     else:
@@ -712,7 +715,7 @@ def generatePrediction():
     """
     METHOD : POST
     HEADER PARAM  : None
-    BODY PARAMS : { "title" : str, "content" : str, "descriptor" : str, "id_user" : int }
+    BODY PARAMS : { "title" : str, "content" : str }
     RETURNS :
         {
             "field": { "name": str, "description": str, "descriptor": str, "website": str }
