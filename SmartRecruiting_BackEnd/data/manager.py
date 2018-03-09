@@ -28,6 +28,8 @@ class DatabaseManager():
         print("Init BD")
         init_db()
         if(app.config['INIT']):
+            if self.get_one_admin() is None:
+                self.add_user("monsieur", "administrateur", "admin", "admin@", "root", 1)
             init(self)
             print ("init")
         elif (app.config['REINIT']):
