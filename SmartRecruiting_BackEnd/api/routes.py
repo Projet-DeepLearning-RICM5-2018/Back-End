@@ -169,7 +169,7 @@ def add_user():
 
 @app.route('/users/<int:id_user>', methods=['PUT'])
 @cross_origin()
-@loginAdminRequired
+@loginRequired
 def update_user(id_user):
     """
     METHOD : PUT
@@ -182,6 +182,9 @@ def update_user(id_user):
     role = data.get('role', None)
     email = data.get('email', None)
     password = data.get('password', None)
+    if password!=None :
+        password = hashpw(password.encode('utf-8'), gensalt())
+    print(password)
     is_admin = data.get('is_admin', None)
     response = dbManager.update_user(id_user, name, surname, role, email, password, is_admin)
     if response is None:
@@ -195,7 +198,7 @@ def update_user(id_user):
 
 @app.route('/users/<int:id_user>', methods=['DELETE'])
 @cross_origin()
-@loginAdminRequired
+@loginRequired
 def delete_user(id_user):
     """
     METHOD : DELETE
