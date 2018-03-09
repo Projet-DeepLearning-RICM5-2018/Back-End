@@ -9,11 +9,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../..'))
 sys.argv.append('-t')
 
 from SmartRecruiting_BackEnd import app
-from SmartRecruiting_BackEnd.deeplearning.preprocess.pretraitement import *
-from SmartRecruiting_BackEnd.data import DatabaseManager, Base
-from SmartRecruiting_BackEnd.data import init_db, dbSession as dB
-
-dbManager = DatabaseManager()
+from SmartRecruiting_BackEnd.deeplearning.preprocess.pretraitement import tokenize, preprocess, descriptor_to_string
 
 app.config['stop_list'] = ['is', 'this', 'a', 'the']
 
