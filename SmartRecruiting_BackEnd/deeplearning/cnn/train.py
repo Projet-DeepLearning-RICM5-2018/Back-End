@@ -42,7 +42,6 @@ def train(db_manager):
 
     # Training
     # ==================================================
-    def_flags()
     FLAGS = tf.flags.FLAGS
 
     with tf.Graph().as_default():

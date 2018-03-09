@@ -10,8 +10,8 @@ Created on Sun Feb 26 16:23:02 2017
 from SmartRecruiting_BackEnd.data.models import *
 from SmartRecruiting_BackEnd.data.database import init_db, dbSession as dB
 from SmartRecruiting_BackEnd import app
-from SmartRecruiting_BackEnd.deeplearning.cnn.train import train
-from SmartRecruiting_BackEnd.deeplearning.cnn.eval import eval_all, save_eval
+from SmartRecruiting_BackEnd.deeplearning.cnn.train import train, def_flags
+from SmartRecruiting_BackEnd.deeplearning.cnn.eval import eval_all, save_eval, def_eval_flag
 from SmartRecruiting_BackEnd.deeplearning.preprocess.pretraitement import init, reinit, preprocess, descriptor_to_string
 import datetime
 
@@ -33,11 +33,15 @@ class DatabaseManager():
         elif (app.config['REINIT']):
             reinit(self)
             print("reinit")
+        def_flags()
         if(app.config['INIT'] or app.config['REINIT']):
             print ("-------------------------------------train ----------------------------------------")
             train(self)
+            def_eval_flag()
             nb_test, accuracy = eval_all(self)
             save_eval(nb_test, accuracy)
+        else :
+            def_eval_flag()
 
 
 
@@ -202,7 +206,7 @@ class DatabaseManager():
                 print(team)
                 if team is None:
                     return None
-                else : 
+                else :
                     dB.delete(team)
                     dB.delete(prediction)
                     dB.delete(offer)

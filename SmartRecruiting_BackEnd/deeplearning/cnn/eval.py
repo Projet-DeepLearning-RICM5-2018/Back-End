@@ -29,6 +29,9 @@ def getDic():
         dic = mypic.load()
     return dic
 
+def def_eval_flag() :
+    tf.flags.DEFINE_string("checkpoint_dir", "./runs/", "Checkpoint directory from training run")
+    tf.flags.DEFINE_boolean("eval_train", False, "Evaluate on all training data")
 
 def FormationByOffer(text):
     """
@@ -37,14 +40,6 @@ def FormationByOffer(text):
     :return:the field
     """
     # Eval Parameters
-    tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")#
-    tf.flags.DEFINE_string("checkpoint_dir", "./runs/", "Checkpoint directory from training run")
-    tf.flags.DEFINE_boolean("eval_train", False, "Evaluate on all training data")
-
-    #MODIF_BEGIN TODO
-    tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")#
-    tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on devices")
-    #MODIF_END TODO
 
     FLAGS = tf.flags.FLAGS
     x_test = pretraitement.preprocess(text)
@@ -88,8 +83,6 @@ def eval_all(db_manager) :
 
     # Misc Parameters
 
-    #tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")#
-    #tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on devices")
 
     FLAGS = tf.flags.FLAGS
     x, y, dic, nb_classes = get_data_from_database(db_manager)
