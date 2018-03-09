@@ -690,7 +690,7 @@ def fields_by_offer(id_offer):
     :METHOD : GET
     :HEADER PARAM  : id_offer : int
     :BODY PARAMS : none
-    :return: {"fields":{"name": str, "description": str, "descriptor": str,"website": str}}
+    :return: {"fields":{"id": int,"name": str,"inbase": boolean}}
     """
     fields = dbManager.fields_by_offer(id_offer)
     if fields is None:
@@ -817,7 +817,8 @@ def get_accuracy():
 @loginAdminRequired
 def update_prediction_by_id_offer():
     data = json.loads(request.data)
-    if dbManager.update_prediction_by_id_offer(data['id_offer'], data['id_field']):
+    in_base = data.get('in_base', None)
+    if dbManager.update_prediction_by_id_offer(data['id_offer'], data['id_field'],in_base):
         return '', 201
     else:
         abort(400)
