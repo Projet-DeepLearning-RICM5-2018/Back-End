@@ -408,10 +408,10 @@ class DatabaseManager():
         dB.add(field)
         try:
             dB.commit()
-            return True
+            return field.serialize()
         except Exception as e:
             dB.rollback()
-            return False
+            return None
 
     def add_field_v2(self, name, description, descriptor, website):
         field = Field(name, description, descriptor, website)

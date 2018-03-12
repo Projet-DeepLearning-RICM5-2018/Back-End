@@ -529,7 +529,6 @@ def add_field():
     }
     """
     data = json.loads(request.data)
-    print(data['contacts'])
     field = dbManager.add_field(data['name'], data['description'], data['descriptor'], data['website'])
     if field != None:
         field['contacts'] = []
