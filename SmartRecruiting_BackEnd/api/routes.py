@@ -490,7 +490,6 @@ def get_fields():
 
 @app.route('/fields/nameonly')
 @cross_origin()
-@loginAdminRequired
 def get_fields_name():
     """
     Function to get all the field in the database
@@ -518,7 +517,7 @@ def get_field(id_field):
 
 @app.route('/fields', methods=['POST'])
 @cross_origin()
-#@loginAdminRequired
+@loginAdminRequired
 def add_field():
     """
     Function to add a field in the database
@@ -545,7 +544,7 @@ def add_field():
 
 @app.route('/fields/<int:id_field>', methods=['PUT'])
 @cross_origin()
-#@loginAdminRequired
+@loginAdminRequired
 def update_field(id_field):
     """
     Function to update a field in the database
@@ -570,7 +569,7 @@ def update_field(id_field):
 
 @app.route('/fields/<int:id_field>', methods=['DELETE'])
 @cross_origin()
-#@loginAdminRequired
+@loginAdminRequired
 def delete_field(id_field):
     """
     Function to delete a field in the database
@@ -612,7 +611,7 @@ def get_contact(id_contact):
 
 @app.route('/contacts', methods=['POST'])
 @cross_origin()
-#@loginAdminRequired
+@loginAdminRequired
 def add_contact():
     """
     Function to add a contact in the database
@@ -634,7 +633,7 @@ def add_contact():
 
 @app.route('/contacts/<int:id_contact>', methods=['PUT'])
 @cross_origin()
-#@loginAdminRequired
+@loginAdminRequired
 def update_contact(id_contact):
     """
     Function to update a contact in the database
@@ -661,7 +660,7 @@ def update_contact(id_contact):
 
 @app.route('/contacts/<int:id_contact>', methods=['DELETE'])
 @cross_origin()
-#@loginAdminRequired
+@loginAdminRequired
 def delete_contact(id_contact):
     """
     Function to delete a contact in the database
@@ -676,6 +675,7 @@ def delete_contact(id_contact):
 
 
 @app.route('/searchOffersByField/<int:id_field>', methods=['GET'])
+@cross_origin()
 def offers_by_field(id_field):
     """
     Function to get all the offers who correspond to a field
@@ -693,6 +693,7 @@ def offers_by_field(id_field):
 
 
 @app.route('/searchFieldsByOffer/<int:id_offer>', methods=['GET'])
+@cross_origin()
 def fields_by_offer(id_offer):
     """
     Function to get all the field who correspond to an offer
@@ -752,6 +753,7 @@ def generatePrediction_save():
 
 
 @app.route('/searchOffersByUser/<int:id_user>', methods=['GET'])
+@cross_origin()
 def offers_by_user(id_user):
     """
     Function to get all the offers who correspond to an user
@@ -768,6 +770,7 @@ def offers_by_user(id_user):
 
 
 @app.route('/averageMark/', methods=['GET'])
+@cross_origin()
 def average_mark():
     """
     Function to get the average of the prediction mark between to date
@@ -823,7 +826,7 @@ def get_accuracy():
 ##############################AUTHETIFICATION
 @app.route('/update_prediction_by_id_offer', methods=['POST'])
 @cross_origin()
-@loginAdminRequired
+@loginRequired
 def update_prediction_by_id_offer():
     data = json.loads(request.data)
     in_base = data.get('in_base', None)
