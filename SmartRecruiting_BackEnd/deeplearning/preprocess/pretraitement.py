@@ -67,6 +67,21 @@ def preprocessAll(file_name) :
     return learning_base
 
 """
+Function to preprocess all the offer from a csv and add them in the database.
+@param fileName : string, the name of the file containing the data to Process
+"""
+def preprocessAll_and_add_to_database(dbManager, file_name) :
+    with open(file_name,encoding='utf-8', mode="r") as f:
+        reader = csv.DictReader(f)
+        i = 1
+        for row in reader:
+            print('preprocess offer ' + str(i))
+            i+=1
+            text = row['Offre initiale'] # Get the text from the initial offer
+            label = row['Formation']
+            add_offer_to_database(dbManager, (text,preprocess(text),label))
+
+"""
 Function to initialize the model and BDD
 Has to be called before using the model for the first time or if the csv containing the base changed
 @return the preprocessed descriptors
@@ -89,8 +104,9 @@ def init(dbManager) :
     model.save("./data/preprocessing_model")
 
     # Put everything in the DB for the first time"
-    base = preprocessAll(filename)
-    add_base_to_database(dbManager,base)
+    preprocessAll_and_add_to_database(dbManager, filename)
+    #base = preprocessAll(filename)
+    #add_base_to_database(dbManager,base)
 
     # Add fields
     filename = './data/fields.csv'
@@ -223,6 +239,21 @@ def add_base_to_database(dbManager, base):
                 idField = get_id_field(dbManager,nameField)
                 if idField!=-1 :
                     dbManager.add_team(idPredic , idField, 1)
+
+"""
+Add one preprocessed offer in the database
+@param offer : list of (text,descriptor,label)
+"""
+def add_offer_to_database(dbManager, offer):
+    adminId = dbManager.get_one_admin().id
+    nameField = offer[2]
+    idOffer = add_an_offer(dbManager, offer, adminId)
+    if idOffer!=-1 :
+        idPredic = dbManager.add_prediction_v2(10.0, True, idOffer)
+        if idPredic!=-1:
+            idField = get_id_field(dbManager,nameField)
+            if idField!=-1 :
+                dbManager.add_team(idPredic , idField, 1)
 
 
 """
