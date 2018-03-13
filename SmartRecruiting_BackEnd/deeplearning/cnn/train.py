@@ -10,22 +10,30 @@ from SmartRecruiting_BackEnd.deeplearning.cnn.textCnn import TextCNN
 import SmartRecruiting_BackEnd.deeplearning.preprocess.pretraitement as pretraitement
 
 
-def train(db_manager):
+def train(db_manager, filter_sizes, num_filters, l2, batch_size, num_epochs):
     """
     Train a convolutional neuronal network and save it in a file in /runs
     @:param: db_manager a manager
     @:return: a boolean
     """
     embedding_dim = 100
-    filter_sizes = "3,4,5"
-    num_filters = 128
-    l2 = 0.0
+    #filter_sizes = "3,4,5"
+    #num_filters = 128
+    #l2 = 0.0
     num_checkpoints = 5
     # dropout_keep_prob = 0.5
     checkpoint_every = 100
     evaluate_every = 100
-    batch_size = 64
-    num_epochs = 200
+    #batch_size = 64
+    #num_epochs = 200
+
+    # embedding_dim = 100
+    # filter_sizes = "3,4,5"
+    # num_filters = 128
+    # l2 = 0.0
+    # dropout_keep_prob = 0.5
+    # batch_size = 64
+    # num_epochs = 200
 
     # get the data from the database
     x, y, dic_cores, nb_classes = get_data_from_database(db_manager)
