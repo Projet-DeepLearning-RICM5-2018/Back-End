@@ -245,17 +245,19 @@ class DatabaseManager():
             dB.rollback()
             return False
 
-    def update_prediction_by_id_offer(self, id_offer, id_field):
+    def update_prediction_by_id_offer(self, id_offer, id_field, in_base):
         offer = Offer.query.get(id_offer)
         if offer is None:
             return None
         else:
             try:
                 prediction = offer.prediction
-                teams = prediction.teams
-                for team in teams:
-                    team.id_field = id_field
-                prediction.inbase == 1
+                if id_field != None :
+                    teams = prediction.teams
+                    for team in teams:
+                        team.id_field = id_field
+                if in_base != None :
+                    prediction.inbase == in_base
                 dB.commit()
                 return True
             except Exception as e:
@@ -285,6 +287,26 @@ class DatabaseManager():
                     prediction.inbase = inbase == 1
                 if id_offer is not None:
                     prediction.idOffer = id_offer
+                dB.commit()
+                return True
+            except Exception as e:
+                dB.rollback()
+                return False
+
+    def update_prediction_by_id_offer(self, id_offer, id_field, in_base):
+        offer = Offer.query.get(id_offer)
+        if offer is None:
+            return None
+        else:
+            try:
+                prediction = offer.prediction
+                if id_field != None :
+                    teams = prediction.teams
+                    for team in teams:
+                        team.id_field = id_field
+                if in_base != None :
+                    prediction.inbase = (in_base == 1)
+                print(prediction.inbase)
                 dB.commit()
                 return True
             except Exception as e:
@@ -385,10 +407,10 @@ class DatabaseManager():
         dB.add(field)
         try:
             dB.commit()
-            return True
+            return field.serialize()
         except Exception as e:
             dB.rollback()
-            return False
+            return None
 
     def add_field_v2(self, name, description, descriptor, website):
         field = Field(name, description, descriptor, website)
@@ -529,11 +551,18 @@ class DatabaseManager():
         return [o.serialize() for o in offers]
 
     def fields_by_offer(self, id_offer):
-        fields = Field.query\
+        fields = Field.query.with_entities(Field.id, Field.name, Prediction.inbase)\
             .join(Team, Team.id_field == Field.id)\
             .join(Prediction, Prediction.id == Team.id_prediction)\
             .filter(Prediction.id_offer == id_offer)
-        return [f.serialize() for f in fields]
+        return [self.serialize_field_in_base(f) for f in fields]
+
+    def serialize_field_in_base(self,item):
+        return {
+            'id': item[0],
+            'name': item[1].decode("utf-8"),
+            'inbase': item[2]
+        }
 
     def offers_by_user(self, id_user):
         offers = Offer.query\
@@ -561,9 +590,15 @@ class DatabaseManager():
         offers = self.recherche_offers_by_date_and_id(begin_date, end_date, id_field)
 
         nb_offer = len(offers)
-        nb_pages = int(nb_offer / nboffre_par_page)+1
+        if nb_offer % nboffre_par_page != 0 :
+            nb_pages = int(nb_offer / nboffre_par_page)+1
+        else :
+            nb_pages = int(nb_offer / nboffre_par_page)
         ind_inf = (num_page_voulue - 1) * nboffre_par_page
         ind_sup = (num_page_voulue * nboffre_par_page)
+        print(ind_inf)
+        print(ind_sup)
+        print(nb_offer)
         list_offre = offers[ind_inf: ind_sup]
         derniere_page = nb_offer < ind_sup #peut etre <=
 
@@ -597,4 +632,3 @@ class DatabaseManager():
             offers = offers.filter(Prediction.date <= end_date, Prediction.date >= begin_date)
 
         return offers.order_by(Offer.id.desc()).all()
-
