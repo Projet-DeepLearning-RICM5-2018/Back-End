@@ -271,6 +271,7 @@ def get_offer(id_offer):
 @loginAdminRequired
 def add_offer():
     """
+    Function to add an offer in the database
     METHOD : POST
     HEADER PARAM  : None
     BODY PARAMS : { "title" : str, "content" : str, "descriptor" : str, "id_user" : int }
@@ -286,6 +287,7 @@ def add_offer():
 @loginRequired
 def add_offer_link_field():
     """
+    Function to add an offer in the database and link it to a field
     METHOD : POST
     HEADER PARAM  : None
     BODY PARAMS : { "title" : str, "content" : str, "id_user" : int, "id_field" : int, "inbase" : bool }
@@ -303,6 +305,7 @@ def add_offer_link_field():
 @loginRequired
 def update_offer(id_offer):
     """
+    Function to update an offer
     METHOD : PUT
     HEADER PARAM  : id_offer :int
     BODY PARAMS : { "title" : str, "content" : str, "descriptor" : str, "id_user" : int }
@@ -415,7 +418,7 @@ def delete_prediction(id_prediction):
     Function to delete a prediction in the database
     :METHOD : DELETE
     :HEADER PARAM  : id_prediction : int
-    :BODY PARAMS :{"mark": int, "inbase": bool, "id_offer": int}
+    :BODY PARAMS :none
     """
     if dbManager.delete_prediction(id_prediction) is None:
         abort(404)
@@ -429,7 +432,7 @@ def delete_prediction(id_prediction):
 def get_teams():
     """
     Function to get all the teams in the database
-    :return: {"predictions":{"mark": int, "inbase": bool, "id_offer": int}}
+    :return: {"team":{"id_prediction": int, "id_field": int, "nb_members": int}}
     """
     return jsonify(dbManager.get_all_teams()), 200
 
@@ -494,7 +497,7 @@ def get_fields():
 def get_fields_name():
     """
     Function to get all the field in the database
-    :return: {"fields":{"name": str, "description": str, "descriptor": str,"website": str}}
+    :return: {"fields":{"id":int, "name": str}}
     """
     return jsonify(dbManager.get_all_fields_name()), 200
 
@@ -504,7 +507,7 @@ def get_field(id_field):
     """
     Function to get a field in the database
     :param id_field: int
-    :return: {"field":{"id": int, "name": str, "description": str, "descriptor": str,"website": str, "contacts":}}
+    :return: {"id": int, "name": str, "description": str, "descriptor": str,"website": str, "contacts":}
     """
     field = dbManager.get_field_by_id(id_field)
     #print(field)
@@ -602,7 +605,7 @@ def get_contact(id_contact):
     """
     Function to get a contact in the database
     :param id_contact: int
-    :return: {"contact":{"name": str, "surname": str, "email": str,"phone": str,"role": str,"id_field": int}}
+    :return: {"name": str, "surname": str, "email": str,"phone": str,"role": str,"id_field": int}
     """
     contact = dbManager.get_contact_by_id(id_contact)
     if contact is None:
@@ -693,7 +696,10 @@ def offers_by_field(id_field):
         return jsonify(offers), 200
 
 
+
 @app.route('/searchFieldsByOffer/<int:id_offer>', methods=['GET'])
+@cross_origin()
+@loginRequired
 def fields_by_offer(id_offer):
     """
     Function to get all the field who correspond to an offer
@@ -713,6 +719,7 @@ def fields_by_offer(id_offer):
 @cross_origin()
 def generatePrediction():
     """
+    Function to get a prediction from an offer
     METHOD : POST
     HEADER PARAM  : None
     BODY PARAMS : { "title" : str, "content" : str }
@@ -737,9 +744,16 @@ def generatePrediction():
 @cross_origin()
 @loginRequired
 def generatePrediction_save():
-    '''
-    not data.descriptor
-    '''
+    """
+    Function to get a prediction from an offer and save it
+    METHOD : POST
+    HEADER PARAM  : None
+    BODY PARAMS : { "title" : str, "content" : str }
+    RETURNS :
+        {
+            "field": { "name": str, "description": str, "descriptor": str, "website": str }
+        }
+    """
     data = json.loads(request.data)
     idfield = FormationByOffer(data['content'])
     #ten = np.zeros(3, int)
@@ -813,6 +827,13 @@ def nb_prediction():
 @cross_origin()
 @loginAdminRequired
 def get_accuracy():
+    """
+    Function to get the accuracy of the system
+    :METHOD : GET
+    :HEADER PARAM  : None
+    :BODY PARAMS : None
+    :return: int
+    """
     nb_test, accuracy = load_eval()
 
     if nb_test is None or accuracy is None:
@@ -826,6 +847,13 @@ def get_accuracy():
 @cross_origin()
 @loginAdminRequired
 def update_prediction_by_id_offer():
+    """
+    Function to update the prediction corresponding to an offer
+    :METHOD : POST
+    :HEADER PARAM  : none
+    :BODY PARAMS : { "id_offer" : int, "id_field" : int }
+    :return: int
+    """
     data = json.loads(request.data)
     if dbManager.update_prediction_by_id_offer(data['id_offer'], data['id_field']):
         return '', 201

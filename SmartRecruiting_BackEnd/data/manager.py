@@ -46,7 +46,6 @@ class DatabaseManager():
             def_eval_flag()
 
 
-
     def get_all_users(self):
         users = User.query.all()
         return [u.serialize() for u in users]
