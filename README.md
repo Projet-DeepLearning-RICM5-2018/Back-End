@@ -47,14 +47,14 @@ Solution 1 : lancer la front et le back sur deux machines différentes
 ## Ajout des données
 
 * Pour l'initialisation il faut ajouter 3 fichiers dans le dossier data :
- * offers.csv
- * fields.csv
- * contacts.csv
+  * offers.csv
+  * fields.csv
+  * contacts.csv
 * Les fichiers doivent être encodés en UTF-8 et les champs doivent être séparés par des virgules
 * Les différents champs des fichiers sont :
- * offers.csv : Formation,Offre initiale
- * fields.csv : name,description,website
- * contacts.csv : name,surname,role,email,phone,field
+  * offers.csv : Formation,Offre initiale
+  * fields.csv : name,description,website
+  * contacts.csv : name,surname,role,email,phone,field
 * La première ligne des fichiers doit comporter le nom des champs
 
 ## Tests unitaires
