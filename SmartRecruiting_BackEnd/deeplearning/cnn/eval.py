@@ -12,18 +12,18 @@ import csv
 import pickle
 from SmartRecruiting_BackEnd.deeplearning.cnn.train import get_data_from_database
 
-def checkPath():
+def check_path():
     """
     Function to get the path of checkpoint
     :return:the path
     """
-    checkPath = open('./data/checkPath', "r").read()
-    print(checkPath)
-    checkpoint_file = tf.train.latest_checkpoint(checkPath)
+    check_path = open('./data/checkPath', "r").read()
+    print(check_path)
+    checkpoint_file = tf.train.latest_checkpoint(check_path)
     return checkpoint_file
 
 
-def getDic():
+def get_dic():
     with open('./data/dic','rb') as fichier:
         mypic = pickle.Unpickler(fichier)
         dic = mypic.load()
@@ -44,7 +44,7 @@ def FormationByOffer(text):
     FLAGS = tf.flags.FLAGS
     x_test = pretraitement.preprocess(text)
     #print(x_test)
-    checkpoint_file=checkPath()
+    checkpoint_file=check_path()
     graph = tf.Graph()
     pred=[]
     s=1
@@ -60,7 +60,6 @@ def FormationByOffer(text):
 
         # Get the placeholders from the graph by name
             input_x = graph.get_operation_by_name("input_x").outputs[0]
-        # input_y = graph.get_operation_by_name("input_y").outputs[0]
             dropout_keep_prob = graph.get_operation_by_name("dropout_keep_prob").outputs[0]
 
         # Tensors we want to evaluate
@@ -70,11 +69,11 @@ def FormationByOffer(text):
         # Generate batches for one epoch
             pred, sc = sess.run([predictions,scores],{input_x:[x_test],dropout_keep_prob: 1.0})
             print(pred)#[2][0]
-    ten = np.zeros(len(getDic()), int)
+    ten = np.zeros(len(get_dic()), int)
     ten[pred[0]] = 1
-    print(getDic())
-    #print(list(getDic().keys())[list(getDic().values()).index(ten)])
-    for idf, arrf in getDic().items():    # for name, age in list.items(): iteritems (for Python 3.x)
+    print(get_dic())
+    #print(list(get_dic().keys())[list(get_dic().values()).index(ten)])
+    for idf, arrf in get_dic().items():    # for name, age in list.items(): iteritems (for Python 3.x)
         if (arrf == ten).all():
             s=idf
             print(idf)
@@ -97,7 +96,7 @@ def eval_all(db_manager) :
     # Evaluation
     # ==================================================
 
-    checkpoint_file = checkPath()
+    checkpoint_file = check_path()
     graph = tf.Graph()
     with graph.as_default():
         session_conf = tf.ConfigProto(
@@ -111,7 +110,6 @@ def eval_all(db_manager) :
 
             # Get the placeholders from the graph by name
             input_x = graph.get_operation_by_name("input_x").outputs[0]
-            input_y = graph.get_operation_by_name("input_y").outputs[0]
             dropout_keep_prob = graph.get_operation_by_name("dropout_keep_prob").outputs[0]
 
             # Tensors we want to evaluate
@@ -133,7 +131,6 @@ def eval_all(db_manager) :
 
     # Print accuracy if y_test is defined
     if y_test is not None:
-        #correct_predictions = float(sum(all_predictions == y_test))
         correct_predictions = 0.0
         for i in range(0, len(all_predictions)):
             print("predicion : {}".format(all_predictions[i]))
