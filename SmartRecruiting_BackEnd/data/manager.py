@@ -474,10 +474,10 @@ class DatabaseManager():
         dB.add(contact)
         try:
             dB.commit()
-            return True
+            return contact.serialize()
         except Exception as e:
             dB.rollback()
-            return False
+            return None
 
     def update_contact(self, id_contact, name, surname, email, phone, role, id_field):
         contact = Contact.query.get(id_contact)
