@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-        #word2vec_path = "./preprocessing_model"
         #word2vec = gensim.models.KeyedVectors.load_word2vec_format(word2vec_path, binary=True)
         #self.base = pretraitement.init()
 import tensorflow as tf

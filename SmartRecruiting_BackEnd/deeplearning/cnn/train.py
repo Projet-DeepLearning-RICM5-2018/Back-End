@@ -21,7 +21,6 @@ def train(db_manager):
     num_filters = 128
     l2 = 0.0
     num_checkpoints = 5
-    # dropout_keep_prob = 0.5
     checkpoint_every = 100
     evaluate_every = 100
     batch_size = 64
@@ -189,7 +188,7 @@ def change_y(dic_cores, y):
     return fields
 
 
-def train_step(x_batch, y_batch, cnn, FLAGS, sess, train_op, global_step, train_summary_op, train_summary_writer):
+def train_step(x_batch, y_batch, cnn, flags, sess, train_op, global_step, train_summary_op, train_summary_writer):
     """
     A single training step
 
@@ -197,7 +196,7 @@ def train_step(x_batch, y_batch, cnn, FLAGS, sess, train_op, global_step, train_
     feed_dict = {
         cnn.input_x: x_batch,
         cnn.input_y: y_batch,
-        cnn.dropout_keep_prob: FLAGS.dropout_keep_prob
+        cnn.dropout_keep_prob: flags.dropout_keep_prob
 
     }
 
