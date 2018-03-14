@@ -53,7 +53,7 @@ Function to preprocess all the offer from a csv.
 @param fileName : string, the name of the file containing the data to Process
 @return [(string,[[float]],string)] list of all offers and their descriptors : (text,descriptor,label)
 """
-def preprocessAll(file_name) :
+def preprocess_all(file_name) :
     learning_base = []
     with open(file_name,encoding='utf-8', mode="r") as f:
         reader = csv.DictReader(f)
@@ -70,7 +70,7 @@ def preprocessAll(file_name) :
 Function to preprocess all the offer from a csv and add them in the database.
 @param fileName : string, the name of the file containing the data to Process
 """
-def preprocessAll_and_add_to_database(dbManager, file_name) :
+def preprocess_all_and_add_to_database(db_manager, file_name) :
     with open(file_name,encoding='utf-8', mode="r") as f:
         reader = csv.DictReader(f)
         i = 1
@@ -79,17 +79,16 @@ def preprocessAll_and_add_to_database(dbManager, file_name) :
             i+=1
             text = row['Offre initiale'] # Get the text from the initial offer
             label = row['Formation']
-            add_offer_to_database(dbManager, (text,preprocess(text),label))
+            add_offer_to_database(db_manager, (text,preprocess(text),label))
 
 """
 Function to initialize the model and BDD
 Has to be called before using the model for the first time or if the csv containing the base changed
 @return the preprocessed descriptors
 """
-def init(dbManager) :
+def init(db_manager) :
     # Input files #
     filename = './data/offers.csv'
-    #filename = './data/Données_RICM_GEO_PRI7.csv'
     sentences = [['x','x','x','x','x']]
     with open(filename,encoding='utf-8', mode="r") as f:
         reader = csv.DictReader(f)
@@ -104,32 +103,30 @@ def init(dbManager) :
     model.save("./data/preprocessing_model")
 
     # Put everything in the DB for the first time"
-    preprocessAll_and_add_to_database(dbManager, filename)
-    #base = preprocessAll(filename)
-    #add_base_to_database(dbManager,base)
+    preprocess_all_and_add_to_database(db_manager, filename)
 
     # Add fields
     filename = './data/fields.csv'
     with open(filename,encoding='utf-8', mode="r") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            set_field_information(dbManager, row['name'], row['description'], row['website'])
+            set_field_information(db_manager, row['name'], row['description'], row['website'])
 
     # Add contacts
     filename = './data/contacts.csv'
     with open(filename,encoding='utf-8', mode="r") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            add_contact(dbManager, row['field'], row['name'], row['surname'], row['role'], row['email'], row['phone'])
+            add_contact(db_manager, row['field'], row['name'], row['surname'], row['role'], row['email'], row['phone'])
 
 
 """
 To reinit the model, and calculate all the descriptors when the DB changed
 So not taking data from the CSV but DB
 """
-def reinit(dbManager) :
+def reinit(db_manager) :
     # Get all offers from dB"
-    offers = dbManager.get_all_offers()
+    offers = db_manager.get_all_offers()
 
     # Rebuild the model #
     sentences = [['x','x','x','x','x']]
@@ -145,7 +142,7 @@ def reinit(dbManager) :
 
     # Recompute all descriptors and put them in the DB #
     res  = recompute_all_descriptors(offers)
-    update_all_offers(dbManager,res)
+    update_all_offers(db_manager,res)
 
 """
 Recompute descriptor for each offer given
@@ -183,7 +180,7 @@ Add a preprocessed offer in the database
 @param offer : (text,descriptor,label) the processed offer
 @return id : int, id of the newly created offer
 """
-def add_an_offer(dbManager, offer, idAdmin) :
+def add_an_offer(db_manager, offer, id_admin) :
     #Make title
     title = offer[0].split(' ')
     title = title[:5]
@@ -192,68 +189,68 @@ def add_an_offer(dbManager, offer, idAdmin) :
     #Make descriptor
     desc = descriptor_to_string(offer[1])
 
-    id = dbManager.add_offer_v2(title, offer[0], desc, idAdmin)
+    id = db_manager.add_offer_v2(title, offer[0], desc, id_admin)
     return id
 
 """
 Update the descriptor of an offer
-@param dbManager
+@param db_manager
 @param offer_id
 @param descriptor
 @return 1 if successful, -1 else.
 """
-def update_descriptor_of_offer_by_id(dbManager,id,descriptor) :
+def update_descriptor_of_offer_by_id(db_manager,id,descriptor) :
     desc = descriptor_to_string(descriptor)
-    if dbManager.update_offer(id,None,None,desc,None) :
+    if db_manager.update_offer(id,None,None,desc,None) :
         return 1
     else :
         return -1
 
 """
 Update all given offers by id (in the DB)
-@param dbManager
+@param db_manager
 @param list : list of (id, descriptors)
 """
-def update_all_offers(dbManager,list) :
+def update_all_offers(db_manager,list) :
     i = 1
     for item in list :
         print('update offer ' + str(i))
         i+=1
-        update_descriptor_of_offer_by_id(dbManager,item['id'],item['desc'])
+        update_descriptor_of_offer_by_id(db_manager,item['id'],item['desc'])
 
 """
 Add all preprocessed offer in the database
 @param offer : list of (text,descriptor,label)
 """
-def add_base_to_database(dbManager, base):
-    adminId = dbManager.get_one_admin().id
+def add_base_to_database(db_manager, base):
+    admin_id = db_manager.get_one_admin().id
     i = 1
     for offer in base :
         print('add to database offer ' + str(i))
         i+=1
-        nameField = offer[2]
-        idOffer = add_an_offer(dbManager, offer, adminId)
-        if idOffer!=-1 :
-            idPredic = dbManager.add_prediction_v2(10.0, True, idOffer)
-            if idPredic!=-1:
-                idField = get_id_field(dbManager,nameField)
-                if idField!=-1 :
-                    dbManager.add_team(idPredic , idField, 1)
+        name_field = offer[2]
+        id_offer = add_an_offer(db_manager, offer, admin_id)
+        if id_offer!=-1 :
+            id_predic = db_manager.add_prediction_v2(10.0, True, id_offer)
+            if id_predic!=-1:
+                id_field = get_id_field(db_manager,name_field)
+                if id_field!=-1 :
+                    db_manager.add_team(id_predic , id_field, 1)
 
 """
 Add one preprocessed offer in the database
 @param offer : list of (text,descriptor,label)
 """
-def add_offer_to_database(dbManager, offer):
-    adminId = dbManager.get_one_admin().id
-    nameField = offer[2]
-    idOffer = add_an_offer(dbManager, offer, adminId)
-    if idOffer!=-1 :
-        idPredic = dbManager.add_prediction_v2(10.0, True, idOffer)
-        if idPredic!=-1:
-            idField = get_id_field(dbManager,nameField)
-            if idField!=-1 :
-                dbManager.add_team(idPredic , idField, 1)
+def add_offer_to_database(db_manager, offer):
+    admin_id = db_manager.get_one_admin().id
+    name_field = offer[2]
+    id_offer = add_an_offer(db_manager, offer, admin_id)
+    if id_offer!=-1 :
+        id_predic = db_manager.add_prediction_v2(10.0, True, id_offer)
+        if id_predic!=-1:
+            id_field = get_id_field(db_manager,name_field)
+            if id_field!=-1 :
+                db_manager.add_team(id_predic , id_field, 1)
 
 
 """
@@ -261,12 +258,12 @@ Add id of the named field or create the field and get the id if the field doesn'
 @param offer : name of the field (string)
 @return id of the offer if succesful, -1 if not
 """
-def get_id_field(dbManager, name)  :
-   field = dbManager.get_field_by_name(name)
+def get_id_field(db_manager, name)  :
+   field = db_manager.get_field_by_name(name)
    if field :
       return field.id
    else :
-      id = dbManager.add_field_v2(name, "", "", "")
+      id = db_manager.add_field_v2(name, "", "", "")
       if id!=-1:
          return id
       else :
@@ -278,19 +275,19 @@ Set information for the field name
 @param description
 @param website
 """
-def set_field_information(dbManager, name, description, website):
-    id = get_id_field(dbManager, name)
-    dbManager.update_field(id, name, description, None, website)
+def set_field_information(db_manager, name, description, website):
+    id = get_id_field(db_manager, name)
+    db_manager.update_field(id, name, description, None, website)
 
 """
 Insert contact in the database
-@param fieldName
+@param field_name
 @param name
 @param surname
 @param role
 @param email
 @param phone
 """
-def add_contact(dbManager, fieldName, name, surname, role, email, phone):
-    id_field = get_id_field(dbManager, fieldName)
-    dbManager.add_contact(name, surname, email, phone, role, id_field)
+def add_contact(db_manager, field_name, name, surname, role, email, phone):
+    id_field = get_id_field(db_manager, field_name)
+    db_manager.add_contact(name, surname, email, phone, role, id_field)
