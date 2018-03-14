@@ -16,7 +16,6 @@ from SmartRecruiting_BackEnd.deeplearning.preprocess.pretraitement import init, 
 import datetime
 
 from sqlalchemy.sql import func
-# from sqlalchemy.orm import join
 
 
 class DatabaseManager():
@@ -63,10 +62,6 @@ class DatabaseManager():
 
     def get_one_admin(self):
         return User.query.filter_by(is_admin=1).first()
-        """if user is None:
-            return None
-        else:
-            return user.serialize()"""
 
 
     def add_user(self, name, surname, role, email, password, is_admin):
