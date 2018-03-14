@@ -10,21 +10,29 @@ from SmartRecruiting_BackEnd.deeplearning.cnn.textCnn import TextCNN
 import SmartRecruiting_BackEnd.deeplearning.preprocess.pretraitement as pretraitement
 
 
-def train(db_manager):
+def train(db_manager, filter_sizes, num_filters, l2, batch_size, num_epochs):
     """
     Train a convolutional neuronal network and save it in a file in /runs
     @:param: db_manager a manager
     @:return: a boolean
     """
     embedding_dim = 100
-    filter_sizes = "3,4,5"
-    num_filters = 128
-    l2 = 0.0
+    #filter_sizes = "3,4,5"
+    #num_filters = 128
+    #l2 = 0.0
     num_checkpoints = 5
     checkpoint_every = 100
     evaluate_every = 100
-    batch_size = 64
-    num_epochs = 200
+    #batch_size = 64
+    #num_epochs = 200
+
+    # embedding_dim = 100
+    # filter_sizes = "3,4,5"
+    # num_filters = 128
+    # l2 = 0.0
+    # dropout_keep_prob = 0.5
+    # batch_size = 64
+    # num_epochs = 200
 
     # get the data from the database
     x, y, dic_cores, nb_classes = get_data_from_database(db_manager)
@@ -122,14 +130,15 @@ def get_data_from_database(db_manager):
     x, y = [], []
     i = 0
     for p in predictions:
-        print(i)
+        #print(i)
         i += 1
         x.append(string_to_descripteur(p[0]))
         y.append(p[1])
 
     dic_cores, nb_classes = create_cores_id_field(db_manager)
     y = change_y(dic_cores, y)
-    print(dic_cores)
+    #print(dic_cores)
+    del predictions
     return x, y, dic_cores, nb_classes
 
 
@@ -204,7 +213,7 @@ def train_step(x_batch, y_batch, cnn, flags, sess, train_op, global_step, train_
         [train_op, global_step, train_summary_op, cnn.loss, cnn.accuracy],
         feed_dict)
     time_str = datetime.datetime.now().isoformat()
-    print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
+   # print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
     train_summary_writer.add_summary(summaries, step)
 
 
