@@ -4,8 +4,6 @@
 Routes and views for the flask application.
 
 """
-
-# import json
 from flask import Flask, jsonify, request, json, session, g
 from flask.json import jsonify
 from flask import render_template, abort, request
@@ -22,7 +20,7 @@ from datetime import datetime
 from SmartRecruiting_BackEnd.deeplearning.cnn.eval import load_eval
 
 
-def createToken(user):
+def create_token(user):
         """
             Create a token for a user with an expiration of 14 days
         """
@@ -35,7 +33,7 @@ def createToken(user):
         return token.decode('unicode_escape')
 
 
-def parseToken(req):
+def parse_token(req):
     """
         Check if the token is correct
     """
@@ -43,7 +41,7 @@ def parseToken(req):
     return decode(token, app.config['TOKEN_SECRET'])
 
 
-def loginRequired(f):
+def login_required(f):
     """
         Decorator for allowing a logged in user to access to the route
     """
@@ -62,7 +60,7 @@ def loginRequired(f):
             return response
 
         try:
-            payload = parseToken(request)
+            payload = parse_token(request)
         except DecodeError:
             response = jsonify(message='Token is invalid')
             response.status_code = 401
@@ -79,7 +77,7 @@ def loginRequired(f):
     return decorated_function
 
 
-def loginAdminRequired(f):
+def login_admin_required(f):
     """
         Decorator for allowing a logged in administrator to access to the route
     """
@@ -98,7 +96,7 @@ def loginAdminRequired(f):
             return response
 
         try:
-            payload = parseToken(request)
+            payload = parse_token(request)
         except DecodeError:
             response = jsonify(message='Token is invalid')
             response.status_code = 401
@@ -120,7 +118,7 @@ def loginAdminRequired(f):
 
 @app.route('/users')
 @cross_origin()
-@loginAdminRequired
+@login_admin_required
 def get_users():
     """
     Function to get all the users
@@ -136,7 +134,7 @@ def get_test_fields() :
 
 @app.route('/users/<int:id_user>')
 @cross_origin()
-@loginAdminRequired
+@login_admin_required
 def get_user(id_user):
     """
     Function to get the user in the database
@@ -152,7 +150,7 @@ def get_user(id_user):
 
 @app.route('/users', methods=['POST'])
 @cross_origin()
-@loginAdminRequired
+@login_admin_required
 def add_user():
     """
     METHOD : POST
@@ -169,7 +167,7 @@ def add_user():
 
 @app.route('/users/<int:id_user>', methods=['PUT'])
 @cross_origin()
-@loginRequired
+@login_required
 def update_user(id_user):
     """
     METHOD : PUT
@@ -198,7 +196,7 @@ def update_user(id_user):
 
 @app.route('/users/<int:id_user>', methods=['DELETE'])
 @cross_origin()
-@loginRequired
+@login_required
 def delete_user(id_user):
     """
     METHOD : DELETE
@@ -212,7 +210,7 @@ def delete_user(id_user):
 
 @app.route('/offers')
 @cross_origin()
-@loginAdminRequired
+@login_admin_required
 def get_offers():
     """
     Function to get all the offers in the database
@@ -222,7 +220,7 @@ def get_offers():
 
 @app.route('/offers/page', methods=['POST'])
 @cross_origin()
-@loginAdminRequired
+@login_admin_required
 def recherche_page():
     """
     Function to get a page of the offers
@@ -252,7 +250,7 @@ def recherche_page():
 
 @app.route('/offers/<int:id_offer>')
 @cross_origin()
-@loginRequired
+@login_required
 def get_offer(id_offer):
     """
     Get the offer of id id_offer
@@ -268,7 +266,7 @@ def get_offer(id_offer):
 
 @app.route('/offers', methods=['POST'])
 @cross_origin()
-@loginAdminRequired
+@login_admin_required
 def add_offer():
     """
     Function to add an offer in the database
@@ -284,7 +282,7 @@ def add_offer():
 
 @app.route('/offers/link', methods=['POST'])
 @cross_origin()
-@loginRequired
+@login_required
 def add_offer_link_field():
     """
     Function to add an offer in the database and link it to a field
@@ -302,7 +300,7 @@ def add_offer_link_field():
 
 @app.route('/offers/<int:id_offer>', methods=['PUT'])
 @cross_origin()
-@loginRequired
+@login_required
 def update_offer(id_offer):
     """
     Function to update an offer
@@ -343,7 +341,7 @@ def delete_offer(id_offer):
 
 @app.route('/predictions')
 @cross_origin()
-@loginAdminRequired
+@login_admin_required
 def get_predictions():
     """
     Function to get all the prediction in the database
@@ -354,7 +352,7 @@ def get_predictions():
 
 @app.route('/predictions/<int:id_offer>')
 @cross_origin()
-@loginRequired
+@login_required
 def get_prediction(id_offer):
     """
     Function to get a prediction in the database
@@ -370,7 +368,7 @@ def get_prediction(id_offer):
 
 @app.route('/predictions', methods=['POST'])
 @cross_origin()
-@loginAdminRequired
+@login_admin_required
 def add_prediction():
     """
     Function to add a prediction in the database
@@ -387,7 +385,7 @@ def add_prediction():
 
 @app.route('/predictions/<int:id_prediction>', methods=['PUT'])
 @cross_origin()
-@loginAdminRequired
+@login_admin_required
 def update_prediction(id_prediction):
     """
     Function to update a prediction in the database
@@ -412,7 +410,7 @@ def update_prediction(id_prediction):
 
 @app.route('/predictions/<int:id_prediction>', methods=['DELETE'])
 @cross_origin()
-@loginAdminRequired
+@login_admin_required
 def delete_prediction(id_prediction):
     """
     Function to delete a prediction in the database
@@ -428,7 +426,7 @@ def delete_prediction(id_prediction):
 
 @app.route('/teams')
 @cross_origin()
-@loginAdminRequired
+@login_admin_required
 def get_teams():
     """
     Function to get all the teams in the database
@@ -520,7 +518,7 @@ def get_field(id_field):
 
 @app.route('/fields', methods=['POST'])
 @cross_origin()
-@loginAdminRequired
+@login_admin_required
 def add_field():
     """
     Function to add a field in the database
@@ -547,7 +545,7 @@ def add_field():
 
 @app.route('/fields/<int:id_field>', methods=['PUT'])
 @cross_origin()
-@loginAdminRequired
+@login_admin_required
 def update_field(id_field):
     """
     Function to update a field in the database
@@ -572,7 +570,7 @@ def update_field(id_field):
 
 @app.route('/fields/<int:id_field>', methods=['DELETE'])
 @cross_origin()
-@loginAdminRequired
+@login_admin_required
 def delete_field(id_field):
     """
     Function to delete a field in the database
@@ -587,7 +585,7 @@ def delete_field(id_field):
 
 @app.route('/contacts')
 @cross_origin()
-@loginAdminRequired
+@login_admin_required
 def get_contacts():
     """
     Function to get all the contact in the database
@@ -598,7 +596,7 @@ def get_contacts():
 
 @app.route('/contacts/<int:id_contact>')
 @cross_origin()
-@loginRequired
+
 def get_contact(id_contact):
     """
     Function to get a contact in the database
@@ -614,7 +612,7 @@ def get_contact(id_contact):
 
 @app.route('/contacts', methods=['POST'])
 @cross_origin()
-@loginAdminRequired
+@login_admin_required
 def add_contact():
     """
     Function to add a contact in the database
@@ -636,7 +634,7 @@ def add_contact():
 
 @app.route('/contacts/<int:id_contact>', methods=['PUT'])
 @cross_origin()
-@loginAdminRequired
+@login_admin_required
 def update_contact(id_contact):
     """
     Function to update a contact in the database
@@ -663,7 +661,7 @@ def update_contact(id_contact):
 
 @app.route('/contacts/<int:id_contact>', methods=['DELETE'])
 @cross_origin()
-@loginAdminRequired
+@login_admin_required
 def delete_contact(id_contact):
     """
     Function to delete a contact in the database
@@ -698,7 +696,7 @@ def offers_by_field(id_field):
 
 @app.route('/searchFieldsByOffer/<int:id_offer>', methods=['GET'])
 @cross_origin()
-@loginRequired
+@login_required
 def fields_by_offer(id_offer):
     """
     Function to get all the field who correspond to an offer
@@ -716,7 +714,7 @@ def fields_by_offer(id_offer):
 
 @app.route('/generatePrediction', methods=['POST'])
 @cross_origin()
-def generatePrediction():
+def generate_prediction():
     """
     Function to get a prediction from an offer
     METHOD : POST
@@ -741,8 +739,8 @@ def generatePrediction():
 
 @app.route('/SaveGeneratePrediction', methods=['POST'])
 @cross_origin()
-@loginRequired
-def generatePrediction_save():
+@login_required
+def generate_prediction_save():
     """
     Function to get a prediction from an offer and save it
     METHOD : POST
@@ -755,8 +753,6 @@ def generatePrediction_save():
     """
     data = json.loads(request.data)
     idfield = FormationByOffer(data['content'])
-    #ten = np.zeros(3, int)
-    #ten[idfield] = 1
     field = dbManager.get_field_by_id(idfield)
     dbManager.add_offer(data['title'], data['content'], data['descriptor'], data['id_user'])
     if field is None:
@@ -805,7 +801,7 @@ def average_mark():
 
 @app.route('/nbPrediction/', methods=['GET'])
 @cross_origin()
-@loginAdminRequired
+@login_admin_required
 def nb_prediction():
     """
     Function to get the number of prediction between two date
@@ -826,7 +822,7 @@ def nb_prediction():
 
 @app.route('/accuracy', methods=['GET'])
 @cross_origin()
-@loginAdminRequired
+@login_admin_required
 def get_accuracy():
     """
     Function to get the accuracy of the system
@@ -846,7 +842,7 @@ def get_accuracy():
 ##############################AUTHETIFICATION
 @app.route('/update_prediction_by_id_offer', methods=['POST'])
 @cross_origin()
-@loginRequired
+@login_required
 def update_prediction_by_id_offer():
     """
     Function to update the prediction corresponding to an offer
@@ -893,7 +889,7 @@ def signup():
     if dbManager.add_user(data["name"], data["surname"], data["role"], data['email'], password, False):
         session['logged_in'] = True
         user = dbManager.get_user_by_email(data["email"])
-        return jsonify(user = user.serialize(), token=createToken(user)), 200
+        return jsonify(user = user.serialize(), token=create_token(user)), 200
     else:
         abort(400)
 
@@ -922,14 +918,14 @@ def login():
 
     if user.password == hashpw(password, user.password):
         session['logged_in'] = True
-        return jsonify(user = user.serialize(), token=createToken(user)), 200
+        return jsonify(user = user.serialize(), token=create_token(user)), 200
     else:
         return jsonify(error="Wrong name or password"), 400
 
 
 @app.route('/auth/logout', methods=['POST'])
 @cross_origin()
-@loginRequired
+@login_required
 def logout():
     """
     METHOD : POST

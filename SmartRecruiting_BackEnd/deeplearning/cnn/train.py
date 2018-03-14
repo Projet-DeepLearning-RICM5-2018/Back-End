@@ -131,14 +131,15 @@ def get_data_from_database(db_manager):
     x, y = [], []
     i = 0
     for p in predictions:
-        print(i)
+        #print(i)
         i += 1
         x.append(string_to_descripteur(p[0]))
         y.append(p[1])
 
     dic_cores, nb_classes = create_cores_id_field(db_manager)
     y = change_y(dic_cores, y)
-    print(dic_cores)
+    #print(dic_cores)
+    del predictions
     return x, y, dic_cores, nb_classes
 
 
@@ -213,7 +214,7 @@ def train_step(x_batch, y_batch, cnn, FLAGS, sess, train_op, global_step, train_
         [train_op, global_step, train_summary_op, cnn.loss, cnn.accuracy],
         feed_dict)
     time_str = datetime.datetime.now().isoformat()
-    print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
+   # print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
     train_summary_writer.add_summary(summaries, step)
 
 
