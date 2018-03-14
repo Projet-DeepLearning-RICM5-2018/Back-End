@@ -17,11 +17,17 @@
 
 ## Installation
 
-/*TODO*/
+* Installer mysql-server et le lancer (pour le choix du nom d'utilisateur et du mot de passe il faut que ça corresponde avec le fichier SmartRecruiting_BackEnd/data/database.py
+* Pas besoin de créer les tables, elles seront crées automatiquement en lançant l'application
+* Installer Python 3 et pip
+* Installer les packages nécessaires : pip install -r requirements.txt
 
 ## Lancement
 
-/*TODO*/
+* Pour lancer le serveur : python runserver.py
+* Paramètres à ajouter :
+  * -i, --init : initialiser le modèle et la base de données
+  * -r, --reinit : réinitialiser le modèle à partir de la base de données
 
 ## Déploiement
 
@@ -37,3 +43,8 @@ Wifi campus n'autorise que le port 80 et 8080. Ainis si le back tourne sur le po
 Solution 1 : lancer la front et le back sur deux machines différentes
 
 :::
+
+## Tests unitaires
+
+* Pour lancer un script de tests en particulier : python SmartRecruiting_BackEnd/tests/script_test.py
+* Pour lancer tous les tests unitaires : nose2
