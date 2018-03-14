@@ -228,7 +228,7 @@ def recherche_page():
     Function to get a page of the offers
     :METHOD : GET
     :HEADER PARAM  : none
-    :BODY PARAMS : {"nb_offre": int ,"num_page":int}
+    :BODY PARAMS : {"nb_offre": int ,"num_page":int, "begin_date": date, "end_date": date, "id_field": int}
     :return: number of the page, number total of page, a boolean to say
     if the page is the last, and the list of the offers
     """
@@ -803,20 +803,21 @@ def average_mark():
         return jsonify(mark), 200
 
 
-@app.route('/nbPrediction/', methods=['GET'])
+@app.route('/nbPrediction', methods=['POST'])
 @cross_origin()
 @loginAdminRequired
 def nb_prediction():
     """
     Function to get the number of prediction between two date
     :METHOD : GET
-    :HEADER PARAM  : {"begin_date": date,"end_date":date}
-    :BODY PARAMS : none
+    :HEADER PARAM  : none
+    :BODY PARAMS : {"begin_date": date,"end_date":date}
     :return: int
     """
-    begin_date = request.args.get('begin_date')
+    data = json.loads(request.data)
+    begin_date = data.get('begin_date', None)
+    end_date = data.get('end_date',None)
     begin_date = datetime.strptime(begin_date, "%Y-%m-%d").date()
-    end_date = request.args.get('end_date')
     end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
     number = dbManager.nb_prediction(begin_date, end_date)
     if number is None:
