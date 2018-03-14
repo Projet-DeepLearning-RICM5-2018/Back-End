@@ -28,14 +28,10 @@ class DatabaseManager():
         init_db()
 
         filter_sizes ="3,4,5"
-
         num_filters = 128
         l2 = 0.0
-
         batch_size = 64
         num_epochs = 200
-
-
 
         if(app.config['INIT']):
             if self.get_one_admin() is None:
@@ -48,55 +44,12 @@ class DatabaseManager():
         def_flags()
         if(app.config['INIT'] or app.config['REINIT']):
             print ("-------------------------------------train ----------------------------------------")
-            #train(self, filter_sizes, num_filters, l2, batch_size, num_epochs)
-            #def_eval_flag()
-            #nb_test, accuracy = eval_all(self)
-            #save_eval(nb_test, accuracy)
-            self.hyperparameters()
+            train(self, filter_sizes, num_filters, l2, batch_size, num_epochs)
+            def_eval_flag()
+            nb_test, accuracy = eval_all(self)
+            save_eval(nb_test, accuracy)
         else :
             def_eval_flag()
-
-    def hyperparameters(self):
-
-        l_num_filters = (50, 100, 150, 200, 225, 250, 300)
-        num_filters = 128
-
-        l2 = 0.0
-        l_l2 = (0.0, 0.25, 0.5)
-
-        batch_size = 64
-        l_batch_size = (25, 50, 75)
-
-        num_epochs = 200
-        l_num_epoch = (100, 150, 200)
-
-        l_filter_sizes = ("2,3,4", "3,4,5")
-        filter_sizes = "3,4,5"
-
-        def_eval_flag()
-        mon_fichier = open("hyperparametre.txt", "w")
-
-        mon_fichier.write("Variation num filter:\n")
-        for num_filters in l_num_filters:
-            train(self, filter_sizes, num_filters, l2, batch_size, num_epochs)
-            nb_test, accuracy = eval_all(self)
-            mon_fichier.write("num_filters : {}, accuracy: {}\n".format(num_filters, accuracy))
-
-
-        mon_fichier.write("Variation l2:\n")
-        for l in l_l2:
-            train(self, filter_sizes, num_filters, l, batch_size, num_epochs)
-            nb_test, accuracy = eval_all(self)
-            mon_fichier.write("l2 : {}, accuracy: {}\n".format(l, accuracy))
-
-
-        mon_fichier.write("Variation filter size:\n")
-        for f in l_filter_sizes:
-            train(self, f, num_filters, l2, batch_size, num_epochs)
-            nb_test, accuracy = eval_all(self)
-            mon_fichier.write("filter_size : {}, accuracy: {}\n".format(f, accuracy))
-
-        mon_fichier.close()
 
     def get_all_users(self):
         users = User.query.all()
