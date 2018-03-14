@@ -26,6 +26,13 @@ class DatabaseManager():
         """
         print("Init BD")
         init_db()
+
+        filter_sizes ="3,4,5"
+        num_filters = 128
+        l2 = 0.0
+        batch_size = 64
+        num_epochs = 200
+
         if(app.config['INIT']):
             if self.get_one_admin() is None:
                 self.add_user("monsieur", "administrateur", "admin", "admin@", "root", 1)
@@ -37,13 +44,12 @@ class DatabaseManager():
         def_flags()
         if(app.config['INIT'] or app.config['REINIT']):
             print ("-------------------------------------train ----------------------------------------")
-            train(self)
+            train(self, filter_sizes, num_filters, l2, batch_size, num_epochs)
             def_eval_flag()
             nb_test, accuracy = eval_all(self)
             save_eval(nb_test, accuracy)
         else :
             def_eval_flag()
-
 
     def get_all_users(self):
         users = User.query.all()
