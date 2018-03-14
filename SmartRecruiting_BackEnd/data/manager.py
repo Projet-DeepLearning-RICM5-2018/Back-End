@@ -146,7 +146,6 @@ class DatabaseManager():
             dB.commit()
             return True
         except Exception as e:
-            print(e)
             dB.rollback()
             return False
 
@@ -157,7 +156,6 @@ class DatabaseManager():
             dB.commit()
             return offer.id
         except Exception as e:
-            print(e)
             dB.rollback()
             return -1
 
@@ -199,10 +197,8 @@ class DatabaseManager():
             return None
         else:
             prediction = Prediction.query.filter_by(id_offer=id_offer).first()
-            print(prediction)
             if prediction is not None:
                 team = Team.query.filter_by(id_prediction=prediction.id).first()
-                print(team)
                 if team is not None:
                     dB.delete(team)
                 dB.delete(prediction)
@@ -306,7 +302,6 @@ class DatabaseManager():
                         team.id_field = id_field
                 if in_base != None :
                     prediction.inbase = (in_base == 1)
-                print(prediction.inbase)
                 dB.commit()
                 return True
             except Exception as e:
@@ -596,9 +591,6 @@ class DatabaseManager():
             nb_pages = int(nb_offer / nboffre_par_page)
         ind_inf = (num_page_voulue - 1) * nboffre_par_page
         ind_sup = (num_page_voulue * nboffre_par_page)
-        print(ind_inf)
-        print(ind_sup)
-        print(nb_offer)
         list_offre = offers[ind_inf: ind_sup]
         derniere_page = nb_offer < ind_sup #peut etre <=
 
