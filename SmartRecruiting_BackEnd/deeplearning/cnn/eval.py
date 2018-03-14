@@ -47,6 +47,7 @@ def FormationByOffer(text):
     checkpoint_file=checkPath()
     graph = tf.Graph()
     pred=[]
+    s=1
     with graph.as_default():
         session_conf = tf.ConfigProto(
           allow_soft_placement=FLAGS.allow_soft_placement,
@@ -75,8 +76,10 @@ def FormationByOffer(text):
     #print(list(getDic().keys())[list(getDic().values()).index(ten)])
     for idf, arrf in getDic().items():    # for name, age in list.items(): iteritems (for Python 3.x)
         if (arrf == ten).all():
+            s=idf
             print(idf)
-    return idf
+            print(s)
+    return s
 
 
 def eval_all(db_manager) :
