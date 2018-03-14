@@ -16,7 +16,7 @@ install: "pip install -r requirements.txt"
 
 before_script:
   - coverage run SmartRecruiting_BackEnd/tests/test_user.py
-  - coverage run SmartRecruiting_BackEnd/tests/test_pretraitement.py
+#  - coverage run SmartRecruiting_BackEnd/tests/test_pretraitement.py
   - coverage run SmartRecruiting_BackEnd/tests/test_offer.py
   - coverage xml -i
 script:
